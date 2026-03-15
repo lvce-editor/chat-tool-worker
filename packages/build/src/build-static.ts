@@ -9,7 +9,7 @@ const sharedProcessUrl = pathToFileURL(sharedProcessPath).toString()
 
 const sharedProcess = await import(sharedProcessUrl)
 
-process.env.PATH_PREFIX = '/chat-network-worker'
+process.env.PATH_PREFIX = '/chat-tool-worker'
 const { commitHash } = await sharedProcess.exportStatic({
   root,
   extensionPath: '',
@@ -24,7 +24,7 @@ export const getRemoteUrl = (path: string): string => {
 }
 
 const content = await readFile(rendererWorkerPath, 'utf8')
-const chatNetworkWorkerPath = join(root, '.tmp/dist-chat-network-worker/dist/chatNetworkWorkerMain.js')
+const chatNetworkWorkerPath = join(root, '.tmp/dist-chat-tool-worker/dist/chatNetworkWorkerMain.js')
 
 const replaceRemoteUrlWithAssetUrl = (
   currentContent: string,
@@ -45,13 +45,7 @@ const ${variableName} = \`${remoteUrl}\``
 }
 
 let newContent = content
-newContent = replaceRemoteUrlWithAssetUrl(
-  newContent,
-  'chatNetworkWorkerUrl',
-  'chat-network-worker',
-  'chatNetworkWorkerMain.js',
-  chatNetworkWorkerPath,
-)
+newContent = replaceRemoteUrlWithAssetUrl(newContent, 'chatNetworkWorkerUrl', 'chat-tool-worker', 'chatNetworkWorkerMain.js', chatNetworkWorkerPath)
 
 if (newContent === content) {
   throw new Error('occurrence not found')

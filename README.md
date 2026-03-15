@@ -1,3 +1,3 @@
-# Chat Network Worker
+# Chat Tool Worker
 
-WebWorker for the Chat Network functionality in Lvce Editor.
+WebWorker for the Chat Tool functionality in Lvce Editor.
