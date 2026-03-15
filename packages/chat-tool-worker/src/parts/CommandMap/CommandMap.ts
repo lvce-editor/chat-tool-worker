@@ -1,7 +1,9 @@
+import { executeChatTool } from '../ExecuteChatTool/ExecuteChatTool.ts'
+import { getBasicChatTools } from '../GetBasicChatTools/GetBasicChatTools.ts'
 import { handleMessagePort } from '../HandleMessagePort/HandleMessagePort.ts'
-import * as ToolCommandMap from './ToolCommandMap.ts'
 
 export const commandMap = {
-  ...ToolCommandMap.toolCommandMap,
+  'ChatTool.execute': executeChatTool,
+  'ChatTool.getTools': getBasicChatTools,
   'HandleMessagePort.handleMessagePort': handleMessagePort,
 }
