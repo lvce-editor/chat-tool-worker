@@ -1,0 +1,18 @@
+{
+  "files": [],
+  "include": [],
+  "references": [
+    {
+      "path": "./packages/chat-tool-worker"
+    },
+    {
+      "path": "./packages/build"
+    },
+    {
+      "path": "./packages/server"
+    },
+    {
+      "path": "./packages/e2e"
+    }
+  ]
+}
