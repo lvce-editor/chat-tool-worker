@@ -1,12 +1,9 @@
 import { RendererWorker } from '@lvce-editor/rpc-registry'
 import type { ExecuteToolOptions } from '../Types/Types.ts'
 import { getToolErrorPayload } from '../GetToolErrorPayload/GetToolErrorPayload.ts'
+import { isAbsoluteUri } from '../IsAbsoluteUri/IsAbsoluteUri.ts'
 import { isPathTraversalAttempt } from '../IsPathTraversalAttempt/IsPathTraversalAttempt.ts'
 import { normalizeRelativePath } from '../NormalizeRelativePath/NormalizeRelativePath.ts'
-
-const isAbsoluteUri = (value: string): boolean => {
-  return /^[a-zA-Z][a-zA-Z0-9+.-]*:\/\//.test(value)
-}
 
 export const executeReadFileTool = async (args: Readonly<Record<string, unknown>>, _options: ExecuteToolOptions): Promise<string> => {
   const uri = typeof args.uri === 'string' ? args.uri : ''

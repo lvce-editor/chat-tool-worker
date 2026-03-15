@@ -1,10 +1,7 @@
 import { RendererWorker } from '@lvce-editor/rpc-registry'
 import type { ExecuteToolOptions } from '../Types/Types.ts'
 import { getToolErrorPayload } from '../GetToolErrorPayload/GetToolErrorPayload.ts'
-
-const isAbsoluteUri = (value: string): boolean => {
-  return /^[a-zA-Z][a-zA-Z0-9+.-]*:\/\//.test(value)
-}
+import { isAbsoluteUri } from '../IsAbsoluteUri/IsAbsoluteUri.ts'
 
 export const executeListFilesTool = async (args: Readonly<Record<string, unknown>>, _options: ExecuteToolOptions): Promise<string> => {
   const uri = typeof args.uri === 'string' ? args.uri : ''
