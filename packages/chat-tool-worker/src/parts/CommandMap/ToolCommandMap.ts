@@ -1,5 +1,3 @@
-import { handleToolCall } from '../HandleToolCall/HandleToolCall.ts'
+import { executeChatTool } from '../ExecuteChatTool/ExecuteChatTool.ts'
 
 export const toolCommandMap = {
-  'ChatTool.handleToolCall': handleToolCall,
-}
