@@ -1,7 +1,7 @@
 import { handleMessagePort } from '../HandleMessagePort/HandleMessagePort.ts'
-import * as NetworkCommandMap from './NetworkCommandMap.ts'
+import * as ToolCommandMap from './ToolCommandMap.ts'
 
 export const commandMap = {
-  ...NetworkCommandMap.networkCommandMap,
+  ...ToolCommandMap.toolCommandMap,
   'HandleMessagePort.handleMessagePort': handleMessagePort,
 }
