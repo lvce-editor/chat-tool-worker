@@ -24,7 +24,7 @@ const getReadFileTool = (): ChatTool => {
 const getWriteFileTool = (): ChatTool => {
   return {
     function: {
-      description: 'Write UTF-8 text content to a file inside the currently open workspace folder.',
+      description: 'Write UTF-8 text content to a file inside the currently open workspace folder. Only pass an absolute URI.',
       name: 'write_file',
       parameters: {
         additionalProperties: false,
@@ -33,12 +33,12 @@ const getWriteFileTool = (): ChatTool => {
             description: 'New UTF-8 text content to write to the file.',
             type: 'string',
           },
-          path: {
-            description: 'Relative file path within the workspace (for example: src/index.ts).',
+          uri: {
+            description: 'Absolute file URI within the workspace (for example: file:///workspace/src/index.ts).',
             type: 'string',
           },
         },
-        required: ['path', 'content'],
+        required: ['uri', 'content'],
         type: 'object',
       },
     },
