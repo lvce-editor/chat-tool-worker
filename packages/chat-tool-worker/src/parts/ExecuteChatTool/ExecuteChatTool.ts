@@ -1,4 +1,4 @@
-import type { ExecuteToolOptions } from '../Types/Types.ts'
+import type { ExecuteToolOptions, ToolResponse } from '../Types/Types.ts'
 import { executeClosePreviewTool } from '../ExecuteClosePreviewTool/ExecuteClosePreviewTool.ts'
 import { executeGetWorkspaceUriTool } from '../ExecuteGetWorkspaceUriTool/ExecuteGetWorkspaceUriTool.ts'
 import { executeListFilesTool } from '../ExecuteListFilesTool/ExecuteListFilesTool.ts'
@@ -8,7 +8,7 @@ import { executeRenderHtmlTool } from '../ExecuteRenderHtmlTool/ExecuteRenderHtm
 import { executeWriteFileTool } from '../ExecuteWriteFileTool/ExecuteWriteFileTool.ts'
 import { parseToolArguments } from '../ParseToolArguments/ParseToolArguments.ts'
 
-export const executeChatTool = async (name: string, rawArguments: unknown, options: ExecuteToolOptions): Promise<string> => {
+export const executeChatTool = async (name: string, rawArguments: unknown, options: ExecuteToolOptions): Promise<ToolResponse> => {
   const args = parseToolArguments(rawArguments)
   if (name === 'read_file') {
     return executeReadFileTool(args, options)
@@ -38,5 +38,5 @@ export const executeChatTool = async (name: string, rawArguments: unknown, optio
     return executeClosePreviewTool(args, options)
   }
 
-  return JSON.stringify({ error: `Unknown tool: ${name}` })
+  return { error: `Unknown tool: ${name}` }
 }
