@@ -112,6 +112,50 @@ const getRenderHtmlTool = (): ChatTool => {
   }
 }
 
+const getOpenPreviewTool = (): ChatTool => {
+  return {
+    function: {
+      description: 'Open the right-side preview for an HTML file URI inside the currently open workspace folder.',
+      name: 'open_preview',
+      parameters: {
+        additionalProperties: false,
+        properties: {
+          uri: {
+            description: 'Absolute HTML file URI within the workspace (for example: file:///workspace/index.html).',
+            type: 'string',
+          },
+        },
+        required: ['uri'],
+        type: 'object',
+      },
+    },
+    type: 'function',
+  }
+}
+
+const getClosePreviewTool = (): ChatTool => {
+  return {
+    function: {
+      description: 'Close the right-side preview if it is currently open.',
+      name: 'close_preview',
+      parameters: {
+        additionalProperties: false,
+        properties: {},
+        type: 'object',
+      },
+    },
+    type: 'function',
+  }
+}
+
 export const getBasicChatTools = (): readonly ChatTool[] => {
-  return [getReadFileTool(), getWriteFileTool(), getListFilesTool(), getGetWorkspaceUriTool(), getRenderHtmlTool()]
+  return [
+    getReadFileTool(),
+    getWriteFileTool(),
+    getListFilesTool(),
+    getGetWorkspaceUriTool(),
+    getRenderHtmlTool(),
+    getOpenPreviewTool(),
+    getClosePreviewTool(),
+  ]
 }

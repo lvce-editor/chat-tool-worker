@@ -1,6 +1,8 @@
 import type { ExecuteToolOptions } from '../Types/Types.ts'
+import { executeClosePreviewTool } from '../ExecuteClosePreviewTool/ExecuteClosePreviewTool.ts'
 import { executeGetWorkspaceUriTool } from '../ExecuteGetWorkspaceUriTool/ExecuteGetWorkspaceUriTool.ts'
 import { executeListFilesTool } from '../ExecuteListFilesTool/ExecuteListFilesTool.ts'
+import { executeOpenPreviewTool } from '../ExecuteOpenPreviewTool/ExecuteOpenPreviewTool.ts'
 import { executeReadFileTool } from '../ExecuteReadFileTool/ExecuteReadFileTool.ts'
 import { executeRenderHtmlTool } from '../ExecuteRenderHtmlTool/ExecuteRenderHtmlTool.ts'
 import { executeWriteFileTool } from '../ExecuteWriteFileTool/ExecuteWriteFileTool.ts'
@@ -26,6 +28,14 @@ export const executeChatTool = async (name: string, rawArguments: unknown, optio
 
   if (name === 'render_html') {
     return executeRenderHtmlTool(args, options)
+  }
+
+  if (name === 'open_preview') {
+    return executeOpenPreviewTool(args, options)
+  }
+
+  if (name === 'close_preview') {
+    return executeClosePreviewTool(args, options)
   }
 
   return JSON.stringify({ error: `Unknown tool: ${name}` })
