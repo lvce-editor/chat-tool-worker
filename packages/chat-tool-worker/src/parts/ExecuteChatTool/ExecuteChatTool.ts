@@ -1,6 +1,7 @@
 import type { ExecuteToolOptions, ToolResponse } from '../Types/Types.ts'
 import { executeClosePreviewTool } from '../ExecuteClosePreviewTool/ExecuteClosePreviewTool.ts'
 import { executeGetWorkspaceUriTool } from '../ExecuteGetWorkspaceUriTool/ExecuteGetWorkspaceUriTool.ts'
+import { executeOpenEditorTool } from '../ExecuteOpenEditorTool/ExecuteOpenEditorTool.ts'
 import { executeListFilesTool } from '../ExecuteListFilesTool/ExecuteListFilesTool.ts'
 import { executeOpenPreviewTool } from '../ExecuteOpenPreviewTool/ExecuteOpenPreviewTool.ts'
 import { executeReadFileTool } from '../ExecuteReadFileTool/ExecuteReadFileTool.ts'
@@ -32,6 +33,10 @@ export const executeChatTool = async (name: string, rawArguments: unknown, optio
 
   if (name === 'open_preview') {
     return executeOpenPreviewTool(args, options)
+  }
+
+  if (name === 'openEditor') {
+    return executeOpenEditorTool(args, options)
   }
 
   if (name === 'close_preview') {
