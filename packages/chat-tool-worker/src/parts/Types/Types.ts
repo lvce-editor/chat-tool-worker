@@ -16,3 +16,5 @@ export type ExecuteToolOptions = {
   readonly assetDir: string
   readonly platform: number
 }
+
+export type ToolResponse = Readonly<Record<string, unknown>>

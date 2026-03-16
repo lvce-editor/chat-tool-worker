@@ -1,12 +1,12 @@
 import { RendererWorker } from '@lvce-editor/rpc-registry'
-import type { ExecuteToolOptions } from '../Types/Types.ts'
+import type { ExecuteToolOptions, ToolResponse } from '../Types/Types.ts'
 import { getToolErrorPayload } from '../GetToolErrorPayload/GetToolErrorPayload.ts'
 
-export const executeGetWorkspaceUriTool = async (_args: Readonly<Record<string, unknown>>, _options: ExecuteToolOptions): Promise<string> => {
+export const executeGetWorkspaceUriTool = async (_args: Readonly<Record<string, unknown>>, _options: ExecuteToolOptions): Promise<ToolResponse> => {
   try {
     const workspaceUri = await RendererWorker.getWorkspacePath()
-    return JSON.stringify({ workspaceUri })
+    return { workspaceUri }
   } catch (error) {
-    return JSON.stringify(getToolErrorPayload(error))
+    return getToolErrorPayload(error)
   }
 }
