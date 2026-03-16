@@ -1,20 +1,25 @@
 import { RendererWorker } from '@lvce-editor/rpc-registry'
 import type { ExecuteToolOptions } from '../Types/Types.ts'
 import { getToolErrorPayload } from '../GetToolErrorPayload/GetToolErrorPayload.ts'
-import { isPathTraversalAttempt } from '../IsPathTraversalAttempt/IsPathTraversalAttempt.ts'
-import { normalizeRelativePath } from '../NormalizeRelativePath/NormalizeRelativePath.ts'
+import { isAbsoluteUri } from '../IsAbsoluteUri/IsAbsoluteUri.ts'
 
 export const executeWriteFileTool = async (args: Readonly<Record<string, unknown>>, _options: ExecuteToolOptions): Promise<string> => {
-  const filePath = typeof args.path === 'string' ? args.path : ''
+  const uri = typeof args.uri === 'string' ? args.uri : ''
   const content = typeof args.content === 'string' ? args.content : ''
-  if (!filePath || isPathTraversalAttempt(filePath)) {
-    return JSON.stringify({ error: 'Access denied: path must be relative and stay within the open workspace folder.' })
+  if (!uri || !isAbsoluteUri(uri)) {
+    return JSON.stringify({ error: 'Invalid argument: uri must be an absolute URI.' })
   }
-  const normalizedPath = normalizeRelativePath(filePath)
+
   try {
-    await RendererWorker.writeFile(normalizedPath, content)
-    return JSON.stringify({ ok: true, path: normalizedPath })
+    new URL(uri)
+  } catch {
+    return JSON.stringify({ error: 'Invalid argument: invalid URL.' })
+  }
+
+  try {
+    await RendererWorker.writeFile(uri, content)
+    return JSON.stringify({ ok: true, uri })
   } catch (error) {
-    return JSON.stringify({ ...getToolErrorPayload(error), path: normalizedPath })
+    return JSON.stringify({ ...getToolErrorPayload(error), uri })
   }
 }
