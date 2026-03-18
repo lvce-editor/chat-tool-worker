@@ -6,6 +6,7 @@ import { executeOpenEditorTool } from '../ExecuteOpenEditorTool/ExecuteOpenEdito
 import { executeOpenPreviewTool } from '../ExecuteOpenPreviewTool/ExecuteOpenPreviewTool.ts'
 import { executeReadFileTool } from '../ExecuteReadFileTool/ExecuteReadFileTool.ts'
 import { executeRenderHtmlTool } from '../ExecuteRenderHtmlTool/ExecuteRenderHtmlTool.ts'
+import { executeSearchTextTool } from '../ExecuteSearchTextTool/ExecuteSearchTextTool.ts'
 import { executeWriteFileTool } from '../ExecuteWriteFileTool/ExecuteWriteFileTool.ts'
 import { parseToolArguments } from '../ParseToolArguments/ParseToolArguments.ts'
 
@@ -41,6 +42,10 @@ export const executeChatTool = async (name: string, rawArguments: unknown, optio
 
   if (name === 'close_preview') {
     return executeClosePreviewTool(args, options)
+  }
+
+  if (name === 'search_text') {
+    return executeSearchTextTool(args, options)
   }
 
   return { error: `Unknown tool: ${name}` }
