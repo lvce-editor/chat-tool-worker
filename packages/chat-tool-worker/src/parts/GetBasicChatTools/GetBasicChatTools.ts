@@ -25,7 +25,7 @@ const getWriteFileTool = (): ChatTool => {
   return {
     function: {
       description:
-        'Write UTF-8 text content to a file. Only pass an absolute file URI (`file://...`). Do not pass a relative path and do not use a `path` argument.',
+        'Write UTF-8 text content to a file for an absolute URI (for example `file://...`, `memfs://...`, or extension-provided file system URIs). Do not pass a relative path and do not use a `path` argument.',
       name: 'write_file',
       parameters: {
         additionalProperties: false,
@@ -35,7 +35,7 @@ const getWriteFileTool = (): ChatTool => {
             type: 'string',
           },
           uri: {
-            description: 'Absolute file URI (`file://...`) for a real path. Relative paths are not allowed.',
+            description: 'Absolute URI for the target file (for example `file://...`, `memfs://...`, or extension-provided file system URIs). Relative paths are not allowed.',
             type: 'string',
           },
         },
