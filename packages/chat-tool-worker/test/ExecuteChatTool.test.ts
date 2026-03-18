@@ -49,3 +49,17 @@ test('executeChatTool dispatches search_text tool', async () => {
     ],
   })
 })
+
+test('executeChatTool dispatches rename tool', async () => {
+  const result = await ExecuteChatTool.executeChatTool(
+    'rename',
+    JSON.stringify({
+      newUri: '/workspace/new-name.ts',
+      oldUri: '/workspace/old-name.ts',
+    }),
+    options,
+  )
+  expect(result).toEqual({
+    error: 'Invalid argument: oldUri must be an absolute URI.',
+  })
+})

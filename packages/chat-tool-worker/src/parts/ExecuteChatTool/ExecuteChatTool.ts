@@ -5,6 +5,7 @@ import { executeListFilesTool } from '../ExecuteListFilesTool/ExecuteListFilesTo
 import { executeOpenEditorTool } from '../ExecuteOpenEditorTool/ExecuteOpenEditorTool.ts'
 import { executeOpenPreviewTool } from '../ExecuteOpenPreviewTool/ExecuteOpenPreviewTool.ts'
 import { executeReadFileTool } from '../ExecuteReadFileTool/ExecuteReadFileTool.ts'
+import { executeRenameTool } from '../ExecuteRenameTool/ExecuteRenameTool.ts'
 import { executeRenderHtmlTool } from '../ExecuteRenderHtmlTool/ExecuteRenderHtmlTool.ts'
 import { executeSearchTextTool } from '../ExecuteSearchTextTool/ExecuteSearchTextTool.ts'
 import { executeWriteFileTool } from '../ExecuteWriteFileTool/ExecuteWriteFileTool.ts'
@@ -18,6 +19,10 @@ export const executeChatTool = async (name: string, rawArguments: unknown, optio
 
   if (name === 'write_file') {
     return executeWriteFileTool(args, options)
+  }
+
+  if (name === 'rename') {
+    return executeRenameTool(args, options)
   }
 
   if (name === 'list_files') {

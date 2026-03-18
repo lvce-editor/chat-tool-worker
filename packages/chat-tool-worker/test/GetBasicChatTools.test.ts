@@ -18,6 +18,7 @@ test('getBasicChatTools returns all expected tool names in order', () => {
   expect(names).toEqual([
     'read_file',
     'write_file',
+    'rename',
     'list_files',
     'getWorkspaceUri',
     'render_html',
@@ -35,6 +36,14 @@ test('getBasicChatTools uses function tool type and object schema', () => {
     expect(tool.function.parameters.type).toBe('object')
     expect(tool.function.parameters.additionalProperties).toBe(false)
   }
+})
+
+test('rename tool defines oldUri and newUri arguments', () => {
+  const renameTool = getTool('rename')
+  const { parameters } = renameTool.function
+  expect(parameters.required).toEqual(['oldUri', 'newUri'])
+  expect(parameters.properties).toHaveProperty('oldUri')
+  expect(parameters.properties).toHaveProperty('newUri')
 })
 
 test('list_files description tells model to call getWorkspaceUri first when uri is unknown', () => {
