@@ -1,6 +1,6 @@
 import { expect, test } from '@jest/globals'
-import * as GetBasicChatTools from '../src/parts/GetBasicChatTools/GetBasicChatTools.ts'
 import type { ChatTool } from '../src/parts/Types/Types.ts'
+import * as GetBasicChatTools from '../src/parts/GetBasicChatTools/GetBasicChatTools.ts'
 
 const getTool = (name: string): ChatTool => {
   for (const tool of GetBasicChatTools.getBasicChatTools()) {
