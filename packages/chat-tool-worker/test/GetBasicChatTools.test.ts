@@ -15,7 +15,7 @@ const getTool = (name: string): ChatTool => {
 test('getBasicChatTools returns all expected tool names in order', () => {
   const tools = GetBasicChatTools.getBasicChatTools()
   const names = tools.map((tool) => tool.function.name)
-  expect(names).toEqual(['read_file', 'write_file', 'list_files', 'getWorkspaceUri', 'render_html', 'open_preview', 'openEditor', 'close_preview'])
+  expect(names).toEqual(['read_file', 'write_file', 'list_files', 'getWorkspaceUri', 'render_html', 'open_preview', 'openEditor', 'close_preview', 'search_text'])
 })
 
 test('getBasicChatTools uses function tool type and object schema', () => {
@@ -44,4 +44,22 @@ test('list_files uri parameter description tells model to use returned workspace
 test('getWorkspaceUri description explains it is a prerequisite for file tools', () => {
   const getWorkspaceUriTool = getTool('getWorkspaceUri')
   expect(getWorkspaceUriTool.function.description).toContain('Call this first before using list_files')
+})
+
+test('search_text defines options object arguments for text search', () => {
+  const searchTextTool = getTool('search_text')
+  const parameters = searchTextTool.function.parameters
+  expect(parameters.required).toEqual(['options'])
+  const optionsProperty = parameters.properties.options as {
+    readonly type: string
+    readonly required: readonly string[]
+    readonly properties: Readonly<Record<string, unknown>>
+  }
+  expect(optionsProperty.type).toBe('object')
+  expect(optionsProperty.required).toEqual(['value', 'isRegex', 'matchCase', 'machWholeWord', 'exclude'])
+  expect(optionsProperty.properties).toHaveProperty('value')
+  expect(optionsProperty.properties).toHaveProperty('isRegex')
+  expect(optionsProperty.properties).toHaveProperty('matchCase')
+  expect(optionsProperty.properties).toHaveProperty('machWholeWord')
+  expect(optionsProperty.properties).toHaveProperty('exclude')
 })
