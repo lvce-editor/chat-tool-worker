@@ -1,11 +1,21 @@
 import { expect, test } from '@jest/globals'
-<<<<<<< HEAD
 import * as GetBasicChatTools from '../src/parts/GetBasicChatTools/GetBasicChatTools.ts'
+import type { ChatTool } from '../src/parts/Types/Types.ts'
+
+const getTool = (name: string): ChatTool => {
+  for (const tool of GetBasicChatTools.getBasicChatTools()) {
+    if (tool.function.name === name) {
+      return tool
+    }
+  }
+
+  throw new Error(`Expected tool to exist: ${name}`)
+}
 
 test('getBasicChatTools returns all expected tool names in order', () => {
   const tools = GetBasicChatTools.getBasicChatTools()
   const names = tools.map((tool) => tool.function.name)
-  expect(names).toEqual(['read_file', 'write_file', 'list_files', 'getWorkspaceUri', 'render_html', 'open_preview', 'close_preview'])
+  expect(names).toEqual(['read_file', 'write_file', 'list_files', 'getWorkspaceUri', 'render_html', 'open_preview', 'openEditor', 'close_preview'])
 })
 
 test('getBasicChatTools uses function tool type and object schema', () => {
@@ -15,19 +25,7 @@ test('getBasicChatTools uses function tool type and object schema', () => {
     expect(tool.function.parameters.type).toBe('object')
     expect(tool.function.parameters.additionalProperties).toBe(false)
   }
-=======
-import type { ChatTool } from '../src/parts/Types/Types.ts'
-import { getBasicChatTools } from '../src/parts/GetBasicChatTools/GetBasicChatTools.ts'
-
-const getTool = (name: string): ChatTool => {
-  for (const tool of getBasicChatTools()) {
-    if (tool.function.name === name) {
-      return tool
-    }
-  }
-
-  throw new Error(`Expected tool to exist: ${name}`)
-}
+})
 
 test('list_files description tells model to call getWorkspaceUri first when uri is unknown', () => {
   const listFilesTool = getTool('list_files')
@@ -46,5 +44,4 @@ test('list_files uri parameter description tells model to use returned workspace
 test('getWorkspaceUri description explains it is a prerequisite for file tools', () => {
   const getWorkspaceUriTool = getTool('getWorkspaceUri')
   expect(getWorkspaceUriTool.function.description).toContain('Call this first before using list_files')
->>>>>>> origin/main
 })
