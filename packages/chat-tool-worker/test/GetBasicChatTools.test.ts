@@ -15,7 +15,17 @@ const getTool = (name: string): ChatTool => {
 test('getBasicChatTools returns all expected tool names in order', () => {
   const tools = GetBasicChatTools.getBasicChatTools()
   const names = tools.map((tool) => tool.function.name)
-  expect(names).toEqual(['read_file', 'write_file', 'list_files', 'getWorkspaceUri', 'render_html', 'open_preview', 'openEditor', 'close_preview', 'search_text'])
+  expect(names).toEqual([
+    'read_file',
+    'write_file',
+    'list_files',
+    'getWorkspaceUri',
+    'render_html',
+    'open_preview',
+    'openEditor',
+    'close_preview',
+    'search_text',
+  ])
 })
 
 test('getBasicChatTools uses function tool type and object schema', () => {

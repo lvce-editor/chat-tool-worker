@@ -9,7 +9,7 @@ type SearchOptions = {
 }
 
 const getSearchOptions = (args: Readonly<Record<string, unknown>>): SearchOptions | undefined => {
-  const options = args.options
+  const { options } = args
   if (!options || typeof options !== 'object') {
     return undefined
   }
