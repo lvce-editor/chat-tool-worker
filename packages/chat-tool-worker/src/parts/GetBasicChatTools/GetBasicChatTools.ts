@@ -35,7 +35,8 @@ const getWriteFileTool = (): ChatTool => {
             type: 'string',
           },
           uri: {
-            description: 'Absolute URI for the target file (for example `file://...`, `memfs://...`, or extension-provided file system URIs). Relative paths are not allowed.',
+            description:
+              'Absolute URI for the target file (for example `file://...`, `memfs://...`, or extension-provided file system URIs). Relative paths are not allowed.',
             type: 'string',
           },
         },
