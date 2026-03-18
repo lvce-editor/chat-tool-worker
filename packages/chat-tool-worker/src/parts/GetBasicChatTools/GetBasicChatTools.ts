@@ -9,7 +9,7 @@ const getReadFileTool = (): ChatTool => {
         additionalProperties: false,
         properties: {
           uri: {
-            description: 'Absolute file URI within the workspace (for example: file:///workspace/src/index.ts).',
+            description: 'Absolute file URI for a real path inside the currently open workspace folder. Do not use placeholder URIs.',
             type: 'string',
           },
         },
@@ -34,7 +34,7 @@ const getWriteFileTool = (): ChatTool => {
             type: 'string',
           },
           uri: {
-            description: 'Absolute file URI within the workspace (for example: file:///workspace/src/index.ts).',
+            description: 'Absolute file URI for a real path inside the currently open workspace folder. Do not use placeholder URIs.',
             type: 'string',
           },
         },
@@ -55,7 +55,7 @@ const getListFilesTool = (): ChatTool => {
         additionalProperties: false,
         properties: {
           uri: {
-            description: 'Absolute folder URI within the workspace (for example: file:///workspace/src).',
+            description: 'Absolute folder URI for a real path inside the currently open workspace folder. Do not use placeholder URIs.',
             type: 'string',
           },
         },
@@ -121,7 +121,7 @@ const getOpenPreviewTool = (): ChatTool => {
         additionalProperties: false,
         properties: {
           uri: {
-            description: 'Absolute HTML file URI within the workspace (for example: file:///workspace/index.html).',
+            description: 'Absolute HTML file URI for a real path inside the currently open workspace folder. Do not use placeholder URIs.',
             type: 'string',
           },
         },
@@ -142,7 +142,7 @@ const getOpenEditorTool = (): ChatTool => {
         additionalProperties: false,
         properties: {
           uri: {
-            description: 'Absolute file URI to open in the editor (for example: file:///workspace/src/index.ts).',
+            description: 'Absolute file URI for a real path inside the currently open workspace folder. Do not use placeholder URIs.',
             type: 'string',
           },
         },
