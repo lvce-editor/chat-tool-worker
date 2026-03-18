@@ -7,13 +7,21 @@ export const executeWriteFileTool = async (args: Readonly<Record<string, unknown
   const uri = typeof args.uri === 'string' ? args.uri : ''
   const content = typeof args.content === 'string' ? args.content : ''
   if (!uri || !isAbsoluteUri(uri)) {
-    return { error: 'Invalid argument: uri must be an absolute URI.' }
+    return { error: 'Invalid argument: uri must be an absolute file URI.' }
   }
 
+  let parsedUrl: URL
   try {
-    new URL(uri)
+    parsedUrl = new URL(uri)
   } catch {
     return { error: 'Invalid argument: invalid URL.' }
+  }
+
+  if (parsedUrl.protocol !== 'file:') {
+    return { error: 'Invalid argument: uri must be an absolute file URI.' }
+  }
+  if (!parsedUrl.pathname || !parsedUrl.pathname.startsWith('/')) {
+    return { error: 'Invalid argument: uri must be an absolute file URI.' }
   }
 
   try {
