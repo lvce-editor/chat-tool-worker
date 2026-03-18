@@ -49,3 +49,23 @@ test('executeChatTool dispatches search_text tool', async () => {
     ],
   })
 })
+
+test('executeChatTool dispatches run_in_terminal tool', async () => {
+  const result = await ExecuteChatTool.executeChatTool(
+    'run_in_terminal',
+    JSON.stringify({
+      options: {
+        command: 'echo hello',
+        shell: '/bin/bash',
+      },
+    }),
+    options,
+  )
+  expect(result).toEqual({
+    output: {
+      exitCode: 0,
+      stderr: '',
+      stdout: 'Mock output for "echo hello" using shell "/bin/bash"',
+    },
+  })
+})
