@@ -15,4 +15,3 @@ test('getBasicChatTools uses function tool type and object schema', () => {
     expect(tool.function.parameters.additionalProperties).toBe(false)
   }
 })
-

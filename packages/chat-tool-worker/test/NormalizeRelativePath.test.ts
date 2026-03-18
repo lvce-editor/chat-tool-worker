@@ -16,4 +16,3 @@ test('normalizeRelativePath normalizes windows separators', () => {
 test('normalizeRelativePath returns dot for empty normalized path', () => {
   expect(NormalizeRelativePath.normalizeRelativePath('./')).toBe('.')
 })
-

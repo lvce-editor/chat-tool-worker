@@ -13,4 +13,3 @@ test('getToolErrorPayload omits stack when missing', () => {
   const payload = GetToolErrorPayload.getToolErrorPayload('failure')
   expect(payload).toEqual({ error: 'failure' })
 })
-

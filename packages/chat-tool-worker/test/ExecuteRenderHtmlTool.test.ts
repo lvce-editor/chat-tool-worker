@@ -27,4 +27,3 @@ test('executeRenderHtmlTool rejects oversized css', async () => {
   const result = await ExecuteRenderHtmlTool.executeRenderHtmlTool({ css, html: '<div></div>' }, options)
   expect(result).toEqual({ error: 'Payload too large: keep html/css under 40,000 characters each.' })
 })
-

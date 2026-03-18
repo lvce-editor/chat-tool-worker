@@ -20,4 +20,3 @@ test('isPathTraversalAttempt returns true for absolute windows path', () => {
 test('isPathTraversalAttempt returns true for file uri', () => {
   expect(IsPathTraversalAttempt.isPathTraversalAttempt('file:///workspace/file.txt')).toBe(true)
 })
-

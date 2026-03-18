@@ -10,4 +10,3 @@ test('executeChatTool returns unknown tool error', async () => {
   const result = await ExecuteChatTool.executeChatTool('does_not_exist', '{}', options)
   expect(result).toEqual({ error: 'Unknown tool: does_not_exist' })
 })
-
