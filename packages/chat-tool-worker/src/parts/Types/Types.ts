@@ -5,7 +5,7 @@ export type ChatTool = {
     readonly description: string
     readonly parameters: {
       readonly type: 'object'
-      readonly properties: Record<string, unknown>
+      readonly properties: Readonly<Record<string, unknown>>
       readonly required?: readonly string[]
       readonly additionalProperties: boolean
     }
