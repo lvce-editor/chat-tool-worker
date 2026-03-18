@@ -133,6 +133,27 @@ const getOpenPreviewTool = (): ChatTool => {
   }
 }
 
+const getOpenEditorTool = (): ChatTool => {
+  return {
+    function: {
+      description: 'Open a file URI in the editor.',
+      name: 'openEditor',
+      parameters: {
+        additionalProperties: false,
+        properties: {
+          uri: {
+            description: 'Absolute file URI to open in the editor (for example: file:///workspace/src/index.ts).',
+            type: 'string',
+          },
+        },
+        required: ['uri'],
+        type: 'object',
+      },
+    },
+    type: 'function',
+  }
+}
+
 const getClosePreviewTool = (): ChatTool => {
   return {
     function: {
@@ -156,6 +177,7 @@ export const getBasicChatTools = (): readonly ChatTool[] => {
     getGetWorkspaceUriTool(),
     getRenderHtmlTool(),
     getOpenPreviewTool(),
+    getOpenEditorTool(),
     getClosePreviewTool(),
   ]
 }
