@@ -18,6 +18,7 @@ test('getBasicChatTools returns all expected tool names in order', () => {
   expect(names).toEqual([
     'read_file',
     'write_file',
+    'edit_file',
     'list_files',
     'getWorkspaceUri',
     'render_html',
