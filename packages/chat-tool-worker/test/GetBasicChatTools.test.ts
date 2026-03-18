@@ -27,6 +27,7 @@ test('getBasicChatTools returns all expected tool names in order', () => {
     'close_preview',
     'search_text',
     'run_in_terminal',
+    'create_directory',
   ])
 })
 
