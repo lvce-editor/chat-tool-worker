@@ -58,7 +58,7 @@ test('getWorkspaceUri description explains it is a prerequisite for file tools',
 
 test('search_text defines options object arguments for text search', () => {
   const searchTextTool = getTool('search_text')
-  const {parameters} = searchTextTool.function
+  const { parameters } = searchTextTool.function
   expect(parameters.required).toEqual(['options'])
   const optionsProperty = parameters.properties.options as {
     readonly type: string
