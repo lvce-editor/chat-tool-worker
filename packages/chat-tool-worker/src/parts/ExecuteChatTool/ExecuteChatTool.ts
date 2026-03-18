@@ -1,5 +1,6 @@
 import type { ExecuteToolOptions, ToolResponse } from '../Types/Types.ts'
 import { executeClosePreviewTool } from '../ExecuteClosePreviewTool/ExecuteClosePreviewTool.ts'
+import { executeCreateDirectoryTool } from '../ExecuteCreateDirectoryTool/ExecuteCreateDirectoryTool.ts'
 import { executeEditFileTool } from '../ExecuteEditFileTool/ExecuteEditFileTool.ts'
 import { executeGetWorkspaceUriTool } from '../ExecuteGetWorkspaceUriTool/ExecuteGetWorkspaceUriTool.ts'
 import { executeListFilesTool } from '../ExecuteListFilesTool/ExecuteListFilesTool.ts'
@@ -56,6 +57,10 @@ export const executeChatTool = async (name: string, rawArguments: unknown, optio
 
   if (name === 'run_in_terminal') {
     return executeRunInTerminalTool(args, options)
+  }
+
+  if (name === 'create_directory') {
+    return executeCreateDirectoryTool(args, options)
   }
 
   return { error: `Unknown tool: ${name}` }
