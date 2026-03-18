@@ -49,3 +49,19 @@ test('executeChatTool dispatches search_text tool', async () => {
     ],
   })
 })
+
+test('executeChatTool dispatches edit_file tool', async () => {
+  const result = await ExecuteChatTool.executeChatTool(
+    'edit_file',
+    JSON.stringify({
+      end: 0,
+      start: 0,
+      text: 'hello',
+      uri: '/not/an/absolute/uri',
+    }),
+    options,
+  )
+  expect(result).toEqual({
+    error: 'Invalid argument: uri must be an absolute URI.',
+  })
+})

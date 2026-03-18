@@ -48,6 +48,41 @@ const getWriteFileTool = (): ChatTool => {
   }
 }
 
+const getEditFileTool = (): ChatTool => {
+  return {
+    function: {
+      description:
+        'Apply a targeted text edit to an existing file by character offsets. This reads the current file, applies the edit, and writes the updated result. Use this for small changes instead of rewriting the full file.',
+      name: 'edit_file',
+      parameters: {
+        additionalProperties: false,
+        properties: {
+          end: {
+            description: 'Zero-based end character offset (exclusive) in the current file content.',
+            type: 'number',
+          },
+          start: {
+            description: 'Zero-based start character offset (inclusive) in the current file content.',
+            type: 'number',
+          },
+          text: {
+            description: 'Replacement text inserted at the range [start, end).',
+            type: 'string',
+          },
+          uri: {
+            description:
+              'Absolute URI for the target file (for example `file://...`, `memfs://...`, or extension-provided file system URIs). Relative paths are not allowed.',
+            type: 'string',
+          },
+        },
+        required: ['uri', 'start', 'end', 'text'],
+        type: 'object',
+      },
+    },
+    type: 'function',
+  }
+}
+
 const getListFilesTool = (): ChatTool => {
   return {
     function: {
@@ -75,7 +110,7 @@ const getGetWorkspaceUriTool = (): ChatTool => {
   return {
     function: {
       description:
-        'Get the URI of the currently open workspace folder. Call this first before using list_files, read_file, write_file, open_preview, or openEditor when you do not already have a concrete workspace URI.',
+        'Get the URI of the currently open workspace folder. Call this first before using list_files, read_file, write_file, edit_file, open_preview, or openEditor when you do not already have a concrete workspace URI.',
       name: 'getWorkspaceUri',
       parameters: {
         additionalProperties: false,
@@ -220,6 +255,7 @@ export const getBasicChatTools = (): readonly ChatTool[] => {
   return [
     getReadFileTool(),
     getWriteFileTool(),
+    getEditFileTool(),
     getListFilesTool(),
     getGetWorkspaceUriTool(),
     getRenderHtmlTool(),
