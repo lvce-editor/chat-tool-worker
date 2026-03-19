@@ -28,6 +28,7 @@ test('getBasicChatTools returns all expected tool names in order', () => {
     'search_text',
     'run_in_terminal',
     'create_directory',
+    'update_todo',
   ])
 })
 
@@ -90,4 +91,14 @@ test('run_in_terminal defines options object arguments for shell execution', () 
   expect(optionsProperty.required).toEqual(['shell', 'command'])
   expect(optionsProperty.properties).toHaveProperty('shell')
   expect(optionsProperty.properties).toHaveProperty('command')
+})
+
+test('update_todo defines todos string argument for checklist updates', () => {
+  const updateTodoTool = getTool('update_todo')
+  const { parameters } = updateTodoTool.function
+  expect(parameters.required).toEqual(['todos'])
+  const todosProperty = parameters.properties.todos as {
+    readonly type: string
+  }
+  expect(todosProperty.type).toBe('string')
 })

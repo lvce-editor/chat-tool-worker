@@ -10,6 +10,7 @@ import { executeReadFileTool } from '../ExecuteReadFileTool/ExecuteReadFileTool.
 import { executeRenderHtmlTool } from '../ExecuteRenderHtmlTool/ExecuteRenderHtmlTool.ts'
 import { executeRunInTerminalTool } from '../ExecuteRunInTerminalTool/ExecuteRunInTerminalTool.ts'
 import { executeSearchTextTool } from '../ExecuteSearchTextTool/ExecuteSearchTextTool.ts'
+import { executeUpdateTodoTool } from '../ExecuteUpdateTodoTool/ExecuteUpdateTodoTool.ts'
 import { executeWriteFileTool } from '../ExecuteWriteFileTool/ExecuteWriteFileTool.ts'
 import { parseToolArguments } from '../ParseToolArguments/ParseToolArguments.ts'
 
@@ -61,6 +62,10 @@ export const executeChatTool = async (name: string, rawArguments: unknown, optio
 
   if (name === 'create_directory') {
     return executeCreateDirectoryTool(args, options)
+  }
+
+  if (name === 'update_todo') {
+    return executeUpdateTodoTool(args, options)
   }
 
   return { error: `Unknown tool: ${name}` }

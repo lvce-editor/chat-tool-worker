@@ -85,3 +85,21 @@ test('executeChatTool dispatches run_in_terminal tool', async () => {
     },
   })
 })
+
+test('executeChatTool dispatches update_todo tool', async () => {
+  const result = await ExecuteChatTool.executeChatTool(
+    'update_todo',
+    JSON.stringify({
+      todos: '- [ ] Inspect\n- [ ] Implement',
+    }),
+    options,
+  )
+
+  expect(result).toEqual({
+    message: 'TODO list updated',
+    ok: true,
+    previousTodos: '',
+    storage: 'memory',
+    todos: '- [ ] Inspect\n- [ ] Implement',
+  })
+})
