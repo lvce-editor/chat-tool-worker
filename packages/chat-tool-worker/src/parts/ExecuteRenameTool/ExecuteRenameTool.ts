@@ -20,8 +20,8 @@ export const executeRenameTool = async (args: Readonly<Record<string, unknown>>,
   }
   try {
     await RendererWorker.invoke('FileSystem.rename', oldUri, newUri)
-    return { ok: true, oldUri, newUri }
+    return { newUri, ok: true, oldUri }
   } catch (error) {
-    return { ...getToolErrorPayload(error), oldUri, newUri }
+    return { ...getToolErrorPayload(error), newUri, oldUri }
   }
 }
