@@ -2,6 +2,7 @@ import type { ExecuteToolOptions, ToolResponse } from '../Types/Types.ts'
 import { executeClosePreviewTool } from '../ExecuteClosePreviewTool/ExecuteClosePreviewTool.ts'
 import { executeCreateDirectoryTool } from '../ExecuteCreateDirectoryTool/ExecuteCreateDirectoryTool.ts'
 import { executeEditFileTool } from '../ExecuteEditFileTool/ExecuteEditFileTool.ts'
+import { executeGlobTool } from '../ExecuteGlobTool/ExecuteGlobTool.ts'
 import { executeGetWorkspaceUriTool } from '../ExecuteGetWorkspaceUriTool/ExecuteGetWorkspaceUriTool.ts'
 import { executeListFilesTool } from '../ExecuteListFilesTool/ExecuteListFilesTool.ts'
 import { executeOpenEditorTool } from '../ExecuteOpenEditorTool/ExecuteOpenEditorTool.ts'
@@ -61,6 +62,10 @@ export const executeChatTool = async (name: string, rawArguments: unknown, optio
 
   if (name === 'create_directory') {
     return executeCreateDirectoryTool(args, options)
+  }
+
+  if (name === 'glob') {
+    return executeGlobTool(args, options)
   }
 
   return { error: `Unknown tool: ${name}` }
