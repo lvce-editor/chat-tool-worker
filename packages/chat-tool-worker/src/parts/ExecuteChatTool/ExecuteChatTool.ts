@@ -3,6 +3,7 @@ import { executeClosePreviewTool } from '../ExecuteClosePreviewTool/ExecuteClose
 import { executeCreateDirectoryTool } from '../ExecuteCreateDirectoryTool/ExecuteCreateDirectoryTool.ts'
 import { executeEditFileTool } from '../ExecuteEditFileTool/ExecuteEditFileTool.ts'
 import { executeGetWorkspaceUriTool } from '../ExecuteGetWorkspaceUriTool/ExecuteGetWorkspaceUriTool.ts'
+import { executeGlobTool } from '../ExecuteGlobTool/ExecuteGlobTool.ts'
 import { executeListFilesTool } from '../ExecuteListFilesTool/ExecuteListFilesTool.ts'
 import { executeOpenEditorTool } from '../ExecuteOpenEditorTool/ExecuteOpenEditorTool.ts'
 import { executeOpenPreviewTool } from '../ExecuteOpenPreviewTool/ExecuteOpenPreviewTool.ts'
@@ -72,6 +73,10 @@ export const executeChatTool = async (name: string, rawArguments: unknown, optio
 
   if (name === 'create_directory') {
     return executeCreateDirectoryTool(args, options)
+  }
+
+  if (name === 'glob') {
+    return executeGlobTool(args, options)
   }
 
   if (name === 'update_todo') {

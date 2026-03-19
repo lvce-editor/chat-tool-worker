@@ -100,6 +100,20 @@ test('executeChatTool dispatches run_in_terminal tool', async () => {
   })
 })
 
+test('executeChatTool dispatches glob tool', async () => {
+  const result = await ExecuteChatTool.executeChatTool(
+    'glob',
+    JSON.stringify({
+      pattern: 'packages/e2e/src/*.ts',
+    }),
+    options,
+  )
+  expect(result).toEqual({
+    paths: ['./src/main.ts', './src/utils/search.ts', './test/Main.test.ts'],
+    pattern: 'packages/e2e/src/*.ts',
+  })
+})
+
 test('executeChatTool dispatches rg tool', async () => {
   const result = await ExecuteChatTool.executeChatTool(
     'rg',

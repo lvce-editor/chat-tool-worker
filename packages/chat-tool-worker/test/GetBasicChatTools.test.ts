@@ -30,6 +30,7 @@ test('getBasicChatTools returns all expected tool names in order', () => {
     'rg',
     'run_in_terminal',
     'create_directory',
+    'glob',
     'update_todo',
   ])
 })
@@ -111,6 +112,18 @@ test('run_in_terminal defines options object arguments for shell execution', () 
   expect(optionsProperty.required).toEqual(['shell', 'command'])
   expect(optionsProperty.properties).toHaveProperty('shell')
   expect(optionsProperty.properties).toHaveProperty('command')
+})
+
+test('glob defines pattern argument for file matching', () => {
+  const globTool = getTool('glob')
+  const { parameters } = globTool.function
+  expect(parameters.required).toEqual(['pattern'])
+  const patternProperty = parameters.properties.pattern as {
+    readonly type: string
+    readonly description: string
+  }
+  expect(patternProperty.type).toBe('string')
+  expect(patternProperty.description).toContain('Glob pattern')
 })
 
 test('rg defines ripgrep-style arguments for workspace search', () => {
