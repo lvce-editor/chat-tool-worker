@@ -1,3 +1,4 @@
+/* eslint-disable @cspell/spellchecker */
 /* eslint-disable e18e/prefer-url-canparse */
 import { RendererWorker } from '@lvce-editor/rpc-registry'
 import type { ExecuteToolOptions, ToolResponse } from '../Types/Types.ts'
