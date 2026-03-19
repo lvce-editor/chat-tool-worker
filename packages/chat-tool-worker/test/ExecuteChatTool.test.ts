@@ -50,6 +50,20 @@ test('executeChatTool dispatches search_text tool', async () => {
   })
 })
 
+test('executeChatTool dispatches rename tool', async () => {
+  const result = await ExecuteChatTool.executeChatTool(
+    'rename',
+    JSON.stringify({
+      newUri: '/workspace/new-name.ts',
+      oldUri: '/workspace/old-name.ts',
+    }),
+    options,
+  )
+  expect(result).toEqual({
+    error: 'Invalid argument: oldUri must be an absolute URI.',
+  })
+})
+
 test('executeChatTool dispatches edit_file tool', async () => {
   const result = await ExecuteChatTool.executeChatTool(
     'edit_file',
@@ -86,16 +100,55 @@ test('executeChatTool dispatches run_in_terminal tool', async () => {
   })
 })
 
+<<<<<<< HEAD
 test('executeChatTool dispatches glob tool', async () => {
   const result = await ExecuteChatTool.executeChatTool(
     'glob',
     JSON.stringify({
       pattern: 'packages/e2e/src/*.ts',
+=======
+test('executeChatTool dispatches rg tool', async () => {
+  const result = await ExecuteChatTool.executeChatTool(
+    'rg',
+    JSON.stringify({
+      '-n': true,
+      output_mode: 'content',
+      path: '/workspace/README.md',
+      pattern: 'render_html|search_text',
+>>>>>>> origin/main
     }),
     options,
   )
   expect(result).toEqual({
+<<<<<<< HEAD
     paths: ['./src/main.ts', './src/utils/search.ts', './test/Main.test.ts'],
     pattern: 'packages/e2e/src/*.ts',
+=======
+    arguments: {
+      '-n': true,
+      output_mode: 'content',
+      path: '/workspace/README.md',
+      pattern: 'render_html|search_text',
+    },
+    result: 'No matches found.',
+  })
+})
+
+test('executeChatTool dispatches update_todo tool', async () => {
+  const result = await ExecuteChatTool.executeChatTool(
+    'update_todo',
+    JSON.stringify({
+      todos: '- [ ] Inspect\n- [ ] Implement',
+    }),
+    options,
+  )
+
+  expect(result).toEqual({
+    message: 'TODO list updated',
+    ok: true,
+    previousTodos: '',
+    storage: 'memory',
+    todos: '- [ ] Inspect\n- [ ] Implement',
+>>>>>>> origin/main
   })
 })

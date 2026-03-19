@@ -8,9 +8,12 @@ import { executeListFilesTool } from '../ExecuteListFilesTool/ExecuteListFilesTo
 import { executeOpenEditorTool } from '../ExecuteOpenEditorTool/ExecuteOpenEditorTool.ts'
 import { executeOpenPreviewTool } from '../ExecuteOpenPreviewTool/ExecuteOpenPreviewTool.ts'
 import { executeReadFileTool } from '../ExecuteReadFileTool/ExecuteReadFileTool.ts'
+import { executeRenameTool } from '../ExecuteRenameTool/ExecuteRenameTool.ts'
 import { executeRenderHtmlTool } from '../ExecuteRenderHtmlTool/ExecuteRenderHtmlTool.ts'
+import { executeRgTool } from '../ExecuteRgTool/ExecuteRgTool.ts'
 import { executeRunInTerminalTool } from '../ExecuteRunInTerminalTool/ExecuteRunInTerminalTool.ts'
 import { executeSearchTextTool } from '../ExecuteSearchTextTool/ExecuteSearchTextTool.ts'
+import { executeUpdateTodoTool } from '../ExecuteUpdateTodoTool/ExecuteUpdateTodoTool.ts'
 import { executeWriteFileTool } from '../ExecuteWriteFileTool/ExecuteWriteFileTool.ts'
 import { parseToolArguments } from '../ParseToolArguments/ParseToolArguments.ts'
 
@@ -22,6 +25,10 @@ export const executeChatTool = async (name: string, rawArguments: unknown, optio
 
   if (name === 'write_file') {
     return executeWriteFileTool(args, options)
+  }
+
+  if (name === 'rename') {
+    return executeRenameTool(args, options)
   }
 
   if (name === 'edit_file') {
@@ -56,6 +63,10 @@ export const executeChatTool = async (name: string, rawArguments: unknown, optio
     return executeSearchTextTool(args, options)
   }
 
+  if (name === 'rg') {
+    return executeRgTool(args, options)
+  }
+
   if (name === 'run_in_terminal') {
     return executeRunInTerminalTool(args, options)
   }
@@ -64,8 +75,13 @@ export const executeChatTool = async (name: string, rawArguments: unknown, optio
     return executeCreateDirectoryTool(args, options)
   }
 
+<<<<<<< HEAD
   if (name === 'glob') {
     return executeGlobTool(args, options)
+=======
+  if (name === 'update_todo') {
+    return executeUpdateTodoTool(args, options)
+>>>>>>> origin/main
   }
 
   return { error: `Unknown tool: ${name}` }
