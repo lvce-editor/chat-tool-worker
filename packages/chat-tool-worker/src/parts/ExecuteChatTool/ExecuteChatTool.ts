@@ -8,6 +8,7 @@ import { executeOpenEditorTool } from '../ExecuteOpenEditorTool/ExecuteOpenEdito
 import { executeOpenPreviewTool } from '../ExecuteOpenPreviewTool/ExecuteOpenPreviewTool.ts'
 import { executeReadFileTool } from '../ExecuteReadFileTool/ExecuteReadFileTool.ts'
 import { executeRenderHtmlTool } from '../ExecuteRenderHtmlTool/ExecuteRenderHtmlTool.ts'
+import { executeRgTool } from '../ExecuteRgTool/ExecuteRgTool.ts'
 import { executeRunInTerminalTool } from '../ExecuteRunInTerminalTool/ExecuteRunInTerminalTool.ts'
 import { executeSearchTextTool } from '../ExecuteSearchTextTool/ExecuteSearchTextTool.ts'
 import { executeUpdateTodoTool } from '../ExecuteUpdateTodoTool/ExecuteUpdateTodoTool.ts'
@@ -54,6 +55,10 @@ export const executeChatTool = async (name: string, rawArguments: unknown, optio
 
   if (name === 'search_text') {
     return executeSearchTextTool(args, options)
+  }
+
+  if (name === 'rg') {
+    return executeRgTool(args, options)
   }
 
   if (name === 'run_in_terminal') {

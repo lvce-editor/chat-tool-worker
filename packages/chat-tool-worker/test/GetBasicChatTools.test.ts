@@ -26,6 +26,7 @@ test('getBasicChatTools returns all expected tool names in order', () => {
     'openEditor',
     'close_preview',
     'search_text',
+    'rg',
     'run_in_terminal',
     'create_directory',
     'update_todo',
@@ -91,6 +92,16 @@ test('run_in_terminal defines options object arguments for shell execution', () 
   expect(optionsProperty.required).toEqual(['shell', 'command'])
   expect(optionsProperty.properties).toHaveProperty('shell')
   expect(optionsProperty.properties).toHaveProperty('command')
+})
+
+test('rg defines ripgrep-style arguments for workspace search', () => {
+  const rgTool = getTool('rg')
+  const { parameters } = rgTool.function
+  expect(parameters.required).toEqual(['pattern'])
+  expect(parameters.properties).toHaveProperty('pattern')
+  expect(parameters.properties).toHaveProperty('path')
+  expect(parameters.properties).toHaveProperty('output_mode')
+  expect(parameters.properties).toHaveProperty('-n')
 })
 
 test('update_todo defines todos string argument for checklist updates', () => {

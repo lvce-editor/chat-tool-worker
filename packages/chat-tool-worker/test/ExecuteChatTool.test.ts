@@ -86,6 +86,28 @@ test('executeChatTool dispatches run_in_terminal tool', async () => {
   })
 })
 
+test('executeChatTool dispatches rg tool', async () => {
+  const result = await ExecuteChatTool.executeChatTool(
+    'rg',
+    JSON.stringify({
+      '-n': true,
+      output_mode: 'content',
+      path: '/workspace/README.md',
+      pattern: 'render_html|search_text',
+    }),
+    options,
+  )
+  expect(result).toEqual({
+    arguments: {
+      '-n': true,
+      output_mode: 'content',
+      path: '/workspace/README.md',
+      pattern: 'render_html|search_text',
+    },
+    result: 'No matches found.',
+  })
+})
+
 test('executeChatTool dispatches update_todo tool', async () => {
   const result = await ExecuteChatTool.executeChatTool(
     'update_todo',
