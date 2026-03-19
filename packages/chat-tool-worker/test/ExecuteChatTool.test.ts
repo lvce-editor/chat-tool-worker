@@ -50,14 +50,20 @@ test('executeChatTool dispatches search_text tool', async () => {
   })
 })
 
-<<<<<<< HEAD
 test('executeChatTool dispatches rename tool', async () => {
   const result = await ExecuteChatTool.executeChatTool(
     'rename',
     JSON.stringify({
       newUri: '/workspace/new-name.ts',
       oldUri: '/workspace/old-name.ts',
-=======
+    }),
+    options,
+  )
+  expect(result).toEqual({
+    error: 'Invalid argument: oldUri must be an absolute URI.',
+  })
+})
+
 test('executeChatTool dispatches edit_file tool', async () => {
   const result = await ExecuteChatTool.executeChatTool(
     'edit_file',
@@ -66,14 +72,10 @@ test('executeChatTool dispatches edit_file tool', async () => {
       start: 0,
       text: 'hello',
       uri: '/not/an/absolute/uri',
->>>>>>> origin/main
     }),
     options,
   )
   expect(result).toEqual({
-<<<<<<< HEAD
-    error: 'Invalid argument: oldUri must be an absolute URI.',
-=======
     error: 'Invalid argument: uri must be an absolute URI.',
   })
 })
@@ -95,6 +97,5 @@ test('executeChatTool dispatches run_in_terminal tool', async () => {
       stderr: '',
       stdout: 'Mock output for "echo hello" using shell "/bin/bash"',
     },
->>>>>>> origin/main
   })
 })

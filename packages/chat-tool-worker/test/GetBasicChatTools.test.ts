@@ -18,11 +18,8 @@ test('getBasicChatTools returns all expected tool names in order', () => {
   expect(names).toEqual([
     'read_file',
     'write_file',
-<<<<<<< HEAD
     'rename',
-=======
     'edit_file',
->>>>>>> origin/main
     'list_files',
     'getWorkspaceUri',
     'render_html',
@@ -42,6 +39,16 @@ test('getBasicChatTools uses function tool type and object schema', () => {
     expect(tool.function.parameters.type).toBe('object')
     expect(tool.function.parameters.additionalProperties).toBe(false)
   }
+})
+
+test('edit_file tool defines uri and range edit arguments', () => {
+  const editFileTool = getTool('edit_file')
+  const { parameters } = editFileTool.function
+  expect(parameters.required).toEqual(['uri', 'start', 'end', 'text'])
+  expect(parameters.properties).toHaveProperty('uri')
+  expect(parameters.properties).toHaveProperty('start')
+  expect(parameters.properties).toHaveProperty('end')
+  expect(parameters.properties).toHaveProperty('text')
 })
 
 test('rename tool defines oldUri and newUri arguments', () => {

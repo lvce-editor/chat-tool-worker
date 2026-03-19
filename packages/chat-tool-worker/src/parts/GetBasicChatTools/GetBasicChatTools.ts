@@ -48,7 +48,6 @@ const getWriteFileTool = (): ChatTool => {
   }
 }
 
-<<<<<<< HEAD
 const getRenameTool = (): ChatTool => {
   return {
     function: {
@@ -68,7 +67,13 @@ const getRenameTool = (): ChatTool => {
           },
         },
         required: ['oldUri', 'newUri'],
-=======
+        type: 'object',
+      },
+    },
+    type: 'function',
+  }
+}
+
 const getEditFileTool = (): ChatTool => {
   return {
     function: {
@@ -97,7 +102,6 @@ const getEditFileTool = (): ChatTool => {
           },
         },
         required: ['uri', 'start', 'end', 'text'],
->>>>>>> origin/main
         type: 'object',
       },
     },
@@ -330,11 +334,8 @@ export const getBasicChatTools = (): readonly ChatTool[] => {
   return [
     getReadFileTool(),
     getWriteFileTool(),
-<<<<<<< HEAD
     getRenameTool(),
-=======
     getEditFileTool(),
->>>>>>> origin/main
     getListFilesTool(),
     getGetWorkspaceUriTool(),
     getRenderHtmlTool(),

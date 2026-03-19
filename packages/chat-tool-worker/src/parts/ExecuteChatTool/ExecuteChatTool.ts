@@ -24,13 +24,12 @@ export const executeChatTool = async (name: string, rawArguments: unknown, optio
     return executeWriteFileTool(args, options)
   }
 
-<<<<<<< HEAD
   if (name === 'rename') {
     return executeRenameTool(args, options)
-=======
+  }
+
   if (name === 'edit_file') {
     return executeEditFileTool(args, options)
->>>>>>> origin/main
   }
 
   if (name === 'list_files') {
