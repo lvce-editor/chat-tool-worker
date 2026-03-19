@@ -1,5 +1,7 @@
 import type { ExecuteToolOptions, ToolResponse } from '../Types/Types.ts'
 import { executeClosePreviewTool } from '../ExecuteClosePreviewTool/ExecuteClosePreviewTool.ts'
+import { executeCreateDirectoryTool } from '../ExecuteCreateDirectoryTool/ExecuteCreateDirectoryTool.ts'
+import { executeEditFileTool } from '../ExecuteEditFileTool/ExecuteEditFileTool.ts'
 import { executeGetWorkspaceUriTool } from '../ExecuteGetWorkspaceUriTool/ExecuteGetWorkspaceUriTool.ts'
 import { executeListFilesTool } from '../ExecuteListFilesTool/ExecuteListFilesTool.ts'
 import { executeOpenEditorTool } from '../ExecuteOpenEditorTool/ExecuteOpenEditorTool.ts'
@@ -7,6 +9,7 @@ import { executeOpenPreviewTool } from '../ExecuteOpenPreviewTool/ExecuteOpenPre
 import { executeReadFileTool } from '../ExecuteReadFileTool/ExecuteReadFileTool.ts'
 import { executeRenameTool } from '../ExecuteRenameTool/ExecuteRenameTool.ts'
 import { executeRenderHtmlTool } from '../ExecuteRenderHtmlTool/ExecuteRenderHtmlTool.ts'
+import { executeRunInTerminalTool } from '../ExecuteRunInTerminalTool/ExecuteRunInTerminalTool.ts'
 import { executeSearchTextTool } from '../ExecuteSearchTextTool/ExecuteSearchTextTool.ts'
 import { executeWriteFileTool } from '../ExecuteWriteFileTool/ExecuteWriteFileTool.ts'
 import { parseToolArguments } from '../ParseToolArguments/ParseToolArguments.ts'
@@ -21,8 +24,13 @@ export const executeChatTool = async (name: string, rawArguments: unknown, optio
     return executeWriteFileTool(args, options)
   }
 
+<<<<<<< HEAD
   if (name === 'rename') {
     return executeRenameTool(args, options)
+=======
+  if (name === 'edit_file') {
+    return executeEditFileTool(args, options)
+>>>>>>> origin/main
   }
 
   if (name === 'list_files') {
@@ -51,6 +59,14 @@ export const executeChatTool = async (name: string, rawArguments: unknown, optio
 
   if (name === 'search_text') {
     return executeSearchTextTool(args, options)
+  }
+
+  if (name === 'run_in_terminal') {
+    return executeRunInTerminalTool(args, options)
+  }
+
+  if (name === 'create_directory') {
+    return executeCreateDirectoryTool(args, options)
   }
 
   return { error: `Unknown tool: ${name}` }

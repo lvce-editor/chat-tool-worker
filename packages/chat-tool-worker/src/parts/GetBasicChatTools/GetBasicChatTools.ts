@@ -48,6 +48,7 @@ const getWriteFileTool = (): ChatTool => {
   }
 }
 
+<<<<<<< HEAD
 const getRenameTool = (): ChatTool => {
   return {
     function: {
@@ -67,6 +68,36 @@ const getRenameTool = (): ChatTool => {
           },
         },
         required: ['oldUri', 'newUri'],
+=======
+const getEditFileTool = (): ChatTool => {
+  return {
+    function: {
+      description:
+        'Apply a targeted text edit to an existing file by character offsets. This reads the current file, applies the edit, and writes the updated result. Use this for small changes instead of rewriting the full file.',
+      name: 'edit_file',
+      parameters: {
+        additionalProperties: false,
+        properties: {
+          end: {
+            description: 'Zero-based end character offset (exclusive) in the current file content.',
+            type: 'number',
+          },
+          start: {
+            description: 'Zero-based start character offset (inclusive) in the current file content.',
+            type: 'number',
+          },
+          text: {
+            description: 'Replacement text inserted at the range [start, end).',
+            type: 'string',
+          },
+          uri: {
+            description:
+              'Absolute URI for the target file (for example `file://...`, `memfs://...`, or extension-provided file system URIs). Relative paths are not allowed.',
+            type: 'string',
+          },
+        },
+        required: ['uri', 'start', 'end', 'text'],
+>>>>>>> origin/main
         type: 'object',
       },
     },
@@ -101,7 +132,7 @@ const getGetWorkspaceUriTool = (): ChatTool => {
   return {
     function: {
       description:
-        'Get the URI of the currently open workspace folder. Call this first before using list_files, read_file, write_file, open_preview, or openEditor when you do not already have a concrete workspace URI.',
+        'Get the URI of the currently open workspace folder. Call this first before using list_files, read_file, write_file, edit_file, open_preview, or openEditor when you do not already have a concrete workspace URI.',
       name: 'getWorkspaceUri',
       parameters: {
         additionalProperties: false,
@@ -242,11 +273,68 @@ const getSearchTextTool = (): ChatTool => {
   }
 }
 
+const getRunInTerminalTool = (): ChatTool => {
+  return {
+    function: {
+      description: 'Run a shell command in a terminal using the provided shell and command options.',
+      name: 'run_in_terminal',
+      parameters: {
+        additionalProperties: false,
+        properties: {
+          options: {
+            additionalProperties: false,
+            properties: {
+              command: {
+                type: 'string',
+              },
+              shell: {
+                type: 'string',
+              },
+            },
+            required: ['shell', 'command'],
+            type: 'object',
+          },
+        },
+        required: ['options'],
+        type: 'object',
+      },
+    },
+    type: 'function',
+  }
+}
+
+const getCreateDirectoryTool = (): ChatTool => {
+  return {
+    function: {
+      description:
+        'Create a new directory at the given absolute URI (for example `file://...`, `memfs://...`, or extension-provided file system URIs). Do not pass a relative path.',
+      name: 'create_directory',
+      parameters: {
+        additionalProperties: false,
+        properties: {
+          uri: {
+            description:
+              'Absolute URI for the target directory (for example `file://...`, `memfs://...`, or extension-provided file system URIs). Relative paths are not allowed.',
+            type: 'string',
+          },
+        },
+        required: ['uri'],
+        type: 'object',
+      },
+    },
+    type: 'function',
+  }
+}
+
 export const getBasicChatTools = (): readonly ChatTool[] => {
   return [
     getReadFileTool(),
     getWriteFileTool(),
+<<<<<<< HEAD
     getRenameTool(),
+=======
+    getEditFileTool(),
+>>>>>>> origin/main
     getListFilesTool(),
     getGetWorkspaceUriTool(),
     getRenderHtmlTool(),
@@ -254,5 +342,7 @@ export const getBasicChatTools = (): readonly ChatTool[] => {
     getOpenEditorTool(),
     getClosePreviewTool(),
     getSearchTextTool(),
+    getRunInTerminalTool(),
+    getCreateDirectoryTool(),
   ]
 }

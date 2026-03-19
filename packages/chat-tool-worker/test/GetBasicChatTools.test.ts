@@ -18,7 +18,11 @@ test('getBasicChatTools returns all expected tool names in order', () => {
   expect(names).toEqual([
     'read_file',
     'write_file',
+<<<<<<< HEAD
     'rename',
+=======
+    'edit_file',
+>>>>>>> origin/main
     'list_files',
     'getWorkspaceUri',
     'render_html',
@@ -26,6 +30,8 @@ test('getBasicChatTools returns all expected tool names in order', () => {
     'openEditor',
     'close_preview',
     'search_text',
+    'run_in_terminal',
+    'create_directory',
   ])
 })
 
@@ -81,4 +87,19 @@ test('search_text defines options object arguments for text search', () => {
   expect(optionsProperty.properties).toHaveProperty('matchCase')
   expect(optionsProperty.properties).toHaveProperty('machWholeWord')
   expect(optionsProperty.properties).toHaveProperty('exclude')
+})
+
+test('run_in_terminal defines options object arguments for shell execution', () => {
+  const runInTerminalTool = getTool('run_in_terminal')
+  const { parameters } = runInTerminalTool.function
+  expect(parameters.required).toEqual(['options'])
+  const optionsProperty = parameters.properties.options as {
+    readonly type: string
+    readonly required: readonly string[]
+    readonly properties: Readonly<Record<string, unknown>>
+  }
+  expect(optionsProperty.type).toBe('object')
+  expect(optionsProperty.required).toEqual(['shell', 'command'])
+  expect(optionsProperty.properties).toHaveProperty('shell')
+  expect(optionsProperty.properties).toHaveProperty('command')
 })
