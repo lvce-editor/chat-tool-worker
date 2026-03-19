@@ -8,23 +8,23 @@ type RgArgs = {
 }
 
 const getRgArgs = (args: Readonly<Record<string, unknown>>): RgArgs | undefined => {
-  const { pattern, path, output_mode, '-n': lineNumbers } = args
+  const { '-n': lineNumbers, output_mode, path, pattern } = args
   if (typeof pattern !== 'string') {
     return undefined
   }
-  if (typeof path !== 'undefined' && typeof path !== 'string') {
+  if (path !== undefined && typeof path !== 'string') {
     return undefined
   }
-  if (typeof output_mode !== 'undefined' && output_mode !== 'content' && output_mode !== 'files_with_matches' && output_mode !== 'count') {
+  if (output_mode !== undefined && output_mode !== 'content' && output_mode !== 'files_with_matches' && output_mode !== 'count') {
     return undefined
   }
-  if (typeof lineNumbers !== 'undefined' && typeof lineNumbers !== 'boolean') {
+  if (lineNumbers !== undefined && typeof lineNumbers !== 'boolean') {
     return undefined
   }
   return {
-    '-n': lineNumbers,
-    output_mode,
-    path,
+    ...(lineNumbers === undefined ? {} : { '-n': lineNumbers }),
+    ...(output_mode === undefined ? {} : { output_mode }),
+    ...(path === undefined ? {} : { path }),
     pattern,
   }
 }
