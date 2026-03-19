@@ -364,7 +364,6 @@ const getCreateDirectoryTool = (): ChatTool => {
   }
 }
 
-<<<<<<< HEAD
 const getGlobTool = (): ChatTool => {
   return {
     function: {
@@ -379,7 +378,13 @@ const getGlobTool = (): ChatTool => {
           },
         },
         required: ['pattern'],
-=======
+        type: 'object',
+      },
+    },
+    type: 'function',
+  }
+}
+
 const getUpdateTodoTool = (): ChatTool => {
   return {
     function: {
@@ -395,7 +400,6 @@ const getUpdateTodoTool = (): ChatTool => {
           },
         },
         required: ['todos'],
->>>>>>> origin/main
         type: 'object',
       },
     },
@@ -419,10 +423,7 @@ export const getBasicChatTools = (): readonly ChatTool[] => {
     getRgTool(),
     getRunInTerminalTool(),
     getCreateDirectoryTool(),
-<<<<<<< HEAD
     getGlobTool(),
-=======
     getUpdateTodoTool(),
->>>>>>> origin/main
   ]
 }
