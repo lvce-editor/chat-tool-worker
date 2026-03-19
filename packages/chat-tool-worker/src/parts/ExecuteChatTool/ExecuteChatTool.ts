@@ -19,69 +19,40 @@ import { parseToolArguments } from '../ParseToolArguments/ParseToolArguments.ts'
 
 export const executeChatTool = async (name: string, rawArguments: unknown, options: ExecuteToolOptions): Promise<ToolResponse> => {
   const args = parseToolArguments(rawArguments)
-  if (name === 'read_file') {
-    return executeReadFileTool(args, options)
+  switch (name) {
+    case 'close_preview':
+      return executeClosePreviewTool(args, options)
+    case 'create_directory':
+      return executeCreateDirectoryTool(args, options)
+    case 'edit_file':
+      return executeEditFileTool(args, options)
+    case 'getWorkspaceUri':
+      return executeGetWorkspaceUriTool(args, options)
+    case 'glob':
+      return executeGlobTool(args, options)
+    case 'list_files':
+      return executeListFilesTool(args, options)
+    case 'open_preview':
+      return executeOpenPreviewTool(args, options)
+    case 'openEditor':
+      return executeOpenEditorTool(args, options)
+    case 'read_file':
+      return executeReadFileTool(args, options)
+    case 'rename':
+      return executeRenameTool(args, options)
+    case 'render_html':
+      return executeRenderHtmlTool(args, options)
+    case 'rg':
+      return executeRgTool(args, options)
+    case 'run_in_terminal':
+      return executeRunInTerminalTool(args, options)
+    case 'search_text':
+      return executeSearchTextTool(args, options)
+    case 'update_todo':
+      return executeUpdateTodoTool(args, options)
+    case 'write_file':
+      return executeWriteFileTool(args, options)
+    default:
+      return { error: `Unknown tool: ${name}` }
   }
-
-  if (name === 'write_file') {
-    return executeWriteFileTool(args, options)
-  }
-
-  if (name === 'rename') {
-    return executeRenameTool(args, options)
-  }
-
-  if (name === 'edit_file') {
-    return executeEditFileTool(args, options)
-  }
-
-  if (name === 'list_files') {
-    return executeListFilesTool(args, options)
-  }
-
-  if (name === 'getWorkspaceUri') {
-    return executeGetWorkspaceUriTool(args, options)
-  }
-
-  if (name === 'render_html') {
-    return executeRenderHtmlTool(args, options)
-  }
-
-  if (name === 'open_preview') {
-    return executeOpenPreviewTool(args, options)
-  }
-
-  if (name === 'openEditor') {
-    return executeOpenEditorTool(args, options)
-  }
-
-  if (name === 'close_preview') {
-    return executeClosePreviewTool(args, options)
-  }
-
-  if (name === 'search_text') {
-    return executeSearchTextTool(args, options)
-  }
-
-  if (name === 'rg') {
-    return executeRgTool(args, options)
-  }
-
-  if (name === 'run_in_terminal') {
-    return executeRunInTerminalTool(args, options)
-  }
-
-  if (name === 'create_directory') {
-    return executeCreateDirectoryTool(args, options)
-  }
-
-  if (name === 'glob') {
-    return executeGlobTool(args, options)
-  }
-
-  if (name === 'update_todo') {
-    return executeUpdateTodoTool(args, options)
-  }
-
-  return { error: `Unknown tool: ${name}` }
 }
