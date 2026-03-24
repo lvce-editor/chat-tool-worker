@@ -1,3 +1,5 @@
+const windowsDrivePathRegex = /^[a-zA-Z]:[\\/]/
+
 export const isAbsoluteFileSystemPath = (value: string): boolean => {
-  return value.startsWith('/') || /^[a-zA-Z]:[\\/]/.test(value)
+  return value.startsWith('/') || windowsDrivePathRegex.test(value)
 }
