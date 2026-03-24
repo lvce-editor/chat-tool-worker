@@ -4,6 +4,7 @@ import { executeCreateDirectoryTool } from '../ExecuteCreateDirectoryTool/Execut
 import { executeEditFileTool } from '../ExecuteEditFileTool/ExecuteEditFileTool.ts'
 import { executeGetWorkspaceUriTool } from '../ExecuteGetWorkspaceUriTool/ExecuteGetWorkspaceUriTool.ts'
 import { executeGlobTool } from '../ExecuteGlobTool/ExecuteGlobTool.ts'
+import { executeGrepSearchTool } from '../ExecuteGrepSearchTool/ExecuteGrepSearchTool.ts'
 import { executeListFilesTool } from '../ExecuteListFilesTool/ExecuteListFilesTool.ts'
 import { executeOpenEditorTool } from '../ExecuteOpenEditorTool/ExecuteOpenEditorTool.ts'
 import { executeOpenPreviewTool } from '../ExecuteOpenPreviewTool/ExecuteOpenPreviewTool.ts'
@@ -30,6 +31,8 @@ export const executeChatTool = async (name: string, rawArguments: unknown, optio
       return executeGetWorkspaceUriTool(args, options)
     case 'glob':
       return executeGlobTool(args, options)
+    case 'grep_search':
+      return executeGrepSearchTool(args, options)
     case 'list_files':
       return executeListFilesTool(args, options)
     case 'open_preview':
