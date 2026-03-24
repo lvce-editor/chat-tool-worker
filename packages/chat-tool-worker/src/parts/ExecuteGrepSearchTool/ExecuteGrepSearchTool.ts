@@ -33,6 +33,9 @@ type LegacyMemorySearchResult = readonly [string, readonly LegacyMemoryMatch[]]
 const grepSearchArgumentError =
   'Invalid argument: grep_search requires query (string), isRegexp (boolean), optional includePattern (string), optional maxResults (number), and optional includeIgnoredFiles (boolean).'
 
+const windowsPathWithLeadingSlashRegex = /^\/[a-zA-Z]:/
+const windowsAbsolutePathRegex = /^[a-zA-Z]:[\\/]/
+
 const getGrepSearchArgs = (args: Readonly<Record<string, unknown>>): GrepSearchArgs | undefined => {
   const { includeIgnoredFiles, includePattern, isRegexp, maxResults, query } = args
   if (typeof query !== 'string' || typeof isRegexp !== 'boolean') {
@@ -66,14 +69,14 @@ const getScheme = (uriOrPath: string): string => {
 const getFilePathFromUri = (uri: string): string => {
   const url = new URL(uri)
   const decodedPath = decodeURIComponent(url.pathname)
-  if (/^\/[a-zA-Z]:/.test(decodedPath)) {
+  if (windowsPathWithLeadingSlashRegex.test(decodedPath)) {
     return decodedPath.slice(1)
   }
   return decodedPath
 }
 
 const isAbsoluteFileSystemPath = (value: string): boolean => {
-  return value.startsWith('/') || /^[a-zA-Z]:[\\/]/.test(value)
+  return value.startsWith('/') || windowsAbsolutePathRegex.test(value)
 }
 
 const isFileUri = (value: string): boolean => {
@@ -168,11 +171,7 @@ const executeFileGrepSearch = async (workspaceUri: string, grepSearchArgs: GrepS
   }
 }
 
-const executeMemoryGrepSearch = async (
-  workspaceUri: string,
-  grepSearchArgs: GrepSearchArgs,
-  options: ExecuteToolOptions,
-): Promise<ToolResponse> => {
+const executeMemoryGrepSearch = async (workspaceUri: string, grepSearchArgs: GrepSearchArgs, options: ExecuteToolOptions): Promise<ToolResponse> => {
   const searchOptions = {
     exclude: '',
     include: grepSearchArgs.includePattern || '',
