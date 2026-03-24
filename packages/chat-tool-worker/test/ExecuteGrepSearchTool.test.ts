@@ -139,6 +139,7 @@ test('executeGrepSearchTool validates grep_search argument shape', async () => {
   )
 
   expect(result).toEqual({
-    error: 'Invalid argument: grep_search requires query (string), isRegexp (boolean), optional includePattern (string), optional maxResults (number), and optional includeIgnoredFiles (boolean).',
+    error:
+      'Invalid argument: grep_search requires query (string), isRegexp (boolean), optional includePattern (string), optional maxResults (number), and optional includeIgnoredFiles (boolean).',
   })
 })
