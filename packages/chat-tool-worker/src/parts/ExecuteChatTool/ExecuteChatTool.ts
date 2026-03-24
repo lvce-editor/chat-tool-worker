@@ -3,6 +3,7 @@ import { executeClosePreviewTool } from '../ExecuteClosePreviewTool/ExecuteClose
 import { executeCreateDirectoryTool } from '../ExecuteCreateDirectoryTool/ExecuteCreateDirectoryTool.ts'
 import { executeEditFileTool } from '../ExecuteEditFileTool/ExecuteEditFileTool.ts'
 import { executeGetWorkspaceUriTool } from '../ExecuteGetWorkspaceUriTool/ExecuteGetWorkspaceUriTool.ts'
+import { executeGrepSearchTool } from '../ExecuteGrepSearchTool/ExecuteGrepSearchTool.ts'
 import { executeGlobTool } from '../ExecuteGlobTool/ExecuteGlobTool.ts'
 import { executeListFilesTool } from '../ExecuteListFilesTool/ExecuteListFilesTool.ts'
 import { executeOpenEditorTool } from '../ExecuteOpenEditorTool/ExecuteOpenEditorTool.ts'
@@ -30,6 +31,8 @@ export const executeChatTool = async (name: string, rawArguments: unknown, optio
       return executeGetWorkspaceUriTool(args, options)
     case 'glob':
       return executeGlobTool(args, options)
+    case 'grep_search':
+      return executeGrepSearchTool(args, options)
     case 'list_files':
       return executeListFilesTool(args, options)
     case 'open_preview':

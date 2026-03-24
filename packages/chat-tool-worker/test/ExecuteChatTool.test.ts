@@ -136,6 +136,28 @@ test('executeChatTool dispatches rg tool', async () => {
   })
 })
 
+test('executeChatTool dispatches grep_search tool', async () => {
+  const result = await ExecuteChatTool.executeChatTool(
+    'grep_search',
+    JSON.stringify({
+      includeIgnoredFiles: false,
+      includePattern: 'packages/chat-tool-worker/src/**/*.ts',
+      isRegexp: false,
+      query: 'search text',
+    }),
+    options,
+  )
+  expect(result).toEqual({
+    arguments: {
+      includeIgnoredFiles: false,
+      includePattern: 'packages/chat-tool-worker/src/**/*.ts',
+      isRegexp: false,
+      query: 'search text',
+    },
+    result: 'No matches found.',
+  })
+})
+
 test('executeChatTool dispatches update_todo tool', async () => {
   const result = await ExecuteChatTool.executeChatTool(
     'update_todo',

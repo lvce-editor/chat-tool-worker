@@ -28,6 +28,7 @@ test('getBasicChatTools returns all expected tool names in order', () => {
     'close_preview',
     'search_text',
     'rg',
+    'grep_search',
     'run_in_terminal',
     'create_directory',
     'glob',
@@ -134,6 +135,17 @@ test('rg defines ripgrep-style arguments for workspace search', () => {
   expect(parameters.properties).toHaveProperty('path')
   expect(parameters.properties).toHaveProperty('output_mode')
   expect(parameters.properties).toHaveProperty('-n')
+})
+
+test('grep_search defines vscode-style grep arguments for workspace search', () => {
+  const grepSearchTool = getTool('grep_search')
+  const { parameters } = grepSearchTool.function
+  expect(parameters.required).toEqual(['query', 'isRegexp'])
+  expect(parameters.properties).toHaveProperty('query')
+  expect(parameters.properties).toHaveProperty('isRegexp')
+  expect(parameters.properties).toHaveProperty('includePattern')
+  expect(parameters.properties).toHaveProperty('maxResults')
+  expect(parameters.properties).toHaveProperty('includeIgnoredFiles')
 })
 
 test('update_todo defines todos string argument for checklist updates', () => {
