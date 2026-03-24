@@ -1,0 +1,16 @@
+Third-Party Notices
+===================
+
+This project is based on the following third-party projects:
+
+1. Visual Studio Code (VS Code)
+   Copyright (c) Microsoft Corporation
+   License: MIT
+   https://github.com/microsoft/vscode
+   License text: https://raw.githubusercontent.com/microsoft/vscode/main/LICENSE.txt
+
+2. GitHub Copilot Chat for VS Code
+   Copyright (c) Microsoft Corporation
+   License: MIT
+   https://github.com/microsoft/vscode-copilot-chat
+   License text: https://raw.githubusercontent.com/microsoft/vscode-copilot-chat/main/LICENSE.txt
