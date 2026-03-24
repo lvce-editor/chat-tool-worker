@@ -175,3 +175,110 @@ test('executeChatTool dispatches update_todo tool', async () => {
     todos: '- [ ] Inspect\n- [ ] Implement',
   })
 })
+
+test('executeChatTool dispatches close_preview tool', async () => {
+  const result = await ExecuteChatTool.executeChatTool('close_preview', JSON.stringify({}), options)
+  expect(result).toMatchObject({
+    error: expect.any(String),
+  })
+})
+
+test('executeChatTool dispatches create_directory tool', async () => {
+  const result = await ExecuteChatTool.executeChatTool(
+    'create_directory',
+    JSON.stringify({
+      uri: '/test/playground/newdir',
+    }),
+    options,
+  )
+
+  expect(result).toEqual({
+    error: 'Invalid argument: uri must be an absolute URI.',
+  })
+})
+
+test('executeChatTool dispatches getWorkspaceUri tool', async () => {
+  const result = await ExecuteChatTool.executeChatTool('getWorkspaceUri', JSON.stringify({}), options)
+  expect(result).toMatchObject({
+    error: expect.any(String),
+  })
+})
+
+test('executeChatTool dispatches list_files tool', async () => {
+  const result = await ExecuteChatTool.executeChatTool(
+    'list_files',
+    JSON.stringify({
+      uri: 'file:///workspace',
+    }),
+    options,
+  )
+
+  expect(result).toEqual({
+    error: 'Invalid argument: uri must be a real workspace folder URI. Call getWorkspaceUri first and use the returned workspaceUri value.',
+    uri: 'file:///workspace',
+  })
+})
+
+test('executeChatTool dispatches open_preview tool', async () => {
+  const result = await ExecuteChatTool.executeChatTool(
+    'open_preview',
+    JSON.stringify({
+      uri: '/test/playground/index.js',
+    }),
+    options,
+  )
+
+  expect(result).toEqual({
+    error: 'Invalid argument: uri must be an absolute URI.',
+  })
+})
+
+test('executeChatTool dispatches openEditor tool', async () => {
+  const result = await ExecuteChatTool.executeChatTool(
+    'openEditor',
+    JSON.stringify({
+      uri: '/test/playground/index.js',
+    }),
+    options,
+  )
+
+  expect(result).toEqual({
+    error: 'Invalid argument: uri must be an absolute URI.',
+  })
+})
+
+test('executeChatTool dispatches read_file tool', async () => {
+  const result = await ExecuteChatTool.executeChatTool(
+    'read_file',
+    JSON.stringify({
+      uri: '/test/playground/index.js',
+    }),
+    options,
+  )
+
+  expect(result).toEqual({
+    error: 'Invalid argument: uri must be an absolute URI.',
+  })
+})
+
+test('executeChatTool dispatches render_html tool', async () => {
+  const result = await ExecuteChatTool.executeChatTool('render_html', JSON.stringify({}), options)
+  expect(result).toEqual({
+    error: 'Missing required argument: html',
+  })
+})
+
+test('executeChatTool dispatches write_file tool', async () => {
+  const result = await ExecuteChatTool.executeChatTool(
+    'write_file',
+    JSON.stringify({
+      content: '',
+      uri: '/test/playground/index.js',
+    }),
+    options,
+  )
+
+  expect(result).toEqual({
+    error: 'Invalid argument: uri must be an absolute URI.',
+  })
+})
