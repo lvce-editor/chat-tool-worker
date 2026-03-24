@@ -1,5 +1,6 @@
+import { initializeFileSystemWorker } from '../InitializeFileSystemWorker/InitializeFileSystemWorker.ts'
 import { initializeRendererWorker } from '../InitializeRendererWorker/InitializeRendererWorker.ts'
 
 export const listen = async (): Promise<void> => {
-  await initializeRendererWorker()
+  await Promise.all([initializeRendererWorker(), initializeFileSystemWorker()])
 }
