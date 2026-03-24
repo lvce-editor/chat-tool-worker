@@ -1,28 +1,132 @@
 import { expect, test } from '@jest/globals'
+import { RendererWorker } from '@lvce-editor/rpc-registry'
 import { executeGrepSearchTool } from '../src/parts/ExecuteGrepSearchTool/ExecuteGrepSearchTool.ts'
 
-test('executeGrepSearchTool returns mock grep output', async () => {
-  const result = await executeGrepSearchTool(
-    {
-      includeIgnoredFiles: true,
-      includePattern: 'src/**/*.ts',
-      isRegexp: true,
-      maxResults: 25,
-      query: 'function|method|procedure',
-    },
-    {} as never,
-  )
+const options = {
+  assetDir: '',
+  platform: 0,
+}
 
-  expect(result).toEqual({
-    arguments: {
-      includeIgnoredFiles: true,
-      includePattern: 'src/**/*.ts',
-      isRegexp: true,
-      maxResults: 25,
-      query: 'function|method|procedure',
+test('executeGrepSearchTool uses search-process for file workspaces', async () => {
+  let called = 0
+  let calledWithMethod = ''
+  let calledWithOptions: any
+  using mockRpc = RendererWorker.registerMockRpc({
+    'SearchProcess.invoke': async (method: string, options: any) => {
+      called++
+      calledWithMethod = method
+      calledWithOptions = options
+      return {
+        limitHit: false,
+        results: [
+          {
+            end: 0,
+            lineNumber: 0,
+            start: 0,
+            text: 'src/main.ts',
+            type: 1,
+          },
+          {
+            end: 20,
+            lineNumber: 12,
+            start: 6,
+            text: 'const searchText = true',
+            type: 2,
+          },
+        ],
+      }
     },
-    result: 'No matches found.',
+    'Workspace.getPath': async () => 'file:///workspace',
   })
+  try {
+    const result = await executeGrepSearchTool(
+      {
+        includeIgnoredFiles: true,
+        includePattern: 'src/**/*.ts',
+        isRegexp: true,
+        maxResults: 25,
+        query: 'function|method|procedure',
+      },
+      options,
+    )
+
+    expect(called).toBe(1)
+    expect(calledWithMethod).toBe('TextSearch.search')
+    expect(calledWithOptions).toEqual({
+      maxSearchResults: 25,
+      ripGrepArgs: [
+        '--hidden',
+        '--no-require-git',
+        '--smart-case',
+        '--stats',
+        '--json',
+        '--threads',
+        '1',
+        '--ignore-case',
+        '--no-ignore',
+        '--glob',
+        'src/**/*.ts',
+        '--regexp',
+        'function|method|procedure',
+        '.',
+      ],
+      searchDir: '/workspace',
+    })
+    expect(result).toEqual({
+      arguments: {
+        includeIgnoredFiles: true,
+        includePattern: 'src/**/*.ts',
+        isRegexp: true,
+        maxResults: 25,
+        query: 'function|method|procedure',
+      },
+      result: 'src/main.ts:12:const searchText = true',
+      workspaceUri: 'file:///workspace',
+    })
+  } finally {
+    if (Symbol.dispose in mockRpc) {
+      ;(mockRpc as { [Symbol.dispose]: () => void })[Symbol.dispose]()
+    }
+  }
+})
+
+test('executeGrepSearchTool uses memory search for non-file workspaces', async () => {
+  let fallbackCalled = 0
+  using mockRpc = RendererWorker.registerMockRpc({
+    'ExtensionHostTextSearch.textSearchMemory': async () => {
+      fallbackCalled++
+      return [['src/main.ts', [{ preview: 'const fromMemory = true' }]]]
+    },
+    'ExtensionHostTextSearch.textSearchMemory2': async () => {
+      throw new Error('new api not supported')
+    },
+    'Workspace.getPath': async () => 'memfs:///workspace',
+  })
+  try {
+    const result = await executeGrepSearchTool(
+      {
+        includePattern: 'src/**/*.ts',
+        isRegexp: false,
+        query: 'fromMemory',
+      },
+      options,
+    )
+
+    expect(fallbackCalled).toBe(1)
+    expect(result).toEqual({
+      arguments: {
+        includePattern: 'src/**/*.ts',
+        isRegexp: false,
+        query: 'fromMemory',
+      },
+      result: 'src/main.ts: const fromMemory = true',
+      workspaceUri: 'memfs:///workspace',
+    })
+  } finally {
+    if (Symbol.dispose in mockRpc) {
+      ;(mockRpc as { [Symbol.dispose]: () => void })[Symbol.dispose]()
+    }
+  }
 })
 
 test('executeGrepSearchTool validates grep_search argument shape', async () => {

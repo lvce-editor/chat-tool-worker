@@ -1,4 +1,5 @@
 import { expect, test } from '@jest/globals'
+import { RendererWorker } from '@lvce-editor/rpc-registry'
 import * as ExecuteChatTool from '../src/parts/ExecuteChatTool/ExecuteChatTool.ts'
 
 const options = {
@@ -137,25 +138,39 @@ test('executeChatTool dispatches rg tool', async () => {
 })
 
 test('executeChatTool dispatches grep_search tool', async () => {
-  const result = await ExecuteChatTool.executeChatTool(
-    'grep_search',
-    JSON.stringify({
-      includeIgnoredFiles: false,
-      includePattern: 'packages/chat-tool-worker/src/**/*.ts',
-      isRegexp: false,
-      query: 'search text',
+  using mockRpc = RendererWorker.registerMockRpc({
+    'SearchProcess.invoke': async () => ({
+      limitHit: false,
+      results: [],
     }),
-    options,
-  )
-  expect(result).toEqual({
-    arguments: {
-      includeIgnoredFiles: false,
-      includePattern: 'packages/chat-tool-worker/src/**/*.ts',
-      isRegexp: false,
-      query: 'search text',
-    },
-    result: 'No matches found.',
+    'Workspace.getPath': async () => 'file:///workspace',
   })
+  try {
+    const result = await ExecuteChatTool.executeChatTool(
+      'grep_search',
+      JSON.stringify({
+        includeIgnoredFiles: false,
+        includePattern: 'packages/chat-tool-worker/src/**/*.ts',
+        isRegexp: false,
+        query: 'search text',
+      }),
+      options,
+    )
+    expect(result).toEqual({
+      arguments: {
+        includeIgnoredFiles: false,
+        includePattern: 'packages/chat-tool-worker/src/**/*.ts',
+        isRegexp: false,
+        query: 'search text',
+      },
+      result: 'No matches found.',
+      workspaceUri: 'file:///workspace',
+    })
+  } finally {
+    if (Symbol.dispose in mockRpc) {
+      ;(mockRpc as { [Symbol.dispose]: () => void })[Symbol.dispose]()
+    }
+  }
 })
 
 test('executeChatTool dispatches update_todo tool', async () => {
