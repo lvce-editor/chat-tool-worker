@@ -101,6 +101,21 @@ test('executeChatTool dispatches run_in_terminal tool', async () => {
   })
 })
 
+test('executeChatTool dispatches spawn_subagent tool', async () => {
+  const result = await ExecuteChatTool.executeChatTool(
+    'spawn_subagent',
+    JSON.stringify({
+      prompt: 'Summarize the current file',
+    }),
+    options,
+  )
+  expect(result).toEqual({
+    ok: true,
+    prompt: 'Summarize the current file',
+    response: 'Hello From Sub agent - not yet implemented',
+  })
+})
+
 test('executeChatTool dispatches glob tool', async () => {
   const result = await ExecuteChatTool.executeChatTool(
     'glob',
