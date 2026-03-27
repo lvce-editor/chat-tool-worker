@@ -10,7 +10,7 @@
  */
 
 const escapeRegExp = (str: string): string => {
-  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  return str.replaceAll(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
 
 /*
@@ -23,42 +23,53 @@ const segmentToRegex = (segment: string): RegExp => {
   while (i < segment.length) {
     const char = segment[i]
 
-    if (char === '*') {
-      // * matches anything except /
-      regexStr += '[^/]*'
-      i++
-    } else if (char === '?') {
-      // ? matches any single character except /
-      regexStr += '[^/]'
-      i++
-    } else if (char === '[') {
-      // Character class [abc] or [!abc] or [a-z]
-      let j = i + 1
-      let negated = false
-      if (j < segment.length && segment[j] === '!') {
-        negated = true
-        j++
+    switch (char) {
+      case '?': {
+        // ? matches any single character except /
+        regexStr += '[^/]'
+        i++
+
+        break
       }
-      let classStr = ''
-      while (j < segment.length && segment[j] !== ']') {
-        classStr += segment[j]
-        j++
-      }
-      if (j < segment.length) {
-        if (negated) {
-          regexStr += `[^${escapeRegExp(classStr)}]`
-        } else {
-          // For character class, we need to preserve the range syntax
-          regexStr += `[${classStr.replace(/\\/g, '\\\\')}]`
+      case '[': {
+        // Character class [abc] or [!abc] or [a-z]
+        let j = i + 1
+        let negated = false
+        if (j < segment.length && segment[j] === '!') {
+          negated = true
+          j++
         }
-        i = j + 1
-      } else {
+        let classStr = ''
+        while (j < segment.length && segment[j] !== ']') {
+          classStr += segment[j]
+          j++
+        }
+        if (j < segment.length) {
+          if (negated) {
+            regexStr += `[^${escapeRegExp(classStr)}]`
+          } else {
+            // For character class, we need to preserve the range syntax
+            regexStr += `[${classStr.replaceAll('\\', '\\\\')}]`
+          }
+          i = j + 1
+        } else {
+          regexStr += escapeRegExp(char)
+          i++
+        }
+
+        break
+      }
+      case '*': {
+        // * matches anything except /
+        regexStr += '[^/]*'
+        i++
+
+        break
+      }
+      default: {
         regexStr += escapeRegExp(char)
         i++
       }
-    } else {
-      regexStr += escapeRegExp(char)
-      i++
     }
   }
 
@@ -67,8 +78,8 @@ const segmentToRegex = (segment: string): RegExp => {
 
 export const matchesGlobPattern = (path: string, pattern: string): boolean => {
   // Normalize slashes and remove leading ./
-  const normalizedPath = path.replace(/\\/g, '/').replace(/^\.\//, '')
-  let normalizedPattern = pattern.replace(/\\/g, '/').replace(/^\.\//, '').replace(/\/+/g, '/')
+  const normalizedPath = path.replaceAll('\\', '/').replace(/^\.\//, '')
+  let normalizedPattern = pattern.replaceAll('\\', '/').replace(/^\.\//, '').replaceAll(/\/+/g, '/')
 
   // Handle trailing slash (matches any content in that directory)
   if (normalizedPattern.endsWith('/')) {

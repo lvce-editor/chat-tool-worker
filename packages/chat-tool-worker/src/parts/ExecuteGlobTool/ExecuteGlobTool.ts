@@ -5,11 +5,11 @@ import { traverseDirectory } from './TraverseDirectory.ts'
 
 const normalizePattern = (pattern: string): { baseDir: string; globPart: string; matchDirectories: boolean } => {
   // Convert backslashes to forward slashes
-  let normalized = pattern.replace(/\\/g, '/')
+  let normalized = pattern.replaceAll('\\', '/')
   // Remove leading ./
   const withoutLeadingDot = normalized.startsWith('./') ? normalized.slice(2) : normalized
   // Collapse consecutive slashes
-  normalized = withoutLeadingDot.replace(/\/+/g, '/')
+  normalized = withoutLeadingDot.replaceAll(/\/+/g, '/')
   // Check if pattern ends with /
   const matchDirectories = normalized.endsWith('/')
 
@@ -49,7 +49,7 @@ export const executeGlobTool = async (args: Readonly<Record<string, unknown>>, _
   }
 
   // Normalize whitespace and slashes
-  const normalizedInput = pattern.trim().replace(/\\/g, '/')
+  const normalizedInput = pattern.trim().replaceAll('\\', '/')
   const { baseDir, globPart, matchDirectories } = normalizePattern(pattern)
 
   const matches: string[] = []
@@ -94,17 +94,20 @@ export const executeGlobTool = async (args: Readonly<Record<string, unknown>>, _
       // Recursive traversal needed (has glob characters with **)
       const baseDirUri = baseDir ? `${baseUri}/${baseDir}` : baseUri
 
-      await traverseDirectory(baseDirUri, '', async (relativePath, entry) => {
-        // Build the full path to check against pattern
-        const fullPath = baseDir ? `${baseDir}/${relativePath}` : relativePath
-
-        // Only match files, not directories
-        if (entry.isFile()) {
-          if (matchesGlobPattern(fullPath, normalizedInput)) {
-            matches.push(fullPath)
+      await traverseDirectory(
+        baseDirUri,
+        '',
+        async (relativePath, entry) => {
+          // Build the full path to check against pattern
+          const fullPath =b&&
+          // Only match files, not directories
+              if (matchesGlobPattern(fullPath, normalizedInput)) {
+              matches.push(fullPath)
+            }
           }
-        }
-      }, visited)
+        },
+        visited,
+      )
     }
 
     // Sort for consistent results

@@ -10,11 +10,12 @@ export type DirEntry = {
 const DEFAULT_EXCLUDE_DIRS = new Set(['.git', 'node_modules', '.cache', '.venv', 'dist', 'build', '.next', '.nuxt'])
 
 export const shouldExcludeDir = (dirName: string, commonlyIgnored = true): boolean => {
-  if (dirName.startsWith('.')) {
-    // Exclude dot files/dirs by default (like .git, .cache, etc.)
-    if (commonlyIgnored && DEFAULT_EXCLUDE_DIRS.has(dirName)) {
-      return true
-    }
+  if (
+    dirName.startsWith('.') && // Exclude dot files/dirs by default (like .git, .cache, etc.)
+    commonlyIgnored &&
+    DEFAULT_EXCLUDE_DIRS.has(dirName)
+  ) {
+    return true
   }
   return false
 }

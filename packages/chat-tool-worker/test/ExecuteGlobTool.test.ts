@@ -4,10 +4,10 @@ import { executeGlobTool } from '../src/parts/ExecuteGlobTool/ExecuteGlobTool.ts
 
 // Helper to create a mock directory entry
 const mockEntry = (name: string, isFile: boolean, isSymbolicLink = false) => ({
-  name,
-  isFile: () => isFile,
   isDirectory: () => !isFile,
+  isFile: () => isFile,
   isSymbolicLink: () => isSymbolicLink,
+  name,
 })
 
 // ============================================================================
@@ -41,13 +41,13 @@ test('executeGlobTool rejects non-string pattern', async () => {
 
 test('executeGlobTool matches files with simple * pattern', async () => {
   using mockRpc = RendererWorker.registerMockRpc({
+    'FileSystem.getFilePathFromUri': async (uri: string) => uri.replace('file://', ''),
     'FileSystem.readDirWithFileTypes': async (uri: string) => {
       if (uri === 'file:///workspace/src') {
         return [mockEntry('main.ts', true), mockEntry('utils.ts', true), mockEntry('config.json', true)]
       }
       return []
     },
-    'FileSystem.getFilePathFromUri': async (uri: string) => uri.replace('file://', ''),
   })
 
   try {
@@ -66,13 +66,13 @@ test('executeGlobTool matches files with simple * pattern', async () => {
 
 test('executeGlobTool matches all files with pattern *', async () => {
   using mockRpc = RendererWorker.registerMockRpc({
+    'FileSystem.getFilePathFromUri': async (uri: string) => uri.replace('file://', ''),
     'FileSystem.readDirWithFileTypes': async (uri: string) => {
       if (uri === 'file:///workspace/src') {
         return [mockEntry('main.ts', true), mockEntry('utils.ts', true), mockEntry('config.json', true)]
       }
       return []
     },
-    'FileSystem.getFilePathFromUri': async (uri: string) => uri.replace('file://', ''),
   })
 
   try {
@@ -90,13 +90,13 @@ test('executeGlobTool matches all files with pattern *', async () => {
 
 test('executeGlobTool matches with ? single character wildcard', async () => {
   using mockRpc = RendererWorker.registerMockRpc({
+    'FileSystem.getFilePathFromUri': async (uri: string) => uri.replace('file://', ''),
     'FileSystem.readDirWithFileTypes': async (uri: string) => {
       if (uri === 'file:///workspace/src') {
         return [mockEntry('a.ts', true), mockEntry('ab.ts', true), mockEntry('b.ts', true)]
       }
       return []
     },
-    'FileSystem.getFilePathFromUri': async (uri: string) => uri.replace('file://', ''),
   })
 
   try {
@@ -115,13 +115,13 @@ test('executeGlobTool matches with ? single character wildcard', async () => {
 
 test('executeGlobTool filters directories with * pattern', async () => {
   using mockRpc = RendererWorker.registerMockRpc({
+    'FileSystem.getFilePathFromUri': async (uri: string) => uri.replace('file://', ''),
     'FileSystem.readDirWithFileTypes': async (uri: string) => {
       if (uri === 'file:///workspace/src') {
         return [mockEntry('main.ts', true), mockEntry('utils', false)]
       }
       return []
     },
-    'FileSystem.getFilePathFromUri': async (uri: string) => uri.replace('file://', ''),
   })
 
   try {
@@ -143,6 +143,7 @@ test('executeGlobTool filters directories with * pattern', async () => {
 
 test('executeGlobTool recursively matches with ** pattern', async () => {
   using mockRpc = RendererWorker.registerMockRpc({
+    'FileSystem.getFilePathFromUri': async (uri: string) => uri.replace('file://', ''),
     'FileSystem.readDirWithFileTypes': async (uri: string) => {
       if (uri === 'file:///workspace/src') {
         return [mockEntry('main.ts', true), mockEntry('subdir', false)]
@@ -155,17 +156,12 @@ test('executeGlobTool recursively matches with ** pattern', async () => {
       }
       return []
     },
-    'FileSystem.getFilePathFromUri': async (uri: string) => uri.replace('file://', ''),
   })
 
   try {
     const result = await executeGlobTool({ pattern: 'src/**/*.ts' }, {} as never)
     expect(result).toMatchObject({
-      paths: expect.arrayContaining([
-        'src/main.ts',
-        'src/subdir/index.ts',
-        'src/subdir/nested/deep.ts',
-      ]),
+      paths: expect.arrayContaining(['src/main.ts', 'src/subdir/index.ts', 'src/subdir/nested/deep.ts']),
       pattern: 'src/**/*.ts',
     })
   } finally {
@@ -181,6 +177,7 @@ test('executeGlobTool matches with ** at the beginning for deep search', async (
       if (uri === 'file:///workspace') {
         return [mockEntry('test', false), mockEntry('src', false)]
       }
+    'FileSystem.getFilePathFromUri': async (uri: string) => uri.replace('file://', ''),
       if (uri === 'file:///workspace/test') {
         return [mockEntry('Main.test.ts', true)]
       }
@@ -196,8 +193,7 @@ test('executeGlobTool matches with ** at the beginning for deep search', async (
   })
 
   try {
-    const result = await executeGlobTool({ pattern: '**/test/*.ts' }, {} as never)
-    expect(result).toMatchObject({
+ T  expect(result).toMatchObject({
       paths: expect.arrayContaining(['test/Main.test.ts']),
       pattern: '**/test/*.ts',
     })
@@ -214,6 +210,7 @@ test('executeGlobTool handles ** matching everything recursively', async () => {
       if (uri === 'file:///workspace') {
         return [mockEntry('a.ts', true), mockEntry('dir', false)]
       }
+    'FileSystem.getFilePathFromUri': async (uri: string) => uri.replace('file://', ''),
       if (uri === 'file:///workspace/dir') {
         return [mockEntry('b.ts', true), mockEntry('nested', false)]
       }
@@ -225,8 +222,7 @@ test('executeGlobTool handles ** matching everything recursively', async () => {
     'FileSystem.getFilePathFromUri': async (uri: string) => uri.replace('file://', ''),
   })
 
-  try {
-    const result = await executeGlobTool({ pattern: '**/*.ts' }, {} as never)
+  try
     expect(result).toMatchObject({
       paths: expect.arrayContaining(['a.ts', 'dir/b.ts', 'dir/nested/c.ts']),
       pattern: '**/*.ts',
@@ -248,7 +244,8 @@ test('executeGlobTool excludes .git directory by default', async () => {
       if (uri === 'file:///workspace') {
         return [mockEntry('.git', false), mockEntry('main.ts', true), mockEntry('src', false)]
       }
-      if (uri === 'file:///workspace/.git') {
+      if (uri ==getFilePathFromUri': async (uri: st=ing) => uri.r pl'ce('file://', ''),
+    'FileSystem.reafile:///workspace/.git') {
         return [mockEntry('config', false)]
       }
       if (uri === 'file:///workspace/src') {
@@ -260,7 +257,6 @@ test('executeGlobTool excludes .git directory by default', async () => {
   })
 
   try {
-    const result = await executeGlobTool({ pattern: '**/*.ts' }, {} as never)
     expect(result).toMatchObject({
       paths: expect.arrayContaining(['main.ts']),
       pattern: '**/*.ts',
@@ -279,7 +275,8 @@ test('executeGlobTool excludes node_modules directory by default', async () => {
       if (uri === 'file:///workspace') {
         return [mockEntry('node_modules', false), mockEntry('main.ts', true)]
       }
-      if (uri === 'file:///workspace/node_modules') {
+      if (urtem.geiFil PathFro=Uri': async (uri: string) => uri== pl'ce('file://', ''),
+    'FileSystem.reafile:///workspace/node_modules') {
         return [mockEntry('lodash', false)]
       }
       return []
@@ -288,7 +285,6 @@ test('executeGlobTool excludes node_modules directory by default', async () => {
   })
 
   try {
-    const result = await executeGlobTool({ pattern: '**/*.ts' }, {} as never)
     expect(result).toMatchObject({
       paths: ['main.ts'],
       pattern: '**/*.ts',
@@ -305,14 +301,10 @@ test('executeGlobTool excludes multiple default ignored directories', async () =
   using mockRpc = RendererWorker.registerMockRpc({
     'FileSystem.readDirWithFileTypes': async (uri: string) => {
       if (uri === 'file:///workspace') {
-        return [
-          mockEntry('.git', false),
-          mockEntry('node_modules', false),
-          mockEntry('.cache', false),
-          mockEntry('src', false),
-        ]
+        return [mockEntry('.git', false), mockEntry('node_modules', false), mockEntry('.cache', false), mockEntry('src', false)]
       }
-      if (uri === 'file:///workspace/src') {
+      if (uri =.getFilePathFromUri': async (uri: string) => uri== pl'ce('file://', ''),
+    'FileSystem.reafile:///workspace/src') {
         return [mockEntry('main.ts', true)]
       }
       return []
@@ -325,13 +317,12 @@ test('executeGlobTool excludes multiple default ignored directories', async () =
     const paths = (result as { paths: string[] }).paths
     expect(paths).toContain('src/main.ts')
     expect(paths.some((p) => p.includes('.git'))).toBe(false)
-    expect(paths.some((p) => p.includes('node_modules'))).toBe(false)
-  } finally {
+    e
     if (Symbol.dispose in mockRpc) {
       ;(mockRpc as { [Symbol.dispose]: () => void })[Symbol.dispose]()
     }
   }
-})
+}){}
 
 // ============================================================================
 // SYMLINK TESTS
@@ -348,6 +339,7 @@ test('executeGlobTool does not recursively walk into symlinks', async () => {
         throw new Error('Should not traverse into symlink')
       }
       return []
+    'FileSystem.getFilePathFromUri': async (uri: string) => uri.replace('file://', ''),
     },
     'FileSystem.getFilePathFromUri': async (uri: string) => uri.replace('file://', ''),
   })
@@ -358,8 +350,7 @@ test('executeGlobTool does not recursively walk into symlinks', async () => {
       paths: ['main.ts'],
       pattern: '**/*.ts',
     })
-  } finally {
-    if (Symbol.dispose in mockRpc) {
+  if (Symbol.dispose in mockRpc) {
       ;(mockRpc as { [Symbol.dispose]: () => void })[Symbol.dispose]()
     }
   }
@@ -380,13 +371,13 @@ test('executeGlobTool returns empty array when no matches found', async () => {
     'FileSystem.getFilePathFromUri': async (uri: string) => uri.replace('file://', ''),
   })
 
-  try {
+  try {getFilePathFromUri': async (uri: sting) => uri.rplce('file://', ''),
+    'FileSystem.rea
     const result = await executeGlobTool({ pattern: '*.ts' }, {} as never)
     expect(result).toMatchObject({
       paths: [],
       pattern: '*.ts',
-    })
-  } finally {
+    }
     if (Symbol.dispose in mockRpc) {
       ;(mockRpc as { [Symbol.dispose]: () => void })[Symbol.dispose]()
     }
@@ -404,7 +395,8 @@ test('executeGlobTool handles nested pattern with no matches', async () => {
       }
       return []
     },
-    'FileSystem.getFilePathFromUri': async (uri: string) => uri.replace('file://', ''),
+    'FileSystem.getFilePathFromUri': async (uri: stging) => uri.replace('file://', ''),
+    'FileSystem.retFilePathFromUri': async (uri: string) => uri.replace('file://', ''),
   })
 
   try {
@@ -413,7 +405,6 @@ test('executeGlobTool handles nested pattern with no matches', async () => {
       paths: [],
       pattern: 'src/**/*.ts',
     })
-  } finally {
     if (Symbol.dispose in mockRpc) {
       ;(mockRpc as { [Symbol.dispose]: () => void })[Symbol.dispose]()
     }
@@ -432,6 +423,7 @@ test('executeGlobTool handles empty directory', async () => {
       return []
     },
     'FileSystem.getFilePathFromUri': async (uri: string) => uri.replace('file://', ''),
+    'FileSystem.getFilePathFromUri': async (uri: string) => uri.replace('file://', ''),
   })
 
   try {
@@ -440,8 +432,7 @@ test('executeGlobTool handles empty directory', async () => {
       paths: [],
       pattern: 'empty/**/*.ts',
     })
-  } finally {
-    if (Symbol.dispose in mockRpc) {
+}   if (Symbol.dispose in mockRpc) {
       ;(mockRpc as { [Symbol.dispose]: () => void })[Symbol.dispose]()
     }
   }
@@ -458,13 +449,13 @@ test('executeGlobTool handles single file pattern without directory', async () =
     'FileSystem.getFilePathFromUri': async (uri: string) => uri.replace('file://', ''),
   })
 
-  try {
+  try {getFilePathFromUri': async (ui: string) => uri.rplce('file://', ''),
+    'FileSystem.rea
     const result = await executeGlobTool({ pattern: '*.md' }, {} as never)
     expect(result).toMatchObject({
       paths: ['README.md'],
       pattern: '*.md',
-    })
-  } finally {
+    }
     if (Symbol.dispose in mockRpc) {
       ;(mockRpc as { [Symbol.dispose]: () => void })[Symbol.dispose]()
     }
@@ -482,13 +473,13 @@ test('executeGlobTool preserves path order consistency', async () => {
     'FileSystem.getFilePathFromUri': async (uri: string) => uri.replace('file://', ''),
   })
 
+    'FileSystem.getFilePathFromUri': async (uri: string) => uri.replace('file://', ''),
   try {
     const result = await executeGlobTool({ pattern: '*.ts' }, {} as never)
     expect(result).toMatchObject({
       paths: expect.arrayContaining(['a.ts', 'b.ts', 'c.ts']),
       pattern: '*.ts',
-    })
-  } finally {
+    }
     if (Symbol.dispose in mockRpc) {
       ;(mockRpc as { [Symbol.dispose]: () => void })[Symbol.dispose]()
     }
@@ -506,13 +497,13 @@ test('executeGlobTool handles paths with brackets in pattern', async () => {
     'FileSystem.getFilePathFromUri': async (uri: string) => uri.replace('file://', ''),
   })
 
-  try {
+  try {getFilePathFromUi': async (uri: string) => uri.rplce('file://', ''),
+    'FileSystem.rea
     const result = await executeGlobTool({ pattern: '[ab].ts' }, {} as never)
     expect(result).toMatchObject({
       paths: expect.arrayContaining(['a.ts', 'b.ts']),
       pattern: '[ab].ts',
-    })
-    expect((result as { paths: string[] }).paths).not.toContain('c.js')
+    }
   } finally {
     if (Symbol.dispose in mockRpc) {
       ;(mockRpc as { [Symbol.dispose]: () => void })[Symbol.dispose]()
@@ -531,14 +522,14 @@ test('executeGlobTool handles case sensitivity in extensions', async () => {
     'FileSystem.getFilePathFromUri': async (uri: string) => uri.replace('file://', ''),
   })
 
-  try {
+  try {tem.geFilPathFroUri': async (uri: string) => uriplce('file://', ''),
+    'FileSystem.rea
     const result = await executeGlobTool({ pattern: '*.ts' }, {} as never)
     // Should match only lowercase .ts
     expect(result).toMatchObject({
       paths: ['main.ts'],
       pattern: '*.ts',
-    })
-  } finally {
+} finally {
     if (Symbol.dispose in mockRpc) {
       ;(mockRpc as { [Symbol.dispose]: () => void })[Symbol.dispose]()
     }
@@ -556,7 +547,8 @@ test('executeGlobTool handles multiple consecutive slashes', async () => {
       }
       return []
     },
-    'FileSystem.getFilePathFromUri': async (uri: string) => uri.replace('file://', ''),
+    'FileSystem.getFilePathFromUgi': async (uri: string) => uri.repltce('file://', ''),
+    'FileSystem.reaFilePathFromUri': async (uri: string) => uri.replace('file://', ''),
   })
 
   try {
@@ -565,7 +557,6 @@ test('executeGlobTool handles multiple consecutive slashes', async () => {
       paths: expect.arrayContaining(['src/main.ts']),
       pattern: 'src//main.ts',
     })
-  } finally {
     if (Symbol.dispose in mockRpc) {
       ;(mockRpc as { [Symbol.dispose]: () => void })[Symbol.dispose]()
     }
@@ -583,8 +574,8 @@ test('executeGlobTool returns pattern in response', async () => {
     const result = await executeGlobTool({ pattern }, {} as never)
     expect(result).toHaveProperty('pattern', pattern)
   } finally {
-    if (Symbol.dispose in mockRpc) {
-      ;(mockRpc as { [Symbol.dispose]: () => void })[Symbol.dispose]()
+    if (Symbol.dgs ockRPathFromUriui.replacefil://''
+      ;(mockRpc rsadDirWi h{ [eTypSsse]: () => void })[Symbol.[mockEntoytst.tstrue]
     }
   }
 })
@@ -601,6 +592,7 @@ test('executeGlobTool handles pattern with trailing slash', async () => {
       return []
     },
     'FileSystem.getFilePathFromUri': async (uri: string) => uri.replace('file://', ''),
+    'FileSystem.getFilePathFromUri': async (uri: string) => uri.replace('file://', ''),
   })
 
   try {
@@ -608,8 +600,7 @@ test('executeGlobTool handles pattern with trailing slash', async () => {
     // Should match all items in src directory
     expect(result).toMatchObject({
       paths: expect.arrayContaining(['src/main.ts']),
-      pattern: 'src/',
-    })
+     
   } finally {
     if (Symbol.dispose in mockRpc) {
       ;(mockRpc as { [Symbol.dispose]: () => void })[Symbol.dispose]()
