@@ -14,6 +14,7 @@ import { executeRenderHtmlTool } from '../ExecuteRenderHtmlTool/ExecuteRenderHtm
 import { executeRgTool } from '../ExecuteRgTool/ExecuteRgTool.ts'
 import { executeRunInTerminalTool } from '../ExecuteRunInTerminalTool/ExecuteRunInTerminalTool.ts'
 import { executeSearchTextTool } from '../ExecuteSearchTextTool/ExecuteSearchTextTool.ts'
+import { executeSpawnSubagentTool } from '../ExecuteSpawnSubagentTool/ExecuteSpawnSubagentTool.ts'
 import { executeUpdateTodoTool } from '../ExecuteUpdateTodoTool/ExecuteUpdateTodoTool.ts'
 import { executeWriteFileTool } from '../ExecuteWriteFileTool/ExecuteWriteFileTool.ts'
 import { parseToolArguments } from '../ParseToolArguments/ParseToolArguments.ts'
@@ -51,6 +52,8 @@ export const executeChatTool = async (name: string, rawArguments: unknown, optio
       return executeRunInTerminalTool(args, options)
     case 'search_text':
       return executeSearchTextTool(args, options)
+    case 'spawn_subagent':
+      return executeSpawnSubagentTool(args, options)
     case 'update_todo':
       return executeUpdateTodoTool(args, options)
     case 'write_file':

@@ -14,6 +14,7 @@ import { getRenderHtmlTool } from './tools/getRenderHtmlTool.ts'
 import { getRgTool } from './tools/getRgTool.ts'
 import { getRunInTerminalTool } from './tools/getRunInTerminalTool.ts'
 import { getSearchTextTool } from './tools/getSearchTextTool.ts'
+import { getSpawnSubagentTool } from './tools/getSpawnSubagentTool.ts'
 import { getUpdateTodoTool } from './tools/getUpdateTodoTool.ts'
 import { getWriteFileTool } from './tools/getWriteFileTool.ts'
 
@@ -33,6 +34,7 @@ export const getBasicChatTools = (): readonly ChatTool[] => {
     getRgTool(),
     getGrepSearchTool(),
     getRunInTerminalTool(),
+    getSpawnSubagentTool(),
     getCreateDirectoryTool(),
     getGlobTool(),
     getUpdateTodoTool(),

@@ -30,6 +30,7 @@ test('getBasicChatTools returns all expected tool names in order', () => {
     'rg',
     'grep_search',
     'run_in_terminal',
+    'spawn_subagent',
     'create_directory',
     'glob',
     'update_todo',
@@ -156,4 +157,16 @@ test('update_todo defines todos string argument for checklist updates', () => {
     readonly type: string
   }
   expect(todosProperty.type).toBe('string')
+})
+
+test('spawn_subagent defines prompt string argument for subagent task delegation', () => {
+  const spawnSubagentTool = getTool('spawn_subagent')
+  const { parameters } = spawnSubagentTool.function
+  expect(parameters.required).toEqual(['prompt'])
+  const promptProperty = parameters.properties.prompt as {
+    readonly type: string
+    readonly description: string
+  }
+  expect(promptProperty.type).toBe('string')
+  expect(promptProperty.description).toContain('subagent')
 })
