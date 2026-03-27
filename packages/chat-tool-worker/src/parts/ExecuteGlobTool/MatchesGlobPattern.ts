@@ -9,8 +9,12 @@
  * - [a-z] matches any character between a and z
  */
 
+const REGEX_SPECIAL_CHARS_REGEX = /[.*+?^${}()|[\]\\]/g
+const LEADING_DOT_SLASH_REGEX = /^\.\//g
+const MULTIPLE_SLASHES_REGEX = /\/+/g
+
 const escapeRegExp = (str: string): string => {
-  return str.replaceAll(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  return str.replaceAll(REGEX_SPECIAL_CHARS_REGEX, '\\$&')
 }
 
 /*
@@ -25,14 +29,11 @@ const segmentToRegex = (segment: string): RegExp => {
 
     switch (char) {
       case '?': {
-        // ? matches any single character except /
         regexStr += '[^/]'
         i++
-
         break
       }
       case '[': {
-        // Character class [abc] or [!abc] or [a-z]
         let j = i + 1
         let negated = false
         if (j < segment.length && segment[j] === '!') {
@@ -48,7 +49,6 @@ const segmentToRegex = (segment: string): RegExp => {
           if (negated) {
             regexStr += `[^${escapeRegExp(classStr)}]`
           } else {
-            // For character class, we need to preserve the range syntax
             regexStr += `[${classStr.replaceAll('\\', '\\\\')}]`
           }
           i = j + 1
@@ -56,14 +56,11 @@ const segmentToRegex = (segment: string): RegExp => {
           regexStr += escapeRegExp(char)
           i++
         }
-
         break
       }
       case '*': {
-        // * matches anything except /
         regexStr += '[^/]*'
         i++
-
         break
       }
       default: {
@@ -77,24 +74,20 @@ const segmentToRegex = (segment: string): RegExp => {
 }
 
 export const matchesGlobPattern = (path: string, pattern: string): boolean => {
-  // Normalize slashes and remove leading ./
-  const normalizedPath = path.replaceAll('\\', '/').replace(/^\.\//, '')
-  let normalizedPattern = pattern.replaceAll('\\', '/').replace(/^\.\//, '').replaceAll(/\/+/g, '/')
+  const normalizedPath = path.replaceAll('\\', '/').replaceAll(LEADING_DOT_SLASH_REGEX, '')
+  let normalizedPattern = pattern.replaceAll('\\', '/').replaceAll(LEADING_DOT_SLASH_REGEX, '').replaceAll(MULTIPLE_SLASHES_REGEX, '/')
 
-  // Handle trailing slash (matches any content in that directory)
   if (normalizedPattern.endsWith('/')) {
     normalizedPattern = normalizedPattern.slice(0, -1) + '/*'
   }
 
-  // Split pattern by /
   const patternParts = normalizedPattern.split('/')
   const pathParts = normalizedPath.split('/')
 
   return matchesPatternParts(pathParts, patternParts, 0, 0)
 }
 
-function matchesPatternParts(pathParts: string[], patternParts: string[], pathIdx: number, patternIdx: number): boolean {
-  // Base cases
+const matchesPatternParts = (pathParts: readonly string[], patternParts: readonly string[], pathIdx: number, patternIdx: number): boolean => {
   if (patternIdx === patternParts.length) {
     return pathIdx === pathParts.length
   }
@@ -104,11 +97,11 @@ function matchesPatternParts(pathParts: string[], patternParts: string[], pathId
   }
 
   const patternPart = patternParts[patternIdx]
+  if (patternPart === undefined) {
+    return false
+  }
 
-  // Handle **
   if (patternPart === '**') {
-    // ** can match zero or more path segments
-    // Try matching the rest of the pattern at different positions
     for (let i = pathIdx; i <= pathParts.length; i++) {
       if (matchesPatternParts(pathParts, patternParts, i, patternIdx + 1)) {
         return true
@@ -117,19 +110,22 @@ function matchesPatternParts(pathParts: string[], patternParts: string[], pathId
     return false
   }
 
-  // Handle .**/pattern (** followed by more patterns)
-  if (patternIdx < patternParts.length - 1 && patternParts[patternIdx] && patternParts[patternIdx].includes('**')) {
-    // This shouldn't happen if we split by /, but just in case
+  if (pathIdx === pathParts.length) {
+    return false
+  }
+
+  if (patternPart.includes('**')) {
     const regex = segmentToRegex(patternPart.replace('**', ''))
-    if (regex.test(pathParts[pathIdx])) {
+    const pathPart = pathParts[pathIdx]
+    if (pathPart !== undefined && regex.test(pathPart)) {
       return matchesPatternParts(pathParts, patternParts, pathIdx + 1, patternIdx + 1)
     }
     return false
   }
 
-  // Regular segment matching
   const regex = segmentToRegex(patternPart)
-  if (regex.test(pathParts[pathIdx])) {
+  const pathPart = pathParts[pathIdx]
+  if (pathPart !== undefined && regex.test(pathPart)) {
     return matchesPatternParts(pathParts, patternParts, pathIdx + 1, patternIdx + 1)
   }
 

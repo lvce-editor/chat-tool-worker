@@ -7,17 +7,11 @@ export type DirEntry = {
   isSymbolicLink: () => boolean
 }
 
+// cspell:ignore venv
 const DEFAULT_EXCLUDE_DIRS = new Set(['.git', 'node_modules', '.cache', '.venv', 'dist', 'build', '.next', '.nuxt'])
 
-export const shouldExcludeDir = (dirName: string, commonlyIgnored = true): boolean => {
-  if (
-    dirName.startsWith('.') && // Exclude dot files/dirs by default (like .git, .cache, etc.)
-    commonlyIgnored &&
-    DEFAULT_EXCLUDE_DIRS.has(dirName)
-  ) {
-    return true
-  }
-  return false
+export const shouldExcludeDir = (dirName: string): boolean => {
+  return DEFAULT_EXCLUDE_DIRS.has(dirName)
 }
 
 export const traverseDirectory = async (
@@ -26,9 +20,8 @@ export const traverseDirectory = async (
   onEntry: (path: string, entry: DirEntry) => Promise<void>,
   visited: Set<string> = new Set(),
 ): Promise<void> => {
-  const uri = currentPath === '' ? baseUri : `${baseUri}${currentPath === '' ? '' : '/'}${currentPath}`
+  const uri = currentPath === '' ? baseUri : `${baseUri}/${currentPath}`
 
-  // Prevent infinite loops from symlinks
   if (visited.has(uri)) {
     return
   }
@@ -39,16 +32,13 @@ export const traverseDirectory = async (
 
     for (const entry of entries) {
       const entryPath = currentPath === '' ? entry.name : `${currentPath}/${entry.name}`
-
-      // Process the entry through callback
       await onEntry(entryPath, entry)
 
-      // Recursively traverse directories (but not symlinks)
       if (entry.isDirectory() && !entry.isSymbolicLink() && !shouldExcludeDir(entry.name)) {
         await traverseDirectory(baseUri, entryPath, onEntry, visited)
       }
     }
   } catch {
-    // Silently ignore errors reading directories
+    // Ignore unreadable directories and continue with other matches.
   }
 }

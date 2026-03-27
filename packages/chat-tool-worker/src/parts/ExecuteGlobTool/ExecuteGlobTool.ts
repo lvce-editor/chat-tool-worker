@@ -3,40 +3,35 @@ import type { ExecuteToolOptions, ToolResponse } from '../Types/Types.ts'
 import { matchesGlobPattern } from './MatchesGlobPattern.ts'
 import { traverseDirectory } from './TraverseDirectory.ts'
 
+const MULTIPLE_SLASHES_REGEX = /\/+/g
+const LEADING_DOT_SLASH_REGEX = /^\.\//g
+
+const hasGlobCharacters = (part: string): boolean => {
+  return part.includes('*') || part.includes('?') || part.includes('[')
+}
+
+const normalizeInputPattern = (pattern: string): string => {
+  return pattern.trim().replaceAll('\\', '/').replaceAll(LEADING_DOT_SLASH_REGEX, '').replaceAll(MULTIPLE_SLASHES_REGEX, '/')
+}
+
 const normalizePattern = (pattern: string): { baseDir: string; globPart: string; matchDirectories: boolean } => {
-  // Convert backslashes to forward slashes
-  let normalized = pattern.replaceAll('\\', '/')
-  // Remove leading ./
-  const withoutLeadingDot = normalized.startsWith('./') ? normalized.slice(2) : normalized
-  // Collapse consecutive slashes
-  normalized = withoutLeadingDot.replaceAll(/\/+/g, '/')
-  // Check if pattern ends with /
+  const normalized = normalizeInputPattern(pattern)
   const matchDirectories = normalized.endsWith('/')
-
-  // Remove trailing slash for parsing
-  const patternToParse = normalized.endsWith('/') ? normalized.slice(0, -1) : normalized
-
-  // Split into parts
+  const patternToParse = matchDirectories ? normalized.slice(0, -1) : normalized
   const parts = patternToParse.split('/')
 
-  // Find the first part with glob characters
   let firstGlobIndex = -1
   for (let i = 0; i < parts.length; i++) {
-    if (parts[i].includes('*') || parts[i].includes('?') || parts[i].includes('[')) {
+    const part = parts[i]
+    if (part && hasGlobCharacters(part)) {
       firstGlobIndex = i
       break
     }
   }
 
-  // If no glob characters found, treat the last part as the pattern
-  const globPartIndex = firstGlobIndex === -1 ? parts.length - 1 : firstGlobIndex
-
-  // baseDir is everything before the glob part
+  const globPartIndex = firstGlobIndex === -1 ? Math.max(parts.length - 1, 0) : firstGlobIndex
   const baseDir = parts.slice(0, globPartIndex).join('/')
-
-  // globPart is from the glob character onwards
   const globPart = parts.slice(globPartIndex).join('/')
-
   return { baseDir, globPart, matchDirectories }
 }
 
@@ -48,69 +43,50 @@ export const executeGlobTool = async (args: Readonly<Record<string, unknown>>, _
     }
   }
 
-  // Normalize whitespace and slashes
-  const normalizedInput = pattern.trim().replaceAll('\\', '/')
+  const normalizedPattern = normalizeInputPattern(pattern)
   const { baseDir, globPart, matchDirectories } = normalizePattern(pattern)
-
-  const matches: string[] = []
   const baseUri = 'file:///workspace'
+  const matches: string[] = []
 
   try {
-    // Set to track visited directories (for symlink detection)
-    const visited = new Set<string>()
-
-    if (matchDirectories || !globPart) {
-      // Pattern is for a directory (has trailing /) or is a literal path
-      // When trailing /, we want to match all items in that directory
-      const dirUri = matchDirectories ? `${baseUri}/${globPart}` : baseDir ? `${baseUri}/${baseDir}` : baseUri
-
-      try {
-        const entries = (await RendererWorker.invoke('FileSystem.readDirWithFileTypes', dirUri)) as Array<{
-          name: string
-          isFile: () => boolean
-          isDirectory: () => boolean
-          isSymbolicLink: () => boolean
-        }>
-
-        for (const entry of entries) {
-          let fullPath = ''
-          if (matchDirectories) {
-            fullPath = globPart ? `${globPart}/${entry.name}` : entry.name
-          } else {
-            fullPath = baseDir ? `${baseDir}/${entry.name}` : entry.name
-          }
-
-          // When matchDirectories, match all items; otherwise match against pattern
-          if (matchDirectories) {
-            matches.push(fullPath)
-          } else if (matchesGlobPattern(fullPath, normalizedInput)) {
-            matches.push(fullPath)
-          }
-        }
-      } catch {
-        // Directory not found or not readable
+    if (matchDirectories) {
+      const dirUri = globPart ? `${baseUri}/${globPart}` : baseUri
+      const entries = (await RendererWorker.invoke('FileSystem.readDirWithFileTypes', dirUri)) as Array<{
+        name: string
+      }>
+      for (const entry of entries) {
+        matches.push(globPart ? `${globPart}/${entry.name}` : entry.name)
       }
-    } else {
-      // Recursive traversal needed (has glob characters with **)
+    } else if (globPart.includes('**')) {
       const baseDirUri = baseDir ? `${baseUri}/${baseDir}` : baseUri
-
+      const visited = new Set<string>()
       await traverseDirectory(
         baseDirUri,
         '',
         async (relativePath, entry) => {
-          // Build the full path to check against pattern
-          const fullPath =b&&
-          // Only match files, not directories
-              if (matchesGlobPattern(fullPath, normalizedInput)) {
-              matches.push(fullPath)
-            }
+          if (!entry.isFile()) {
+            return
+          }
+          const fullPath = baseDir ? `${baseDir}/${relativePath}` : relativePath
+          if (matchesGlobPattern(fullPath, normalizedPattern)) {
+            matches.push(fullPath)
           }
         },
         visited,
       )
+    } else {
+      const dirUri = baseDir ? `${baseUri}/${baseDir}` : baseUri
+      const entries = (await RendererWorker.invoke('FileSystem.readDirWithFileTypes', dirUri)) as Array<{
+        name: string
+      }>
+      for (const entry of entries) {
+        const fullPath = baseDir ? `${baseDir}/${entry.name}` : entry.name
+        if (matchesGlobPattern(fullPath, normalizedPattern)) {
+          matches.push(fullPath)
+        }
+      }
     }
 
-    // Sort for consistent results
     matches.sort()
 
     return {
