@@ -1,5 +1,5 @@
 import { expect, test } from '@jest/globals'
-import { RendererWorker } from '@lvce-editor/rpc-registry'
+import { FileSystemWorker } from '@lvce-editor/rpc-registry'
 import { executeWriteFileTool } from '../src/parts/ExecuteWriteFileTool/ExecuteWriteFileTool.ts'
 
 test('executeWriteFileTool rejects relative path values', async () => {
@@ -22,7 +22,7 @@ test('executeWriteFileTool writes file and returns ok payload', async () => {
   let called = 0
   let calledWithUri = ''
   let calledWithContent = ''
-  using mockRpc = RendererWorker.registerMockRpc({
+  using mockRpc = FileSystemWorker.registerMockRpc({
     'FileSystem.writeFile': async (uri: string, content: string) => {
       called++
       calledWithUri = uri
@@ -48,7 +48,7 @@ test('executeWriteFileTool writes file and returns ok payload', async () => {
 test('executeWriteFileTool returns error payload when renderer worker write fails', async () => {
   const uri = 'file:///workspace/file.txt'
   let called = 0
-  using mockRpc = RendererWorker.registerMockRpc({
+  using mockRpc = FileSystemWorker.registerMockRpc({
     'FileSystem.writeFile': async () => {
       called++
       throw new Error('write failed')
