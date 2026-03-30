@@ -1,10 +1,9 @@
-import { RendererWorker } from '@lvce-editor/rpc-registry'
+import { DirentType } from '@lvce-editor/constants'
+import { FileSystemWorker } from '@lvce-editor/rpc-registry'
 
 export type DirEntry = {
-  name: string
-  isFile: () => boolean
-  isDirectory: () => boolean
-  isSymbolicLink: () => boolean
+  readonly name: string
+  readonly type: number
 }
 
 // cspell:ignore venv
@@ -28,17 +27,20 @@ export const traverseDirectory = async (
   visited.add(uri)
 
   try {
-    const entries = (await RendererWorker.invoke('FileSystem.readDirWithFileTypes', uri)) as DirEntry[]
+    const entries = await FileSystemWorker.readDirWithFileTypes(uri)
 
     for (const entry of entries) {
       const entryPath = currentPath === '' ? entry.name : `${currentPath}/${entry.name}`
       await onEntry(entryPath, entry)
 
-      if (entry.isDirectory() && !entry.isSymbolicLink() && !shouldExcludeDir(entry.name)) {
+      if (entry.type === DirentType.Directory && !shouldExcludeDir(entry.name)) {
         await traverseDirectory(baseUri, entryPath, onEntry, visited)
       }
     }
-  } catch {
+  } catch (error) {
+    if (currentPath === '') {
+      throw error
+    }
     // Ignore unreadable directories and continue with other matches.
   }
 }
