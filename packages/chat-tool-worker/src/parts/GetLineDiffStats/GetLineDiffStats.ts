@@ -4,7 +4,7 @@ const toLines = (content: string): readonly string[] => {
   if (content === '') {
     return []
   }
-  const normalizedContent = content.replace(carriageReturnNewLineRegex, '\n')
+  const normalizedContent = content.replaceAll(carriageReturnNewLineRegex, '\n')
   const lines = normalizedContent.split('\n')
   if (lines.at(-1) === '') {
     lines.pop()

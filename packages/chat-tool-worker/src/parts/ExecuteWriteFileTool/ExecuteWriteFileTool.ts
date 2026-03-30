@@ -1,6 +1,6 @@
 import { FileSystemWorker } from '@lvce-editor/rpc-registry'
-import { getLineDiffStats } from '../GetLineDiffStats/GetLineDiffStats.ts'
 import type { ExecuteToolOptions, ToolResponse } from '../Types/Types.ts'
+import { getLineDiffStats } from '../GetLineDiffStats/GetLineDiffStats.ts'
 import { getToolErrorPayload } from '../GetToolErrorPayload/GetToolErrorPayload.ts'
 import { isAbsoluteUri } from '../IsAbsoluteUri/IsAbsoluteUri.ts'
 
