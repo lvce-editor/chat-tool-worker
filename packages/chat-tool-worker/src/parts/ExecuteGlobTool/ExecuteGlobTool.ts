@@ -84,7 +84,7 @@ export const executeGlobTool = async (args: Readonly<Record<string, unknown>>, _
         baseDirUri,
         '',
         async (relativePath, entry) => {
-          if (entry.direntType !== DirentType.File) {
+          if (entry.type !== DirentType.File) {
             return
           }
           const fullPath = baseDir ? `${baseDir}/${relativePath}` : relativePath
