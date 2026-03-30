@@ -4,7 +4,7 @@ import { executeGlobTool } from '../src/parts/ExecuteGlobTool/ExecuteGlobTool.ts
 
 const baseUri = 'file:///test/workspace'
 
-const executeGlob = (pattern: string) => {
+const executeGlob = (pattern: string): any => {
   return executeGlobTool({ baseUri, pattern }, {} as never)
 }
 
