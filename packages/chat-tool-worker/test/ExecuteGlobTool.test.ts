@@ -1,3 +1,7 @@
+import { mkdtemp, mkdir, rm, writeFile } from 'node:fs/promises'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
+import { pathToFileURL } from 'node:url'
 import { expect, test } from '@jest/globals'
 import { RendererWorker } from '@lvce-editor/rpc-registry'
 import { executeGlobTool } from '../src/parts/ExecuteGlobTool/ExecuteGlobTool.ts'
@@ -600,5 +604,25 @@ test('executeGlobTool handles pattern with trailing slash', async () => {
     if (Symbol.dispose in mockRpc) {
       ;(mockRpc as { [Symbol.dispose]: () => void })[Symbol.dispose]()
     }
+  }
+})
+
+test('executeGlobTool falls back to node fs for file uris', async () => {
+  const tempDir = await mkdtemp(join(tmpdir(), 'execute-glob-tool-'))
+  await mkdir(join(tempDir, 'src'))
+  await mkdir(join(tempDir, 'src', 'nested'))
+  await writeFile(join(tempDir, 'README.md'), '# test\n')
+  await writeFile(join(tempDir, 'src', 'main.ts'), 'export const main = true\n')
+  await writeFile(join(tempDir, 'src', 'nested', 'deep.ts'), 'export const deep = true\n')
+
+  try {
+    const tempUri = pathToFileURL(tempDir).href
+    const result = await executeGlobTool({ baseUri: tempUri, pattern: '**/*' }, {} as never)
+    expect(result).toMatchObject({
+      paths: expect.arrayContaining(['README.md', 'src/main.ts', 'src/nested/deep.ts']),
+      pattern: '**/*',
+    })
+  } finally {
+    await rm(tempDir, { force: true, recursive: true })
   }
 })

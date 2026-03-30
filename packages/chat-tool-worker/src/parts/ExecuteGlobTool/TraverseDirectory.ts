@@ -1,11 +1,11 @@
-import { RendererWorker } from '@lvce-editor/rpc-registry'
-
 export type DirEntry = {
   name: string
   isFile: () => boolean
   isDirectory: () => boolean
   isSymbolicLink: () => boolean
 }
+
+import { readDirWithFileTypes } from './ReadDirWithFileTypes.ts'
 
 // cspell:ignore venv
 const DEFAULT_EXCLUDE_DIRS = new Set(['.git', 'node_modules', '.cache', '.venv', 'dist', 'build', '.next', '.nuxt'])
@@ -28,7 +28,7 @@ export const traverseDirectory = async (
   visited.add(uri)
 
   try {
-    const entries = (await RendererWorker.invoke('FileSystem.readDirWithFileTypes', uri)) as DirEntry[]
+    const entries = await readDirWithFileTypes(uri)
 
     for (const entry of entries) {
       const entryPath = currentPath === '' ? entry.name : `${currentPath}/${entry.name}`
@@ -38,7 +38,10 @@ export const traverseDirectory = async (
         await traverseDirectory(baseUri, entryPath, onEntry, visited)
       }
     }
-  } catch {
+  } catch (error) {
+    if (currentPath === '') {
+      throw error
+    }
     // Ignore unreadable directories and continue with other matches.
   }
 }
