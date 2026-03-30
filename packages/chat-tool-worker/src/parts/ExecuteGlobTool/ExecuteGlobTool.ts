@@ -1,3 +1,4 @@
+import { DirentType } from '@lvce-editor/constants'
 import { FileSystemWorker } from '@lvce-editor/rpc-registry'
 import type { ExecuteToolOptions, ToolResponse } from '../Types/Types.ts'
 import { isAbsoluteUri } from '../IsAbsoluteUri/IsAbsoluteUri.ts'
@@ -83,7 +84,7 @@ export const executeGlobTool = async (args: Readonly<Record<string, unknown>>, _
         baseDirUri,
         '',
         async (relativePath, entry) => {
-          if (!entry.isFile()) {
+          if (entry.direntType !== DirentType.File) {
             return
           }
           const fullPath = baseDir ? `${baseDir}/${relativePath}` : relativePath

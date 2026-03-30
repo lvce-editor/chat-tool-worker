@@ -2,9 +2,7 @@ import { FileSystemWorker } from '@lvce-editor/rpc-registry'
 
 export type DirEntry = {
   name: string
-  isFile: () => boolean
-  isDirectory: () => boolean
-  isSymbolicLink: () => boolean
+  direntType: number
 }
 
 // cspell:ignore venv
