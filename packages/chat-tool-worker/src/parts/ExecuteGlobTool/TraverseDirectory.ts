@@ -29,7 +29,6 @@ export const traverseDirectory = async (
   try {
     const entries = await FileSystemWorker.readDirWithFileTypes(uri)
 
-    console.log({ entries })
     for (const entry of entries) {
       const entryPath = currentPath === '' ? entry.name : `${currentPath}/${entry.name}`
       await onEntry(entryPath, entry)
