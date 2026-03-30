@@ -1,5 +1,28 @@
 import { expect, test } from '@jest/globals'
+import { DirentType } from '@lvce-editor/constants'
+import { RendererWorker } from '@lvce-editor/rpc-registry'
 import { executeListFilesTool } from '../src/parts/ExecuteListFilesTool/ExecuteListFilesTool.ts'
+
+test('executeListFilesTool returns readable entry types', async () => {
+  using mockRpc = RendererWorker.registerMockRpc({
+    'FileSystem.readDirWithFileTypes': async () => [
+      { name: 'package.json', type: DirentType.File },
+      { name: 'src', type: DirentType.Directory },
+      { name: 'current', type: DirentType.Symlink },
+    ],
+  })
+  void mockRpc
+
+  const result = await executeListFilesTool({ uri: 'file:///test/workspace' }, {} as never)
+  expect(result).toEqual({
+    entries: [
+      { name: 'package.json', type: 'file' },
+      { name: 'src', type: 'folder' },
+      { name: 'current', type: 'symlink' },
+    ],
+    uri: 'file:///test/workspace',
+  })
+})
 
 test('executeListFilesTool rejects placeholder workspace uri with actionable error', async () => {
   const result = await executeListFilesTool({ uri: 'file:///workspace' }, {} as never)
