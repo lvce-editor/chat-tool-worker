@@ -116,14 +116,20 @@ test('run_in_terminal defines options object arguments for shell execution', () 
   expect(optionsProperty.properties).toHaveProperty('command')
 })
 
-test('glob defines pattern argument for file matching', () => {
+test('glob defines baseUri and pattern arguments for file matching', () => {
   const globTool = getTool('glob')
   const { parameters } = globTool.function
-  expect(parameters.required).toEqual(['pattern'])
+  expect(parameters.required).toEqual(['baseUri', 'pattern'])
+  const baseUriProperty = parameters.properties.baseUri as {
+    readonly type: string
+    readonly description: string
+  }
   const patternProperty = parameters.properties.pattern as {
     readonly type: string
     readonly description: string
   }
+  expect(baseUriProperty.type).toBe('string')
+  expect(baseUriProperty.description).toContain('getWorkspaceUri')
   expect(patternProperty.type).toBe('string')
   expect(patternProperty.description).toContain('Glob pattern')
 })

@@ -125,8 +125,7 @@ test('executeChatTool dispatches glob tool', async () => {
     options,
   )
   expect(result).toEqual({
-    error: "Failed to glob: Cannot read properties of undefined (reading 'invoke')",
-    pattern: 'packages/e2e/src/*.ts',
+    error: 'Invalid argument: baseUri must be an absolute URI.',
   })
 })
 
