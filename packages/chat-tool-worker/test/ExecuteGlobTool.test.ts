@@ -1,4 +1,5 @@
 import { expect, test } from '@jest/globals'
+import { DirentType } from '@lvce-editor/constants'
 import { RendererWorker } from '@lvce-editor/rpc-registry'
 import { mkdtemp, mkdir, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
@@ -19,18 +20,25 @@ type MockEntryOptions = {
 }
 
 type MockEntry = {
-  readonly isDirectory: () => boolean
-  readonly isFile: () => boolean
-  readonly isSymbolicLink: () => boolean
   readonly name: string
+  readonly type: number
 }
 
-const mockEntry = ({ isFile, isSymbolicLink = false, name }: MockEntryOptions): MockEntry => ({
-  isDirectory: (): boolean => !isFile,
-  isFile: (): boolean => isFile,
-  isSymbolicLink: (): boolean => isSymbolicLink,
-  name,
+const getEntryType = ({ isFile, isSymbolicLink = false }: MockEntryOptions): number => {
+  if (isSymbolicLink) {
+    return DirentType.Symlink
+  }
+  if (isFile) {
+    return DirentType.File
+  }
+  return DirentType.Directory
+}
+
+const mockEntry = (options: MockEntryOptions): MockEntry => ({
+  name: options.name,
+  type: getEntryType(options),
 })
+
 test('executeGlobTool validates pattern is a non-empty string', async () => {
   const result = await executeGlobTool({ baseUri }, {} as never)
   expect(result).toEqual({
