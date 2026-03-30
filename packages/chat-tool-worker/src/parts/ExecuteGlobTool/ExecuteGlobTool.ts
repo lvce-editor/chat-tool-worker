@@ -1,7 +1,7 @@
+import { FileSystemWorker } from '@lvce-editor/rpc-registry'
 import type { ExecuteToolOptions, ToolResponse } from '../Types/Types.ts'
 import { isAbsoluteUri } from '../IsAbsoluteUri/IsAbsoluteUri.ts'
 import { matchesGlobPattern } from './MatchesGlobPattern.ts'
-import { readDirWithFileTypes } from './ReadDirWithFileTypes.ts'
 import { traverseDirectory } from './TraverseDirectory.ts'
 
 const MULTIPLE_SLASHES_REGEX = /\/+/g
@@ -72,7 +72,7 @@ export const executeGlobTool = async (args: Readonly<Record<string, unknown>>, _
   try {
     if (matchDirectories) {
       const dirUri = joinUri(baseUri, globPart)
-      const entries = await readDirWithFileTypes(dirUri)
+      const entries = await FileSystemWorker.readDirWithFileTypes(dirUri)
       for (const entry of entries) {
         matches.push(globPart ? `${globPart}/${entry.name}` : entry.name)
       }
@@ -95,7 +95,7 @@ export const executeGlobTool = async (args: Readonly<Record<string, unknown>>, _
       )
     } else {
       const dirUri = joinUri(baseUri, baseDir)
-      const entries = await readDirWithFileTypes(dirUri)
+      const entries = await FileSystemWorker.readDirWithFileTypes(dirUri)
       for (const entry of entries) {
         const fullPath = baseDir ? `${baseDir}/${entry.name}` : entry.name
         if (matchesGlobPattern(fullPath, normalizedPattern)) {

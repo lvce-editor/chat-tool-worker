@@ -1,11 +1,11 @@
+import { FileSystemWorker } from '@lvce-editor/rpc-registry'
+
 export type DirEntry = {
   name: string
   isFile: () => boolean
   isDirectory: () => boolean
   isSymbolicLink: () => boolean
 }
-
-import { readDirWithFileTypes } from './ReadDirWithFileTypes.ts'
 
 // cspell:ignore venv
 const DEFAULT_EXCLUDE_DIRS = new Set(['.git', 'node_modules', '.cache', '.venv', 'dist', 'build', '.next', '.nuxt'])
@@ -28,7 +28,7 @@ export const traverseDirectory = async (
   visited.add(uri)
 
   try {
-    const entries = await readDirWithFileTypes(uri)
+    const entries = await FileSystemWorker.readDirWithFileTypes(uri)
 
     for (const entry of entries) {
       const entryPath = currentPath === '' ? entry.name : `${currentPath}/${entry.name}`
