@@ -2,8 +2,8 @@ import { DirentType } from '@lvce-editor/constants'
 import { FileSystemWorker } from '@lvce-editor/rpc-registry'
 
 export type DirEntry = {
-  name: string
-  direntType: number
+  readonly name: string
+  readonly type: number
 }
 
 // cspell:ignore venv
