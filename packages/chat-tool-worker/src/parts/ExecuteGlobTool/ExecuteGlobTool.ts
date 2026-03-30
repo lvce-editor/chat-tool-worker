@@ -1,10 +1,12 @@
 import { RendererWorker } from '@lvce-editor/rpc-registry'
 import type { ExecuteToolOptions, ToolResponse } from '../Types/Types.ts'
+import { isAbsoluteUri } from '../IsAbsoluteUri/IsAbsoluteUri.ts'
 import { matchesGlobPattern } from './MatchesGlobPattern.ts'
 import { traverseDirectory } from './TraverseDirectory.ts'
 
 const MULTIPLE_SLASHES_REGEX = /\/+/g
 const LEADING_DOT_SLASH_REGEX = /^\.\//g
+const PLACEHOLDER_WORKSPACE_URI = 'file:///workspace'
 
 const hasGlobCharacters = (part: string): boolean => {
   return part.includes('*') || part.includes('?') || part.includes('[')
@@ -35,6 +37,13 @@ const normalizePattern = (pattern: string): { baseDir: string; globPart: string;
   return { baseDir, globPart, matchDirectories }
 }
 
+const joinUri = (baseUri: string, path: string): string => {
+  if (!path) {
+    return baseUri
+  }
+  return baseUri.endsWith('/') ? `${baseUri}${path}` : `${baseUri}/${path}`
+}
+
 export const executeGlobTool = async (args: Readonly<Record<string, unknown>>, _options: ExecuteToolOptions): Promise<ToolResponse> => {
   const pattern = typeof args.pattern === 'string' ? args.pattern : ''
   if (!pattern) {
@@ -43,14 +52,26 @@ export const executeGlobTool = async (args: Readonly<Record<string, unknown>>, _
     }
   }
 
+  const baseUri = typeof args.baseUri === 'string' ? args.baseUri : ''
+  if (!baseUri || !isAbsoluteUri(baseUri)) {
+    return {
+      error: 'Invalid argument: baseUri must be an absolute URI.',
+    }
+  }
+  if (baseUri === PLACEHOLDER_WORKSPACE_URI || baseUri.startsWith(`${PLACEHOLDER_WORKSPACE_URI}/`)) {
+    return {
+      baseUri,
+      error: 'Invalid argument: baseUri must be a real workspace folder URI. Call getWorkspaceUri first and use the returned workspaceUri value.',
+    }
+  }
+
   const normalizedPattern = normalizeInputPattern(pattern)
   const { baseDir, globPart, matchDirectories } = normalizePattern(pattern)
-  const baseUri = 'file:///workspace'
   const matches: string[] = []
 
   try {
     if (matchDirectories) {
-      const dirUri = globPart ? `${baseUri}/${globPart}` : baseUri
+      const dirUri = joinUri(baseUri, globPart)
       const entries = (await RendererWorker.invoke('FileSystem.readDirWithFileTypes', dirUri)) as Array<{
         name: string
       }>
@@ -58,7 +79,7 @@ export const executeGlobTool = async (args: Readonly<Record<string, unknown>>, _
         matches.push(globPart ? `${globPart}/${entry.name}` : entry.name)
       }
     } else if (globPart.includes('**')) {
-      const baseDirUri = baseDir ? `${baseUri}/${baseDir}` : baseUri
+      const baseDirUri = joinUri(baseUri, baseDir)
       const visited = new Set<string>()
       await traverseDirectory(
         baseDirUri,
@@ -75,7 +96,7 @@ export const executeGlobTool = async (args: Readonly<Record<string, unknown>>, _
         visited,
       )
     } else {
-      const dirUri = baseDir ? `${baseUri}/${baseDir}` : baseUri
+      const dirUri = joinUri(baseUri, baseDir)
       const entries = (await RendererWorker.invoke('FileSystem.readDirWithFileTypes', dirUri)) as Array<{
         name: string
       }>
