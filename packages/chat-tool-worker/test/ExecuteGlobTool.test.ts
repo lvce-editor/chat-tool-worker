@@ -1,9 +1,9 @@
+import { expect, test } from '@jest/globals'
+import { RendererWorker } from '@lvce-editor/rpc-registry'
 import { mkdtemp, mkdir, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { pathToFileURL } from 'node:url'
-import { expect, test } from '@jest/globals'
-import { RendererWorker } from '@lvce-editor/rpc-registry'
 import { executeGlobTool } from '../src/parts/ExecuteGlobTool/ExecuteGlobTool.ts'
 
 const baseUri = 'file:///test/workspace'
