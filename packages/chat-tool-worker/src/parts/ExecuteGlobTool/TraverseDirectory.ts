@@ -1,3 +1,4 @@
+import { DirentType } from '@lvce-editor/constants'
 import { FileSystemWorker } from '@lvce-editor/rpc-registry'
 
 export type DirEntry = {
@@ -32,7 +33,7 @@ export const traverseDirectory = async (
       const entryPath = currentPath === '' ? entry.name : `${currentPath}/${entry.name}`
       await onEntry(entryPath, entry)
 
-      if (entry.isDirectory() && !entry.isSymbolicLink() && !shouldExcludeDir(entry.name)) {
+      if (entry.type === DirentType.Directory && !shouldExcludeDir(entry.name)) {
         await traverseDirectory(baseUri, entryPath, onEntry, visited)
       }
     }
