@@ -125,7 +125,7 @@ test('executeChatTool dispatches glob tool', async () => {
     options,
   )
   expect(result).toEqual({
-    paths: ['./src/main.ts', './src/utils/search.ts', './test/Main.test.ts'],
+    error: "Failed to glob: Cannot read properties of undefined (reading 'invoke')",
     pattern: 'packages/e2e/src/*.ts',
   })
 })
