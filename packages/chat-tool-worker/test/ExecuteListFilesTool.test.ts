@@ -11,9 +11,9 @@ test('executeListFilesTool returns readable entry types', async () => {
       { name: 'current', type: DirentType.Symlink },
     ],
   })
-  void mockRpc
 
   const result = await executeListFilesTool({ uri: 'file:///test/workspace' }, {} as never)
+  expect(mockRpc.invocations).toEqual([['FileSystem.readDirWithFileTypes', 'file:///test/workspace']])
   expect(result).toEqual({
     entries: [
       { name: 'package.json', type: 'file' },
