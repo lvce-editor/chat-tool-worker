@@ -90,6 +90,105 @@ test('executeGrepSearchTool uses search-process for file workspaces', async () =
   }
 })
 
+test('executeGrepSearchTool formats file workspace results as xml', async () => {
+  using mockRpc = RendererWorker.registerMockRpc({
+    'SearchProcess.invoke': async () => {
+      return {
+        limitHit: false,
+        results: [
+          {
+            end: 0,
+            lineNumber: 0,
+            start: 0,
+            text: '/workspace/src/main.ts',
+            type: 1,
+          },
+          {
+            end: 20,
+            lineNumber: 12,
+            start: 6,
+            text: 'const searchText = true',
+            type: 2,
+          },
+        ],
+      }
+    },
+    'Workspace.getPath': async () => 'file:///workspace',
+  })
+  try {
+    const result = await executeGrepSearchTool(
+      {
+        isRegexp: false,
+        outputFormat: 'xml',
+        query: 'searchText',
+      },
+      options,
+    )
+
+    expect(result).toEqual({
+      arguments: {
+        isRegexp: false,
+        outputFormat: 'xml',
+        query: 'searchText',
+      },
+      result: '1 matches\n<match path="/workspace/src/main.ts" line="12">\nconst searchText = true\n</match>',
+      workspaceUri: 'file:///workspace',
+    })
+  } finally {
+    if (Symbol.dispose in mockRpc) {
+      ;(mockRpc as { [Symbol.dispose]: () => void })[Symbol.dispose]()
+    }
+  }
+})
+
+test('executeGrepSearchTool formats memory workspace results as json', async () => {
+  using mockRpc = RendererWorker.registerMockRpc({
+    'ExtensionHostTextSearch.textSearchMemory2': async () => {
+      return {
+        limitHit: false,
+        results: [['src/main.ts', [{ preview: 'const fromMemory = true' }]]],
+      }
+    },
+    'Workspace.getPath': async () => 'memfs:///workspace',
+  })
+  try {
+    const result = await executeGrepSearchTool(
+      {
+        isRegexp: false,
+        outputFormat: 'json',
+        query: 'fromMemory',
+      },
+      options,
+    )
+
+    expect(result).toEqual({
+      arguments: {
+        isRegexp: false,
+        outputFormat: 'json',
+        query: 'fromMemory',
+      },
+      result: JSON.stringify(
+        {
+          count: 1,
+          matches: [
+            {
+              path: 'src/main.ts',
+              text: 'const fromMemory = true',
+            },
+          ],
+        },
+        undefined,
+        2,
+      ),
+      workspaceUri: 'memfs:///workspace',
+    })
+  } finally {
+    if (Symbol.dispose in mockRpc) {
+      ;(mockRpc as { [Symbol.dispose]: () => void })[Symbol.dispose]()
+    }
+  }
+})
+
 test('executeGrepSearchTool uses memory search for non-file workspaces', async () => {
   let fallbackCalled = 0
   using mockRpc = RendererWorker.registerMockRpc({
@@ -140,6 +239,22 @@ test('executeGrepSearchTool validates grep_search argument shape', async () => {
 
   expect(result).toEqual({
     error:
-      'Invalid argument: grep_search requires query (string), isRegexp (boolean), optional includePattern (string), optional maxResults (number), and optional includeIgnoredFiles (boolean).',
+      'Invalid argument: grep_search requires query (string), isRegexp (boolean), optional includePattern (string), optional maxResults (number), optional includeIgnoredFiles (boolean), and optional outputFormat ("xml" | "json").',
+  })
+})
+
+test('executeGrepSearchTool rejects unsupported outputFormat values', async () => {
+  const result = await executeGrepSearchTool(
+    {
+      isRegexp: false,
+      outputFormat: 'text',
+      query: 'searchText',
+    },
+    {} as never,
+  )
+
+  expect(result).toEqual({
+    error:
+      'Invalid argument: grep_search requires query (string), isRegexp (boolean), optional includePattern (string), optional maxResults (number), optional includeIgnoredFiles (boolean), and optional outputFormat ("xml" | "json").',
   })
 })

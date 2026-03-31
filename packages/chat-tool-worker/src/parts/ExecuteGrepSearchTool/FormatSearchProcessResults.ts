@@ -1,11 +1,15 @@
-import type { SearchProcessResult } from './ExecuteGrepSearchToolTypes.ts'
+import type { GrepSearchOutputFormat, SearchProcessResult } from './ExecuteGrepSearchToolTypes.ts'
+import { formatGrepMatches } from './FormatGrepMatches.ts'
 
-export const formatSearchProcessResults = (results: readonly SearchProcessResult[] | undefined): string => {
+export const formatSearchProcessResults = (
+  results: readonly SearchProcessResult[] | undefined,
+  outputFormat?: GrepSearchOutputFormat,
+): string => {
   if (!results || results.length === 0) {
     return 'No matches found.'
   }
   let currentFile = ''
-  const lines: string[] = []
+  const matches = []
   for (const result of results) {
     if (result.type === 1) {
       currentFile = result.text
@@ -13,14 +17,22 @@ export const formatSearchProcessResults = (results: readonly SearchProcessResult
     }
     if (result.type === 2) {
       if (currentFile) {
-        lines.push(`${currentFile}:${result.lineNumber}:${result.text}`)
+        matches.push({
+          lineNumber: result.lineNumber,
+          path: currentFile,
+          text: result.text,
+        })
       } else {
-        lines.push(`${result.lineNumber}:${result.text}`)
+        matches.push({
+          lineNumber: result.lineNumber,
+          path: '',
+          text: result.text,
+        })
       }
     }
   }
-  if (lines.length === 0) {
+  if (matches.length === 0) {
     return 'No matches found.'
   }
-  return lines.join('\n')
+  return formatGrepMatches(matches, outputFormat)
 }

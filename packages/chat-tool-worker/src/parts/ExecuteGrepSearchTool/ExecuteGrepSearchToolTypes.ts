@@ -1,9 +1,18 @@
+export type GrepSearchOutputFormat = 'json' | 'xml'
+
 export type GrepSearchArgs = {
   readonly query: string
   readonly isRegexp: boolean
   readonly includePattern?: string
   readonly maxResults?: number
   readonly includeIgnoredFiles?: boolean
+  readonly outputFormat?: GrepSearchOutputFormat
+}
+
+export type GrepSearchMatch = {
+  readonly path: string
+  readonly lineNumber?: number
+  readonly text: string
 }
 
 export type SearchProcessResult = {
