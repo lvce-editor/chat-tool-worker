@@ -29,7 +29,8 @@ export const getGrepSearchTool = (): ChatTool => {
             type: 'number',
           },
           outputFormat: {
-            description: 'Optional structured output format. Use "xml" for match tags or "json" for machine-readable JSON. When omitted, grep_search returns plain text lines.',
+            description:
+              'Optional structured output format. Use "xml" for match tags or "json" for machine-readable JSON. When omitted, grep_search returns plain text lines.',
             enum: ['xml', 'json'],
             type: 'string',
           },

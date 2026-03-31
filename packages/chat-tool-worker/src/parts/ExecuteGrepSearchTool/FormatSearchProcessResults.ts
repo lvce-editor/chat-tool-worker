@@ -1,10 +1,7 @@
 import type { GrepSearchOutputFormat, SearchProcessResult } from './ExecuteGrepSearchToolTypes.ts'
 import { formatGrepMatches } from './FormatGrepMatches.ts'
 
-export const formatSearchProcessResults = (
-  results: readonly SearchProcessResult[] | undefined,
-  outputFormat?: GrepSearchOutputFormat,
-): string => {
+export const formatSearchProcessResults = (results: readonly SearchProcessResult[] | undefined, outputFormat?: GrepSearchOutputFormat): string => {
   if (!results || results.length === 0) {
     return 'No matches found.'
   }
