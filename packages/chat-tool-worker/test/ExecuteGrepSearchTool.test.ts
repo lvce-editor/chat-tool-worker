@@ -12,7 +12,7 @@ test('executeGrepSearchTool uses search-process for file workspaces', async () =
   let calledWithMethod = ''
   let calledWithOptions
   using mockRpc = RendererWorker.registerMockRpc({
-    'SearchProcess.invoke': async (method, options) => {
+    'SearchProcess.invoke': async (method: string, options: unknown) => {
       called++
       calledWithMethod = method
       calledWithOptions = options
@@ -38,6 +38,7 @@ test('executeGrepSearchTool uses search-process for file workspaces', async () =
     },
     'Workspace.getPath': async () => 'file:///workspace',
   })
+  void mockRpc
   const result = await executeGrepSearchTool(
     {
       includeIgnoredFiles: true,
@@ -71,6 +72,33 @@ test('executeGrepSearchTool uses search-process for file workspaces', async () =
     ],
     searchDir: '/workspace',
   })
+  expect(mockRpc.invocations).toEqual([
+    ['Workspace.getPath'],
+    [
+      'SearchProcess.invoke',
+      'TextSearch.search',
+      {
+        maxSearchResults: 25,
+        ripGrepArgs: [
+          '--hidden',
+          '--no-require-git',
+          '--smart-case',
+          '--stats',
+          '--json',
+          '--threads',
+          '1',
+          '--ignore-case',
+          '--no-ignore',
+          '--glob',
+          'src/**/*.ts',
+          '--regexp',
+          'function|method|procedure',
+          '.',
+        ],
+        searchDir: '/workspace',
+      },
+    ],
+  ])
   expect(result).toEqual({
     arguments: {
       includeIgnoredFiles: true,
@@ -109,6 +137,7 @@ test('executeGrepSearchTool formats file workspace results as xml', async () => 
     },
     'Workspace.getPath': async () => 'file:///workspace',
   })
+  void mockRpc
   const result = await executeGrepSearchTool(
     {
       isRegexp: false,
@@ -118,6 +147,31 @@ test('executeGrepSearchTool formats file workspace results as xml', async () => 
     options,
   )
 
+  expect(mockRpc.invocations).toEqual([
+    ['Workspace.getPath'],
+    [
+      'SearchProcess.invoke',
+      'TextSearch.search',
+      {
+        maxSearchResults: undefined,
+        ripGrepArgs: [
+          '--hidden',
+          '--no-require-git',
+          '--smart-case',
+          '--stats',
+          '--json',
+          '--threads',
+          '1',
+          '--ignore-case',
+          '--fixed-strings',
+          '--',
+          'searchText',
+          '.',
+        ],
+        searchDir: '/workspace',
+      },
+    ],
+  ])
   expect(result).toEqual({
     arguments: {
       isRegexp: false,
@@ -139,6 +193,7 @@ test('executeGrepSearchTool formats memory workspace results as json', async () 
     },
     'Workspace.getPath': async () => 'memfs:///workspace',
   })
+  void mockRpc
   const result = await executeGrepSearchTool(
     {
       isRegexp: false,
@@ -148,6 +203,26 @@ test('executeGrepSearchTool formats memory workspace results as json', async () 
     options,
   )
 
+  expect(mockRpc.invocations).toEqual([
+    ['Workspace.getPath'],
+    [
+      'ExtensionHostTextSearch.textSearchMemory2',
+      'memfs',
+      'memfs:///workspace',
+      'fromMemory',
+      {
+        exclude: '',
+        include: '',
+        isCaseSensitive: false,
+        query: 'fromMemory',
+        root: 'memfs:///workspace',
+        scheme: 'memfs',
+        threads: 1,
+        useRegularExpression: false,
+      },
+      '',
+    ],
+  ])
   expect(result).toEqual({
     arguments: {
       isRegexp: false,
@@ -183,6 +258,7 @@ test('executeGrepSearchTool uses memory search for non-file workspaces', async (
     },
     'Workspace.getPath': async () => 'memfs:///workspace',
   })
+  void mockRpc
   const result = await executeGrepSearchTool(
     {
       includePattern: 'src/**/*.ts',
@@ -193,6 +269,43 @@ test('executeGrepSearchTool uses memory search for non-file workspaces', async (
   )
 
   expect(fallbackCalled).toBe(1)
+  expect(mockRpc.invocations).toEqual([
+    ['Workspace.getPath'],
+    [
+      'ExtensionHostTextSearch.textSearchMemory2',
+      'memfs',
+      'memfs:///workspace',
+      'fromMemory',
+      {
+        exclude: '',
+        include: 'src/**/*.ts',
+        isCaseSensitive: false,
+        query: 'fromMemory',
+        root: 'memfs:///workspace',
+        scheme: 'memfs',
+        threads: 1,
+        useRegularExpression: false,
+      },
+      '',
+    ],
+    [
+      'ExtensionHostTextSearch.textSearchMemory',
+      'memfs',
+      'memfs:///workspace',
+      'fromMemory',
+      {
+        exclude: '',
+        include: 'src/**/*.ts',
+        isCaseSensitive: false,
+        query: 'fromMemory',
+        root: 'memfs:///workspace',
+        scheme: 'memfs',
+        threads: 1,
+        useRegularExpression: false,
+      },
+      '',
+    ],
+  ])
   expect(result).toEqual({
     arguments: {
       includePattern: 'src/**/*.ts',

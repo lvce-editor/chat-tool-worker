@@ -2,10 +2,10 @@ import type { GrepSearchOutputFormat, LegacyMemorySearchResult } from './Execute
 import { formatGrepMatches } from './FormatGrepMatches.ts'
 
 export const formatLegacyMemorySearchResults = (results: readonly LegacyMemorySearchResult[], outputFormat?: GrepSearchOutputFormat): string => {
-  const matches = []
+  const matches: { path: string; text: string }[] = []
   for (const result of results) {
-    const [path, matches] = result
-    for (const match of matches) {
+    const [path, resultMatches] = result
+    for (const match of resultMatches) {
       const preview = typeof match?.preview === 'string' ? match.preview : ''
       matches.push(
         preview

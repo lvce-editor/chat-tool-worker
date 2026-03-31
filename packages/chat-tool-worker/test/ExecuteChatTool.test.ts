@@ -159,6 +159,7 @@ test('executeChatTool dispatches grep_search tool', async () => {
     }),
     'Workspace.getPath': async () => 'file:///workspace',
   })
+  void mockRpc
   const result = await ExecuteChatTool.executeChatTool(
     'grep_search',
     JSON.stringify({
@@ -169,6 +170,33 @@ test('executeChatTool dispatches grep_search tool', async () => {
     }),
     options,
   )
+  expect(mockRpc.invocations).toEqual([
+    ['Workspace.getPath'],
+    [
+      'SearchProcess.invoke',
+      'TextSearch.search',
+      {
+        maxSearchResults: undefined,
+        ripGrepArgs: [
+          '--hidden',
+          '--no-require-git',
+          '--smart-case',
+          '--stats',
+          '--json',
+          '--threads',
+          '1',
+          '--ignore-case',
+          '--glob',
+          'packages/chat-tool-worker/src/**/*.ts',
+          '--fixed-strings',
+          '--',
+          'search text',
+          '.',
+        ],
+        searchDir: '/workspace',
+      },
+    ],
+  ])
   expect(result).toEqual({
     arguments: {
       includeIgnoredFiles: false,

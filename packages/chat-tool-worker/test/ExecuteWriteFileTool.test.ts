@@ -39,6 +39,7 @@ test('executeWriteFileTool writes file and returns ok payload', async () => {
       calledWithContent = content
     },
   })
+  void mockRpc
   const result = await executeWriteFileTool({ content, uri }, {} as never)
   expect(existsCalled).toBe(1)
   expect(readCalled).toBe(1)
@@ -72,6 +73,7 @@ test('executeWriteFileTool returns diff counts when writing a new file', async (
       writeCalled++
     },
   })
+  void mockRpc
   const result = await executeWriteFileTool({ content, uri }, {} as never)
   expect(existsCalled).toBe(1)
   expect(readCalled).toBe(0)
@@ -95,6 +97,7 @@ test('executeWriteFileTool returns error payload when renderer worker write fail
       throw new Error('write failed')
     },
   })
+  void mockRpc
   const result = await executeWriteFileTool({ content: 'x', uri }, {} as never)
   expect(called).toBe(1)
   expect(result).toMatchObject({

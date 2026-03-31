@@ -1,5 +1,4 @@
 /* eslint-disable @cspell/spellchecker */
-/* eslint-disable e18e/prefer-url-canparse */
 import { RendererWorker } from '@lvce-editor/rpc-registry'
 import type { ExecuteToolOptions, ToolResponse } from '../Types/Types.ts'
 import { getToolErrorPayload } from '../GetToolErrorPayload/GetToolErrorPayload.ts'
@@ -14,16 +13,15 @@ export const executeRenameTool = async (args: Readonly<Record<string, unknown>>,
   if (!newUri || !isAbsoluteUri(newUri)) {
     return { error: 'Invalid argument: newUri must be an absolute URI.' }
   }
-  try {
-    new URL(oldUri)
-    new URL(newUri)
-  } catch {
+  if (!URL.canParse(oldUri) || !URL.canParse(newUri)) {
     return { error: 'Invalid argument: invalid URL.' }
   }
+  const oldUrl = new URL(oldUri)
+  const newUrl = new URL(newUri)
   try {
-    await RendererWorker.invoke('FileSystem.rename', oldUri, newUri)
-    return { newUri, ok: true, oldUri }
+    await RendererWorker.invoke('FileSystem.rename', oldUrl.toString(), newUrl.toString())
+    return { newUri: newUrl.toString(), ok: true, oldUri: oldUrl.toString() }
   } catch (error) {
-    return { ...getToolErrorPayload(error), newUri, oldUri }
+    return { ...getToolErrorPayload(error), newUri: newUrl.toString(), oldUri: oldUrl.toString() }
   }
 }
