@@ -1,4 +1,4 @@
-import type { GrepSearchMatch, GrepSearchOutputFormat } from './ExecuteGrepSearchToolTypes.ts'
+import type { GrepSearchMatch, GrepSearchOutputFormat } from '../ExecuteGrepSearchToolTypes/ExecuteGrepSearchToolTypes.ts'
 
 const escapeXml = (value: string): string => {
   return value.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;')

@@ -1,9 +1,9 @@
 import { RendererWorker } from '@lvce-editor/rpc-registry'
 import type { ToolResponse } from '../Types/Types.ts'
-import type { GrepSearchArgs, SearchProcessResponse } from './ExecuteGrepSearchToolTypes.ts'
-import { formatSearchProcessResults } from './FormatSearchProcessResults.ts'
-import { getRipGrepArgs } from './GetRipGrepArgs.ts'
-import { getSearchDir } from './GetSearchDir.ts'
+import type { GrepSearchArgs, SearchProcessResponse } from '../ExecuteGrepSearchToolTypes/ExecuteGrepSearchToolTypes.ts'
+import { formatSearchProcessResults } from '../FormatSearchProcessResults/FormatSearchProcessResults.ts'
+import { getRipGrepArgs } from '../GetRipGrepArgs/GetRipGrepArgs.ts'
+import { getSearchDir } from '../GetSearchDir/GetSearchDir.ts'
 
 export const executeFileGrepSearch = async (workspaceUri: string, grepSearchArgs: GrepSearchArgs): Promise<ToolResponse> => {
   const result = (await RendererWorker.invoke('SearchProcess.invoke', 'TextSearch.search', {

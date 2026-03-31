@@ -1,7 +1,7 @@
-import { getFilePathFromUri } from './GetFilePathFromUri.ts'
-import { getScheme } from './GetScheme.ts'
-import { isAbsoluteFileSystemPath } from './IsAbsoluteFileSystemPath.ts'
-import { isFileUri } from './IsFileUri.ts'
+import { getFilePathFromUri } from '../GetFilePathFromUri/GetFilePathFromUri.ts'
+import { getScheme } from '../GetScheme/GetScheme.ts'
+import { isAbsoluteFileSystemPath } from '../IsAbsoluteFileSystemPath/IsAbsoluteFileSystemPath.ts'
+import { isFileUri } from '../IsFileUri/IsFileUri.ts'
 
 export const getSearchDir = (workspaceUri: string, includePattern?: string): string => {
   if (!includePattern) {

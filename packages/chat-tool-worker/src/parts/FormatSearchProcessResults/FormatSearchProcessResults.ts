@@ -1,5 +1,5 @@
-import type { GrepSearchOutputFormat, SearchProcessResult } from './ExecuteGrepSearchToolTypes.ts'
-import { formatGrepMatches } from './FormatGrepMatches.ts'
+import type { GrepSearchOutputFormat, SearchProcessResult } from '../ExecuteGrepSearchToolTypes/ExecuteGrepSearchToolTypes.ts'
+import { formatGrepMatches } from '../FormatGrepMatches/FormatGrepMatches.ts'
 
 export const formatSearchProcessResults = (results: readonly SearchProcessResult[] | undefined, outputFormat?: GrepSearchOutputFormat): string => {
   if (!results || results.length === 0) {

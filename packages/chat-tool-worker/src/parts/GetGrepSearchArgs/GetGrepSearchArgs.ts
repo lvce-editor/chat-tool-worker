@@ -1,4 +1,4 @@
-import type { GrepSearchArgs } from './ExecuteGrepSearchToolTypes.ts'
+import type { GrepSearchArgs } from '../ExecuteGrepSearchToolTypes/ExecuteGrepSearchToolTypes.ts'
 
 export const getGrepSearchArgs = (args: Readonly<Record<string, unknown>>): GrepSearchArgs | undefined => {
   const { includeIgnoredFiles, includePattern, isRegexp, maxResults, outputFormat, query } = args

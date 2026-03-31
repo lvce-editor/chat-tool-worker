@@ -1,9 +1,9 @@
 import { RendererWorker } from '@lvce-editor/rpc-registry'
 import type { ExecuteToolOptions, ToolResponse } from '../Types/Types.ts'
-import type { GrepSearchArgs, LegacyMemorySearchResult } from './ExecuteGrepSearchToolTypes.ts'
-import { formatLegacyMemorySearchResults } from './FormatLegacyMemorySearchResults.ts'
-import { getScheme } from './GetScheme.ts'
-import { isLegacyMemorySearchResult } from './IsLegacyMemorySearchResult.ts'
+import type { GrepSearchArgs, LegacyMemorySearchResult } from '../ExecuteGrepSearchToolTypes/ExecuteGrepSearchToolTypes.ts'
+import { formatLegacyMemorySearchResults } from '../FormatLegacyMemorySearchResults/FormatLegacyMemorySearchResults.ts'
+import { getScheme } from '../GetScheme/GetScheme.ts'
+import { isLegacyMemorySearchResult } from '../IsLegacyMemorySearchResult/IsLegacyMemorySearchResult.ts'
 
 export const executeMemoryGrepSearch = async (
   workspaceUri: string,

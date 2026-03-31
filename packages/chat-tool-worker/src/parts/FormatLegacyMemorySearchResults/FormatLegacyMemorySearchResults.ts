@@ -1,5 +1,5 @@
-import type { GrepSearchOutputFormat, LegacyMemorySearchResult } from './ExecuteGrepSearchToolTypes.ts'
-import { formatGrepMatches } from './FormatGrepMatches.ts'
+import type { GrepSearchOutputFormat, LegacyMemorySearchResult } from '../ExecuteGrepSearchToolTypes/ExecuteGrepSearchToolTypes.ts'
+import { formatGrepMatches } from '../FormatGrepMatches/FormatGrepMatches.ts'
 
 export const formatLegacyMemorySearchResults = (results: readonly LegacyMemorySearchResult[], outputFormat?: GrepSearchOutputFormat): string => {
   const matches: { path: string; text: string }[] = []
