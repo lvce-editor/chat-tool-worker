@@ -1,4 +1,21 @@
+import { RendererWorker } from '@lvce-editor/rpc-registry'
 import type { ExecuteToolOptions, ToolResponse } from '../Types/Types.ts'
+import { getToolErrorPayload } from '../GetToolErrorPayload/GetToolErrorPayload.ts'
+import * as TerminalProcess from '../TerminalProcess/TerminalProcess.ts'
+
+type ExecuteShellCommandSuccessResult = {
+  readonly exitCode: number | null
+  readonly stderr: string
+  readonly stdout: string
+}
+
+type ExecuteShellCommandErrorResult = {
+  readonly errorCode: string | undefined
+  readonly errorMessage: string
+  readonly errorStack: string | undefined
+}
+
+type ExecuteShellCommandResult = ExecuteShellCommandSuccessResult | ExecuteShellCommandErrorResult
 
 type RunInTerminalOptions = {
   readonly shell: string
@@ -31,11 +48,15 @@ export const executeRunInTerminalTool = async (args: Readonly<Record<string, unk
     }
   }
 
-  return {
-    output: {
-      exitCode: 0,
-      stderr: '',
-      stdout: `Mock output for "${runInTerminalOptions.command}" using shell "${runInTerminalOptions.shell}"`,
-    },
+  try {
+    const workspaceUri = await RendererWorker.getWorkspacePath()
+    const result = (await TerminalProcess.invoke('Terminal.executeShellCommand', {
+      args: ['-c', runInTerminalOptions.command],
+      cwd: workspaceUri,
+      toSpawn: runInTerminalOptions.shell,
+    })) as ExecuteShellCommandResult
+    return result
+  } catch (error) {
+    return getToolErrorPayload(error)
   }
 }

@@ -1,10 +1,9 @@
 import { LazyTransferMessagePortRpcParent } from '@lvce-editor/rpc'
-// @ts-ignore
-import { RendererWorker, TerminalProcess } from '@lvce-editor/rpc-registry'
+import { RendererWorker } from '@lvce-editor/rpc-registry'
 import * as CommandMap from '../CommandMap/CommandMap.ts'
+import * as TerminalProcess from '../TerminalProcess/TerminalProcess.ts'
 
 const send = async (port: MessagePort): Promise<void> => {
-  // @ts-ignore
   await RendererWorker.sendMessagePortToTerminalProcess(port)
 }
 

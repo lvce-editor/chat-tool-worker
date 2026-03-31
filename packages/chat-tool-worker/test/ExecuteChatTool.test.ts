@@ -1,6 +1,7 @@
 import { expect, test } from '@jest/globals'
 import { RendererWorker } from '@lvce-editor/rpc-registry'
 import * as ExecuteChatTool from '../src/parts/ExecuteChatTool/ExecuteChatTool.ts'
+import * as TerminalProcess from '../src/parts/TerminalProcess/TerminalProcess.ts'
 
 const options = {
   assetDir: '',
@@ -82,6 +83,17 @@ test('executeChatTool dispatches edit_file tool', async () => {
 })
 
 test('executeChatTool dispatches run_in_terminal tool', async () => {
+  using rendererMockRpc = RendererWorker.registerMockRpc({
+    'Workspace.getPath': async () => 'file:///workspace',
+  })
+  using terminalProcessMockRpc = TerminalProcess.registerMockRpc({
+    'Terminal.executeShellCommand': async () => ({
+      exitCode: 0,
+      stderr: '',
+      stdout: 'hello from terminal',
+    }),
+  })
+
   const result = await ExecuteChatTool.executeChatTool(
     'run_in_terminal',
     JSON.stringify({
@@ -93,12 +105,21 @@ test('executeChatTool dispatches run_in_terminal tool', async () => {
     options,
   )
   expect(result).toEqual({
-    output: {
-      exitCode: 0,
-      stderr: '',
-      stdout: 'Mock output for "echo hello" using shell "/bin/bash"',
-    },
+    exitCode: 0,
+    stderr: '',
+    stdout: 'hello from terminal',
   })
+  expect(rendererMockRpc.invocations).toEqual([['Workspace.getPath']])
+  expect(terminalProcessMockRpc.invocations).toEqual([
+    [
+      'Terminal.executeShellCommand',
+      {
+        args: ['-c', 'echo hello'],
+        cwd: 'file:///workspace',
+        toSpawn: '/bin/bash',
+      },
+    ],
+  ])
 })
 
 test('executeChatTool dispatches spawn_subagent tool', async () => {
