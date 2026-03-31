@@ -1,4 +1,3 @@
-/* eslint-disable @cspell/spellchecker */
 import { RendererWorker } from '@lvce-editor/rpc-registry'
 import type { ExecuteToolOptions, ToolResponse } from '../Types/Types.ts'
 import { getToolErrorPayload } from '../GetToolErrorPayload/GetToolErrorPayload.ts'
