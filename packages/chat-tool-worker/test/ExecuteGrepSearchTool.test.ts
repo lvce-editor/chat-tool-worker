@@ -10,9 +10,9 @@ const options = {
 test('executeGrepSearchTool uses search-process for file workspaces', async () => {
   let called = 0
   let calledWithMethod = ''
-  let calledWithOptions: any
+  let calledWithOptions
   using mockRpc = RendererWorker.registerMockRpc({
-    'SearchProcess.invoke': async (method: string, options: any) => {
+    'SearchProcess.invoke': async (method, options) => {
       called++
       calledWithMethod = method
       calledWithOptions = options
