@@ -38,7 +38,6 @@ test('executeGrepSearchTool uses search-process for file workspaces', async () =
     },
     'Workspace.getPath': async () => 'file:///workspace',
   })
-  void mockRpc
   const result = await executeGrepSearchTool(
     {
       includeIgnoredFiles: true,
@@ -137,7 +136,6 @@ test('executeGrepSearchTool formats file workspace results as xml', async () => 
     },
     'Workspace.getPath': async () => 'file:///workspace',
   })
-  void mockRpc
   const result = await executeGrepSearchTool(
     {
       isRegexp: false,
@@ -193,7 +191,6 @@ test('executeGrepSearchTool formats memory workspace results as json', async () 
     },
     'Workspace.getPath': async () => 'memfs:///workspace',
   })
-  void mockRpc
   const result = await executeGrepSearchTool(
     {
       isRegexp: false,
@@ -258,7 +255,6 @@ test('executeGrepSearchTool uses memory search for non-file workspaces', async (
     },
     'Workspace.getPath': async () => 'memfs:///workspace',
   })
-  void mockRpc
   const result = await executeGrepSearchTool(
     {
       includePattern: 'src/**/*.ts',

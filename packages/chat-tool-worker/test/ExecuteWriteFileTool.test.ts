@@ -39,13 +39,17 @@ test('executeWriteFileTool writes file and returns ok payload', async () => {
       calledWithContent = content
     },
   })
-  void mockRpc
   const result = await executeWriteFileTool({ content, uri }, {} as never)
   expect(existsCalled).toBe(1)
   expect(readCalled).toBe(1)
   expect(called).toBe(1)
   expect(calledWithUri).toBe(uri)
   expect(calledWithContent).toBe(content)
+  expect(mockRpc.invocations).toEqual([
+    ['FileSystem.exists', uri],
+    ['FileSystem.readFile', uri],
+    ['FileSystem.writeFile', uri, content],
+  ])
   expect(result).toEqual({
     addedLines: 1,
     ok: true,
@@ -73,11 +77,14 @@ test('executeWriteFileTool returns diff counts when writing a new file', async (
       writeCalled++
     },
   })
-  void mockRpc
   const result = await executeWriteFileTool({ content, uri }, {} as never)
   expect(existsCalled).toBe(1)
   expect(readCalled).toBe(0)
   expect(writeCalled).toBe(1)
+  expect(mockRpc.invocations).toEqual([
+    ['FileSystem.exists', uri],
+    ['FileSystem.writeFile', uri, content],
+  ])
   expect(result).toEqual({
     addedLines: 2,
     ok: true,
@@ -97,9 +104,13 @@ test('executeWriteFileTool returns error payload when renderer worker write fail
       throw new Error('write failed')
     },
   })
-  void mockRpc
   const result = await executeWriteFileTool({ content: 'x', uri }, {} as never)
   expect(called).toBe(1)
+  expect(mockRpc.invocations).toEqual([
+    ['FileSystem.exists', uri],
+    ['FileSystem.readFile', uri],
+    ['FileSystem.writeFile', uri, 'x'],
+  ])
   expect(result).toMatchObject({
     error: expect.any(String),
     uri,

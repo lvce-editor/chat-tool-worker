@@ -159,7 +159,6 @@ test('executeChatTool dispatches grep_search tool', async () => {
     }),
     'Workspace.getPath': async () => 'file:///workspace',
   })
-  void mockRpc
   const result = await ExecuteChatTool.executeChatTool(
     'grep_search',
     JSON.stringify({
