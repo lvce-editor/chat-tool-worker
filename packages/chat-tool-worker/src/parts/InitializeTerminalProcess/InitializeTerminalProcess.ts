@@ -4,7 +4,7 @@ import * as CommandMap from '../CommandMap/CommandMap.ts'
 import * as TerminalProcess from '../TerminalProcess/TerminalProcess.ts'
 
 const send = async (port: MessagePort): Promise<void> => {
-  await RendererWorker.sendMessagePortToTerminalProcess(port)
+  await RendererWorker.sendMessagePortToTerminalProcess(port, 0)
 }
 
 export const initializeTerminalProcess = async (): Promise<void> => {
