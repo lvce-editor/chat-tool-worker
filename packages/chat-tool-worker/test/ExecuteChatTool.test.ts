@@ -159,32 +159,26 @@ test('executeChatTool dispatches grep_search tool', async () => {
     }),
     'Workspace.getPath': async () => 'file:///workspace',
   })
-  try {
-    const result = await ExecuteChatTool.executeChatTool(
-      'grep_search',
-      JSON.stringify({
-        includeIgnoredFiles: false,
-        includePattern: 'packages/chat-tool-worker/src/**/*.ts',
-        isRegexp: false,
-        query: 'search text',
-      }),
-      options,
-    )
-    expect(result).toEqual({
-      arguments: {
-        includeIgnoredFiles: false,
-        includePattern: 'packages/chat-tool-worker/src/**/*.ts',
-        isRegexp: false,
-        query: 'search text',
-      },
-      result: 'No matches found.',
-      workspaceUri: 'file:///workspace',
-    })
-  } finally {
-    if (Symbol.dispose in mockRpc) {
-      ;(mockRpc as { [Symbol.dispose]: () => void })[Symbol.dispose]()
-    }
-  }
+  const result = await ExecuteChatTool.executeChatTool(
+    'grep_search',
+    JSON.stringify({
+      includeIgnoredFiles: false,
+      includePattern: 'packages/chat-tool-worker/src/**/*.ts',
+      isRegexp: false,
+      query: 'search text',
+    }),
+    options,
+  )
+  expect(result).toEqual({
+    arguments: {
+      includeIgnoredFiles: false,
+      includePattern: 'packages/chat-tool-worker/src/**/*.ts',
+      isRegexp: false,
+      query: 'search text',
+    },
+    result: 'No matches found.',
+    workspaceUri: 'file:///workspace',
+  })
 })
 
 test('executeChatTool dispatches update_todo tool', async () => {

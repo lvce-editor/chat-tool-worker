@@ -38,51 +38,50 @@ test('executeGrepSearchTool uses search-process for file workspaces', async () =
     },
     'Workspace.getPath': async () => 'file:///workspace',
   })
-    const result = await executeGrepSearchTool(
-      {
-        includeIgnoredFiles: true,
-        includePattern: 'src/**/*.ts',
-        isRegexp: true,
-        maxResults: 25,
-        query: 'function|method|procedure',
-      },
-      options,
-    )
+  const result = await executeGrepSearchTool(
+    {
+      includeIgnoredFiles: true,
+      includePattern: 'src/**/*.ts',
+      isRegexp: true,
+      maxResults: 25,
+      query: 'function|method|procedure',
+    },
+    options,
+  )
 
-    expect(called).toBe(1)
-    expect(calledWithMethod).toBe('TextSearch.search')
-    expect(calledWithOptions).toEqual({
-      maxSearchResults: 25,
-      ripGrepArgs: [
-        '--hidden',
-        '--no-require-git',
-        '--smart-case',
-        '--stats',
-        '--json',
-        '--threads',
-        '1',
-        '--ignore-case',
-        '--no-ignore',
-        '--glob',
-        'src/**/*.ts',
-        '--regexp',
-        'function|method|procedure',
-        '.',
-      ],
-      searchDir: '/workspace',
-    })
-    expect(result).toEqual({
-      arguments: {
-        includeIgnoredFiles: true,
-        includePattern: 'src/**/*.ts',
-        isRegexp: true,
-        maxResults: 25,
-        query: 'function|method|procedure',
-      },
-      result: 'src/main.ts:12:const searchText = true',
-      workspaceUri: 'file:///workspace',
-    })
-
+  expect(called).toBe(1)
+  expect(calledWithMethod).toBe('TextSearch.search')
+  expect(calledWithOptions).toEqual({
+    maxSearchResults: 25,
+    ripGrepArgs: [
+      '--hidden',
+      '--no-require-git',
+      '--smart-case',
+      '--stats',
+      '--json',
+      '--threads',
+      '1',
+      '--ignore-case',
+      '--no-ignore',
+      '--glob',
+      'src/**/*.ts',
+      '--regexp',
+      'function|method|procedure',
+      '.',
+    ],
+    searchDir: '/workspace',
+  })
+  expect(result).toEqual({
+    arguments: {
+      includeIgnoredFiles: true,
+      includePattern: 'src/**/*.ts',
+      isRegexp: true,
+      maxResults: 25,
+      query: 'function|method|procedure',
+    },
+    result: 'src/main.ts:12:const searchText = true',
+    workspaceUri: 'file:///workspace',
+  })
 })
 
 test('executeGrepSearchTool formats file workspace results as xml', async () => {
@@ -110,25 +109,24 @@ test('executeGrepSearchTool formats file workspace results as xml', async () => 
     },
     'Workspace.getPath': async () => 'file:///workspace',
   })
-    const result = await executeGrepSearchTool(
-      {
-        isRegexp: false,
-        outputFormat: 'xml',
-        query: 'searchText',
-      },
-      options,
-    )
+  const result = await executeGrepSearchTool(
+    {
+      isRegexp: false,
+      outputFormat: 'xml',
+      query: 'searchText',
+    },
+    options,
+  )
 
-    expect(result).toEqual({
-      arguments: {
-        isRegexp: false,
-        outputFormat: 'xml',
-        query: 'searchText',
-      },
-      result: '1 matches\n<match path="/workspace/src/main.ts" line="12">\nconst searchText = true\n</match>',
-      workspaceUri: 'file:///workspace',
-    })
-
+  expect(result).toEqual({
+    arguments: {
+      isRegexp: false,
+      outputFormat: 'xml',
+      query: 'searchText',
+    },
+    result: '1 matches\n<match path="/workspace/src/main.ts" line="12">\nconst searchText = true\n</match>',
+    workspaceUri: 'file:///workspace',
+  })
 })
 
 test('executeGrepSearchTool formats memory workspace results as json', async () => {
@@ -141,37 +139,36 @@ test('executeGrepSearchTool formats memory workspace results as json', async () 
     },
     'Workspace.getPath': async () => 'memfs:///workspace',
   })
-  try {
-    const result = await executeGrepSearchTool(
-      {
-        isRegexp: false,
-        outputFormat: 'json',
-        query: 'fromMemory',
-      },
-      options,
-    )
+  const result = await executeGrepSearchTool(
+    {
+      isRegexp: false,
+      outputFormat: 'json',
+      query: 'fromMemory',
+    },
+    options,
+  )
 
-    expect(result).toEqual({
-      arguments: {
-        isRegexp: false,
-        outputFormat: 'json',
-        query: 'fromMemory',
+  expect(result).toEqual({
+    arguments: {
+      isRegexp: false,
+      outputFormat: 'json',
+      query: 'fromMemory',
+    },
+    result: JSON.stringify(
+      {
+        count: 1,
+        matches: [
+          {
+            path: 'src/main.ts',
+            text: 'const fromMemory = true',
+          },
+        ],
       },
-      result: JSON.stringify(
-        {
-          count: 1,
-          matches: [
-            {
-              path: 'src/main.ts',
-              text: 'const fromMemory = true',
-            },
-          ],
-        },
-        undefined,
-        2,
-      ),
-      workspaceUri: 'memfs:///workspace',
-    })
+      undefined,
+      2,
+    ),
+    workspaceUri: 'memfs:///workspace',
+  })
 })
 
 test('executeGrepSearchTool uses memory search for non-file workspaces', async () => {
@@ -186,26 +183,25 @@ test('executeGrepSearchTool uses memory search for non-file workspaces', async (
     },
     'Workspace.getPath': async () => 'memfs:///workspace',
   })
-    const result = await executeGrepSearchTool(
-      {
-        includePattern: 'src/**/*.ts',
-        isRegexp: false,
-        query: 'fromMemory',
-      },
-      options,
-    )
+  const result = await executeGrepSearchTool(
+    {
+      includePattern: 'src/**/*.ts',
+      isRegexp: false,
+      query: 'fromMemory',
+    },
+    options,
+  )
 
-    expect(fallbackCalled).toBe(1)
-    expect(result).toEqual({
-      arguments: {
-        includePattern: 'src/**/*.ts',
-        isRegexp: false,
-        query: 'fromMemory',
-      },
-      result: 'src/main.ts: const fromMemory = true',
-      workspaceUri: 'memfs:///workspace',
-    })
-
+  expect(fallbackCalled).toBe(1)
+  expect(result).toEqual({
+    arguments: {
+      includePattern: 'src/**/*.ts',
+      isRegexp: false,
+      query: 'fromMemory',
+    },
+    result: 'src/main.ts: const fromMemory = true',
+    workspaceUri: 'memfs:///workspace',
+  })
 })
 
 test('executeGrepSearchTool validates grep_search argument shape', async () => {
