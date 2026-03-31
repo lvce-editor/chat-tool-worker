@@ -1,9 +1,9 @@
 import { RendererWorker } from '@lvce-editor/rpc-registry'
+import type { GrepSearchArgs, LegacyMemorySearchResult } from '../ExecuteGrepSearchToolTypes/ExecuteGrepSearchToolTypes.ts'
 import type { ExecuteToolOptions, ToolResponse } from '../Types/Types.ts'
-import type { GrepSearchArgs, LegacyMemorySearchResult } from './ExecuteGrepSearchToolTypes.ts'
-import { formatLegacyMemorySearchResults } from './FormatLegacyMemorySearchResults.ts'
-import { getScheme } from './GetScheme.ts'
-import { isLegacyMemorySearchResult } from './IsLegacyMemorySearchResult.ts'
+import { formatLegacyMemorySearchResults } from '../FormatLegacyMemorySearchResults/FormatLegacyMemorySearchResults.ts'
+import { getScheme } from '../GetScheme/GetScheme.ts'
+import { isLegacyMemorySearchResult } from '../IsLegacyMemorySearchResult/IsLegacyMemorySearchResult.ts'
 
 export const executeMemoryGrepSearch = async (
   workspaceUri: string,
@@ -31,7 +31,7 @@ export const executeMemoryGrepSearch = async (
     )) as { readonly limitHit?: boolean; readonly results?: readonly LegacyMemorySearchResult[] }
     return {
       arguments: grepSearchArgs,
-      result: formatLegacyMemorySearchResults(result.results || []),
+      result: formatLegacyMemorySearchResults(result.results || [], grepSearchArgs.outputFormat),
       workspaceUri,
       ...(result.limitHit ? { warning: 'Search result limit reached.' } : {}),
     }
@@ -46,7 +46,9 @@ export const executeMemoryGrepSearch = async (
     )) as unknown
     return {
       arguments: grepSearchArgs,
-      result: isLegacyMemorySearchResult(legacyResults) ? formatLegacyMemorySearchResults(legacyResults) : 'No matches found.',
+      result: isLegacyMemorySearchResult(legacyResults)
+        ? formatLegacyMemorySearchResults(legacyResults, grepSearchArgs.outputFormat)
+        : 'No matches found.',
       workspaceUri,
     }
   }

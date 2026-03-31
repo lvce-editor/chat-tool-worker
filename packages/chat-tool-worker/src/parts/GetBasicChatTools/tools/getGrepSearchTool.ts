@@ -28,6 +28,12 @@ export const getGrepSearchTool = (): ChatTool => {
               "The maximum number of results to return. Do not use this unless necessary, it can slow things down. By default, only some matches are returned. If you use this and don't see what you're looking for, you can try again with a more specific query or a larger maxResults.",
             type: 'number',
           },
+          outputFormat: {
+            description:
+              'Optional structured output format. Use "xml" for match tags or "json" for machine-readable JSON. When omitted, grep_search returns plain text lines.',
+            enum: ['xml', 'json'],
+            type: 'string',
+          },
           query: {
             description:
               "The pattern to search for in files in the workspace. Use regex with alternation (e.g., 'word1|word2|word3') or character classes to find multiple potential words in a single search. Be sure to set the isRegexp property properly to declare whether it's a regex or plain text pattern. Is case-insensitive.",

@@ -1,6 +1,6 @@
-import type { GrepSearchArgs } from './ExecuteGrepSearchToolTypes.ts'
-import { isAbsoluteFileSystemPath } from './IsAbsoluteFileSystemPath.ts'
-import { isFileUri } from './IsFileUri.ts'
+import type { GrepSearchArgs } from '../ExecuteGrepSearchToolTypes/ExecuteGrepSearchToolTypes.ts'
+import { isAbsoluteFileSystemPath } from '../IsAbsoluteFileSystemPath/IsAbsoluteFileSystemPath.ts'
+import { isFileUri } from '../IsFileUri/IsFileUri.ts'
 
 export const getRipGrepArgs = ({ includeIgnoredFiles, includePattern, isRegexp, query }: GrepSearchArgs): readonly string[] => {
   const ripGrepArgs = ['--hidden', '--no-require-git', '--smart-case', '--stats', '--json', '--threads', '1', '--ignore-case']

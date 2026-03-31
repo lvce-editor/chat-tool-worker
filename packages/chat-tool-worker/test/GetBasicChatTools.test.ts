@@ -153,6 +153,7 @@ test('grep_search defines vscode-style grep arguments for workspace search', () 
   expect(parameters.properties).toHaveProperty('includePattern')
   expect(parameters.properties).toHaveProperty('maxResults')
   expect(parameters.properties).toHaveProperty('includeIgnoredFiles')
+  expect(parameters.properties).toHaveProperty('outputFormat')
 })
 
 test('update_todo defines todos string argument for checklist updates', () => {

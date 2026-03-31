@@ -88,19 +88,14 @@ test('executeGlobTool matches files with simple * pattern', async () => {
       return []
     },
   })
+  void mockRpc
 
-  try {
-    const result = await executeGlob('src/*.ts')
-    expect(result).toMatchObject({
-      paths: expect.arrayContaining(['src/main.ts', 'src/utils.ts']),
-      pattern: 'src/*.ts',
-    })
-    expect((result as { paths: string[] }).paths).not.toContain('src/config.json')
-  } finally {
-    if (Symbol.dispose in mockRpc) {
-      ;(mockRpc as { [Symbol.dispose]: () => void })[Symbol.dispose]()
-    }
+  const result = await executeGlob('src/*.ts')
+  const expectedItems = {
+    paths: ['src/main.ts', 'src/utils.ts'],
+    pattern: 'src/*.ts',
   }
+  expect(result).toEqual(expectedItems)
 })
 
 test('executeGlobTool matches all files with pattern *', async () => {
@@ -116,18 +111,14 @@ test('executeGlobTool matches all files with pattern *', async () => {
       return []
     },
   })
+  void mockRpc
 
-  try {
-    const result = await executeGlob('src/*')
-    expect(result).toMatchObject({
-      paths: expect.arrayContaining(['src/main.ts', 'src/utils.ts', 'src/config.json']),
-      pattern: 'src/*',
-    })
-  } finally {
-    if (Symbol.dispose in mockRpc) {
-      ;(mockRpc as { [Symbol.dispose]: () => void })[Symbol.dispose]()
-    }
+  const result = await executeGlob('src/*')
+  const expectedItems = {
+    paths: ['src/config.json', 'src/main.ts', 'src/utils.ts'],
+    pattern: 'src/*',
   }
+  expect(result).toEqual(expectedItems)
 })
 
 test('executeGlobTool matches with ? single character wildcard', async () => {
@@ -139,19 +130,14 @@ test('executeGlobTool matches with ? single character wildcard', async () => {
       return []
     },
   })
+  void mockRpc
 
-  try {
-    const result = await executeGlob('src/?.ts')
-    expect(result).toMatchObject({
-      paths: expect.arrayContaining(['src/a.ts', 'src/b.ts']),
-      pattern: 'src/?.ts',
-    })
-    expect((result as { paths: string[] }).paths).not.toContain('src/ab.ts')
-  } finally {
-    if (Symbol.dispose in mockRpc) {
-      ;(mockRpc as { [Symbol.dispose]: () => void })[Symbol.dispose]()
-    }
+  const result = await executeGlob('src/?.ts')
+  const expectedItems = {
+    paths: ['src/a.ts', 'src/b.ts'],
+    pattern: 'src/?.ts',
   }
+  expect(result).toEqual(expectedItems)
 })
 
 test('executeGlobTool filters directories with * pattern', async () => {
@@ -163,18 +149,14 @@ test('executeGlobTool filters directories with * pattern', async () => {
       return []
     },
   })
+  void mockRpc
 
-  try {
-    const result = await executeGlob('src/*.ts')
-    expect(result).toMatchObject({
-      paths: ['src/main.ts'],
-      pattern: 'src/*.ts',
-    })
-  } finally {
-    if (Symbol.dispose in mockRpc) {
-      ;(mockRpc as { [Symbol.dispose]: () => void })[Symbol.dispose]()
-    }
+  const result = await executeGlob('src/*.ts')
+  const expectedItems = {
+    paths: ['src/main.ts'],
+    pattern: 'src/*.ts',
   }
+  expect(result).toEqual(expectedItems)
 })
 
 test('executeGlobTool recursively matches with ** pattern', async () => {
@@ -192,18 +174,14 @@ test('executeGlobTool recursively matches with ** pattern', async () => {
       return []
     },
   })
+  void mockRpc
 
-  try {
-    const result = await executeGlob('src/**/*.ts')
-    expect(result).toMatchObject({
-      paths: expect.arrayContaining(['src/main.ts', 'src/subdir/index.ts', 'src/subdir/nested/deep.ts']),
-      pattern: 'src/**/*.ts',
-    })
-  } finally {
-    if (Symbol.dispose in mockRpc) {
-      ;(mockRpc as { [Symbol.dispose]: () => void })[Symbol.dispose]()
-    }
+  const result = await executeGlob('src/**/*.ts')
+  const expectedItems = {
+    paths: ['src/main.ts', 'src/subdir/index.ts', 'src/subdir/nested/deep.ts'],
+    pattern: 'src/**/*.ts',
   }
+  expect(result).toEqual(expectedItems)
 })
 
 test('executeGlobTool matches with ** at the beginning for deep search', async () => {
@@ -224,18 +202,14 @@ test('executeGlobTool matches with ** at the beginning for deep search', async (
       return []
     },
   })
+  void mockRpc
 
-  try {
-    const result = await executeGlob('**/test/*.ts')
-    expect(result).toMatchObject({
-      paths: ['test/Main.test.ts'],
-      pattern: '**/test/*.ts',
-    })
-  } finally {
-    if (Symbol.dispose in mockRpc) {
-      ;(mockRpc as { [Symbol.dispose]: () => void })[Symbol.dispose]()
-    }
+  const result = await executeGlob('**/test/*.ts')
+  const expectedItems = {
+    paths: ['test/Main.test.ts'],
+    pattern: '**/test/*.ts',
   }
+  expect(result).toEqual(expectedItems)
 })
 
 test('executeGlobTool handles ** matching everything recursively', async () => {
@@ -253,18 +227,14 @@ test('executeGlobTool handles ** matching everything recursively', async () => {
       return []
     },
   })
+  void mockRpc
 
-  try {
-    const result = await executeGlob('**/*.ts')
-    expect(result).toMatchObject({
-      paths: expect.arrayContaining(['a.ts', 'dir/b.ts', 'dir/nested/c.ts']),
-      pattern: '**/*.ts',
-    })
-  } finally {
-    if (Symbol.dispose in mockRpc) {
-      ;(mockRpc as { [Symbol.dispose]: () => void })[Symbol.dispose]()
-    }
+  const result = await executeGlob('**/*.ts')
+  const expectedItems = {
+    paths: ['a.ts', 'dir/b.ts', 'dir/nested/c.ts'],
+    pattern: '**/*.ts',
   }
+  expect(result).toEqual(expectedItems)
 })
 
 test('executeGlobTool excludes .git directory by default', async () => {
@@ -282,19 +252,14 @@ test('executeGlobTool excludes .git directory by default', async () => {
       return []
     },
   })
+  void mockRpc
 
-  try {
-    const result = await executeGlob('**/*.ts')
-    expect(result).toMatchObject({
-      paths: expect.arrayContaining(['main.ts']),
-      pattern: '**/*.ts',
-    })
-    expect((result as { paths: string[] }).paths.some((path) => path.includes('.git'))).toBe(false)
-  } finally {
-    if (Symbol.dispose in mockRpc) {
-      ;(mockRpc as { [Symbol.dispose]: () => void })[Symbol.dispose]()
-    }
+  const result = await executeGlob('**/*.ts')
+  const expectedItems = {
+    paths: ['main.ts'],
+    pattern: '**/*.ts',
   }
+  expect(result).toEqual(expectedItems)
 })
 
 test('executeGlobTool excludes node_modules directory by default', async () => {
@@ -309,19 +274,14 @@ test('executeGlobTool excludes node_modules directory by default', async () => {
       return []
     },
   })
+  void mockRpc
 
-  try {
-    const result = await executeGlob('**/*.ts')
-    expect(result).toMatchObject({
-      paths: ['main.ts'],
-      pattern: '**/*.ts',
-    })
-    expect((result as { paths: string[] }).paths.some((path) => path.includes('node_modules'))).toBe(false)
-  } finally {
-    if (Symbol.dispose in mockRpc) {
-      ;(mockRpc as { [Symbol.dispose]: () => void })[Symbol.dispose]()
-    }
+  const result = await executeGlob('**/*.ts')
+  const expectedItems = {
+    paths: ['main.ts'],
+    pattern: '**/*.ts',
   }
+  expect(result).toEqual(expectedItems)
 })
 
 test('executeGlobTool excludes multiple default ignored directories', async () => {
@@ -341,19 +301,14 @@ test('executeGlobTool excludes multiple default ignored directories', async () =
       return []
     },
   })
+  void mockRpc
 
-  try {
-    const result = await executeGlob('**/*.ts')
-    const { paths } = result as { paths: string[] }
-    expect(paths).toContain('src/main.ts')
-    expect(paths.some((path) => path.includes('.git'))).toBe(false)
-    expect(paths.some((path) => path.includes('node_modules'))).toBe(false)
-    expect(paths.some((path) => path.includes('.cache'))).toBe(false)
-  } finally {
-    if (Symbol.dispose in mockRpc) {
-      ;(mockRpc as { [Symbol.dispose]: () => void })[Symbol.dispose]()
-    }
+  const result = await executeGlob('**/*.ts')
+  const expectedItems = {
+    paths: ['src/main.ts'],
+    pattern: '**/*.ts',
   }
+  expect(result).toEqual(expectedItems)
 })
 
 test('executeGlobTool does not recursively walk into symlinks', async () => {
@@ -368,18 +323,14 @@ test('executeGlobTool does not recursively walk into symlinks', async () => {
       return []
     },
   })
+  void mockRpc
 
-  try {
-    const result = await executeGlob('**/*.ts')
-    expect(result).toMatchObject({
-      paths: ['main.ts'],
-      pattern: '**/*.ts',
-    })
-  } finally {
-    if (Symbol.dispose in mockRpc) {
-      ;(mockRpc as { [Symbol.dispose]: () => void })[Symbol.dispose]()
-    }
+  const result = await executeGlob('**/*.ts')
+  const expectedItems = {
+    paths: ['main.ts'],
+    pattern: '**/*.ts',
   }
+  expect(result).toEqual(expectedItems)
 })
 
 test('executeGlobTool returns empty array when no matches found', async () => {
@@ -391,18 +342,14 @@ test('executeGlobTool returns empty array when no matches found', async () => {
       return []
     },
   })
+  void mockRpc
 
-  try {
-    const result = await executeGlob('*.ts')
-    expect(result).toMatchObject({
-      paths: [],
-      pattern: '*.ts',
-    })
-  } finally {
-    if (Symbol.dispose in mockRpc) {
-      ;(mockRpc as { [Symbol.dispose]: () => void })[Symbol.dispose]()
-    }
+  const result = await executeGlob('*.ts')
+  const expectedItems = {
+    paths: [],
+    pattern: '*.ts',
   }
+  expect(result).toEqual(expectedItems)
 })
 
 test('executeGlobTool handles nested pattern with no matches', async () => {
@@ -417,18 +364,14 @@ test('executeGlobTool handles nested pattern with no matches', async () => {
       return []
     },
   })
+  void mockRpc
 
-  try {
-    const result = await executeGlob('src/**/*.ts')
-    expect(result).toMatchObject({
-      paths: [],
-      pattern: 'src/**/*.ts',
-    })
-  } finally {
-    if (Symbol.dispose in mockRpc) {
-      ;(mockRpc as { [Symbol.dispose]: () => void })[Symbol.dispose]()
-    }
+  const result = await executeGlob('src/**/*.ts')
+  const expectedItems = {
+    paths: [],
+    pattern: 'src/**/*.ts',
   }
+  expect(result).toEqual(expectedItems)
 })
 
 test('executeGlobTool handles empty directory', async () => {
@@ -443,18 +386,14 @@ test('executeGlobTool handles empty directory', async () => {
       return []
     },
   })
+  void mockRpc
 
-  try {
-    const result = await executeGlob('empty/**/*.ts')
-    expect(result).toMatchObject({
-      paths: [],
-      pattern: 'empty/**/*.ts',
-    })
-  } finally {
-    if (Symbol.dispose in mockRpc) {
-      ;(mockRpc as { [Symbol.dispose]: () => void })[Symbol.dispose]()
-    }
+  const result = await executeGlob('empty/**/*.ts')
+  const expectedItems = {
+    paths: [],
+    pattern: 'empty/**/*.ts',
   }
+  expect(result).toEqual(expectedItems)
 })
 
 test('executeGlobTool handles single file pattern without directory', async () => {
@@ -466,18 +405,14 @@ test('executeGlobTool handles single file pattern without directory', async () =
       return []
     },
   })
+  void mockRpc
 
-  try {
-    const result = await executeGlob('*.md')
-    expect(result).toMatchObject({
-      paths: ['README.md'],
-      pattern: '*.md',
-    })
-  } finally {
-    if (Symbol.dispose in mockRpc) {
-      ;(mockRpc as { [Symbol.dispose]: () => void })[Symbol.dispose]()
-    }
+  const result = await executeGlob('*.md')
+  const expectedItems = {
+    paths: ['README.md'],
+    pattern: '*.md',
   }
+  expect(result).toEqual(expectedItems)
 })
 
 test('executeGlobTool preserves path order consistency', async () => {
@@ -489,18 +424,14 @@ test('executeGlobTool preserves path order consistency', async () => {
       return []
     },
   })
+  void mockRpc
 
-  try {
-    const result = await executeGlob('*.ts')
-    expect(result).toMatchObject({
-      paths: ['a.ts', 'b.ts', 'c.ts'],
-      pattern: '*.ts',
-    })
-  } finally {
-    if (Symbol.dispose in mockRpc) {
-      ;(mockRpc as { [Symbol.dispose]: () => void })[Symbol.dispose]()
-    }
+  const result = await executeGlob('*.ts')
+  const expectedItems = {
+    paths: ['a.ts', 'b.ts', 'c.ts'],
+    pattern: '*.ts',
   }
+  expect(result).toEqual(expectedItems)
 })
 
 test('executeGlobTool handles paths with brackets in pattern', async () => {
@@ -512,18 +443,14 @@ test('executeGlobTool handles paths with brackets in pattern', async () => {
       return []
     },
   })
+  void mockRpc
 
-  try {
-    const result = await executeGlob('[ab].ts')
-    expect(result).toMatchObject({
-      paths: ['a.ts', 'b.ts'],
-      pattern: '[ab].ts',
-    })
-  } finally {
-    if (Symbol.dispose in mockRpc) {
-      ;(mockRpc as { [Symbol.dispose]: () => void })[Symbol.dispose]()
-    }
+  const result = await executeGlob('[ab].ts')
+  const expectedItems = {
+    paths: ['a.ts', 'b.ts'],
+    pattern: '[ab].ts',
   }
+  expect(result).toEqual(expectedItems)
 })
 
 test('executeGlobTool handles case sensitivity in extensions', async () => {
@@ -539,18 +466,14 @@ test('executeGlobTool handles case sensitivity in extensions', async () => {
       return []
     },
   })
+  void mockRpc
 
-  try {
-    const result = await executeGlob('*.ts')
-    expect(result).toMatchObject({
-      paths: ['main.ts'],
-      pattern: '*.ts',
-    })
-  } finally {
-    if (Symbol.dispose in mockRpc) {
-      ;(mockRpc as { [Symbol.dispose]: () => void })[Symbol.dispose]()
-    }
+  const result = await executeGlob('*.ts')
+  const expectedItems = {
+    paths: ['main.ts'],
+    pattern: '*.ts',
   }
+  expect(result).toEqual(expectedItems)
 })
 
 test('executeGlobTool handles multiple consecutive slashes', async () => {
@@ -562,34 +485,29 @@ test('executeGlobTool handles multiple consecutive slashes', async () => {
       return []
     },
   })
+  void mockRpc
 
-  try {
-    const result = await executeGlob('src//main.ts')
-    expect(result).toMatchObject({
-      paths: ['src/main.ts'],
-      pattern: 'src//main.ts',
-    })
-  } finally {
-    if (Symbol.dispose in mockRpc) {
-      ;(mockRpc as { [Symbol.dispose]: () => void })[Symbol.dispose]()
-    }
+  const result = await executeGlob('src//main.ts')
+  const expectedItems = {
+    paths: ['src/main.ts'],
+    pattern: 'src//main.ts',
   }
+  expect(result).toEqual(expectedItems)
 })
 
 test('executeGlobTool returns pattern in response', async () => {
   using mockRpc = FileSystemWorker.registerMockRpc({
     'FileSystem.readDirWithFileTypes': async () => [mockEntry({ isFile: true, name: 'test.ts' })],
   })
+  void mockRpc
 
-  try {
-    const pattern = '*.ts'
-    const result = await executeGlob(pattern)
-    expect(result).toHaveProperty('pattern', pattern)
-  } finally {
-    if (Symbol.dispose in mockRpc) {
-      ;(mockRpc as { [Symbol.dispose]: () => void })[Symbol.dispose]()
-    }
+  const pattern = '*.ts'
+  const result = await executeGlob(pattern)
+  const expectedItems = {
+    paths: ['test.ts'],
+    pattern,
   }
+  expect(result).toEqual(expectedItems)
 })
 
 test('executeGlobTool handles pattern with trailing slash', async () => {
@@ -601,18 +519,14 @@ test('executeGlobTool handles pattern with trailing slash', async () => {
       return []
     },
   })
+  void mockRpc
 
-  try {
-    const result = await executeGlob('src/')
-    expect(result).toMatchObject({
-      paths: expect.arrayContaining(['src/main.ts', 'src/nested']),
-      pattern: 'src/',
-    })
-  } finally {
-    if (Symbol.dispose in mockRpc) {
-      ;(mockRpc as { [Symbol.dispose]: () => void })[Symbol.dispose]()
-    }
+  const result = await executeGlob('src/')
+  const expectedItems = {
+    paths: ['src/main.ts', 'src/nested'],
+    pattern: 'src/',
   }
+  expect(result).toEqual(expectedItems)
 })
 
 test('executeGlobTool returns an error when file uris are used without a file system worker rpc', async () => {
@@ -626,10 +540,11 @@ test('executeGlobTool returns an error when file uris are used without a file sy
   try {
     const tempUri = pathToFileURL(tempDir).href
     const result = await executeGlobTool({ baseUri: tempUri, pattern: '**/*' }, {} as never)
-    expect(result).toMatchObject({
+    const expectedItems = {
       error: expect.stringContaining('Failed to glob:'),
       pattern: '**/*',
-    })
+    }
+    expect(result).toEqual(expectedItems)
   } finally {
     await rm(tempDir, { force: true, recursive: true })
   }

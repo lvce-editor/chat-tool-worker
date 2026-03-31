@@ -39,24 +39,19 @@ test('executeWriteFileTool writes file and returns ok payload', async () => {
       calledWithContent = content
     },
   })
-  try {
-    const result = await executeWriteFileTool({ content, uri }, {} as never)
-    expect(existsCalled).toBe(1)
-    expect(readCalled).toBe(1)
-    expect(called).toBe(1)
-    expect(calledWithUri).toBe(uri)
-    expect(calledWithContent).toBe(content)
-    expect(result).toEqual({
-      addedLines: 1,
-      ok: true,
-      removedLines: 0,
-      uri,
-    })
-  } finally {
-    if (Symbol.dispose in mockRpc) {
-      ;(mockRpc as { [Symbol.dispose]: () => void })[Symbol.dispose]()
-    }
-  }
+  void mockRpc
+  const result = await executeWriteFileTool({ content, uri }, {} as never)
+  expect(existsCalled).toBe(1)
+  expect(readCalled).toBe(1)
+  expect(called).toBe(1)
+  expect(calledWithUri).toBe(uri)
+  expect(calledWithContent).toBe(content)
+  expect(result).toEqual({
+    addedLines: 1,
+    ok: true,
+    removedLines: 0,
+    uri,
+  })
 })
 
 test('executeWriteFileTool returns diff counts when writing a new file', async () => {
@@ -78,22 +73,17 @@ test('executeWriteFileTool returns diff counts when writing a new file', async (
       writeCalled++
     },
   })
-  try {
-    const result = await executeWriteFileTool({ content, uri }, {} as never)
-    expect(existsCalled).toBe(1)
-    expect(readCalled).toBe(0)
-    expect(writeCalled).toBe(1)
-    expect(result).toEqual({
-      addedLines: 2,
-      ok: true,
-      removedLines: 0,
-      uri,
-    })
-  } finally {
-    if (Symbol.dispose in mockRpc) {
-      ;(mockRpc as { [Symbol.dispose]: () => void })[Symbol.dispose]()
-    }
-  }
+  void mockRpc
+  const result = await executeWriteFileTool({ content, uri }, {} as never)
+  expect(existsCalled).toBe(1)
+  expect(readCalled).toBe(0)
+  expect(writeCalled).toBe(1)
+  expect(result).toEqual({
+    addedLines: 2,
+    ok: true,
+    removedLines: 0,
+    uri,
+  })
 })
 
 test('executeWriteFileTool returns error payload when renderer worker write fails', async () => {
@@ -107,16 +97,11 @@ test('executeWriteFileTool returns error payload when renderer worker write fail
       throw new Error('write failed')
     },
   })
-  try {
-    const result = await executeWriteFileTool({ content: 'x', uri }, {} as never)
-    expect(called).toBe(1)
-    expect(result).toMatchObject({
-      error: expect.any(String),
-      uri,
-    })
-  } finally {
-    if (Symbol.dispose in mockRpc) {
-      ;(mockRpc as { [Symbol.dispose]: () => void })[Symbol.dispose]()
-    }
-  }
+  void mockRpc
+  const result = await executeWriteFileTool({ content: 'x', uri }, {} as never)
+  expect(called).toBe(1)
+  expect(result).toMatchObject({
+    error: expect.any(String),
+    uri,
+  })
 })
