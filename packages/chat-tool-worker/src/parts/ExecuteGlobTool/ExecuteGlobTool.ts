@@ -79,21 +79,15 @@ export const executeGlobTool = async (args: Readonly<Record<string, unknown>>, _
       }
     } else if (globPart.includes('**')) {
       const baseDirUri = joinUri(baseUri, baseDir)
-      const visited = new Set<string>()
-      await traverseDirectory(
-        baseDirUri,
-        '',
-        async (relativePath, entry) => {
-          if (entry.type !== DirentType.File) {
-            return
-          }
-          const fullPath = baseDir ? `${baseDir}/${relativePath}` : relativePath
-          if (matchesGlobPattern(fullPath, normalizedPattern)) {
-            matches.push(fullPath)
-          }
-        },
-        visited,
-      )
+      await traverseDirectory(baseDirUri, '', async (relativePath, entry) => {
+        if (entry.type !== DirentType.File) {
+          return
+        }
+        const fullPath = baseDir ? `${baseDir}/${relativePath}` : relativePath
+        if (matchesGlobPattern(fullPath, normalizedPattern)) {
+          matches.push(fullPath)
+        }
+      })
     } else {
       const dirUri = joinUri(baseUri, baseDir)
       const entries = await FileSystemWorker.readDirWithFileTypes(dirUri)
