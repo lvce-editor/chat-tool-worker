@@ -39,10 +39,6 @@ const mockEntry = (options: MockEntryOptions): MockEntry => ({
   type: getEntryType(options),
 })
 
-const expectReadDirInvocations = (mockRpc: { readonly invocations: readonly unknown[] }, ...uris: readonly string[]): void => {
-  expect(mockRpc.invocations).toEqual(uris.map((uri) => ['FileSystem.readDirWithFileTypes', uri]))
-}
-
 test('executeGlobTool validates pattern is a non-empty string', async () => {
   const result = await executeGlobTool({ baseUri }, {} as never)
   expect(result).toEqual({
@@ -94,7 +90,7 @@ test('executeGlobTool matches files with simple * pattern', async () => {
   })
 
   const result = await executeGlob('src/*.ts')
-  expectReadDirInvocations(mockRpc, `${baseUri}/src`)
+  expect(mockRpc.invocations).toEqual([['FileSystem.readDirWithFileTypes', `${baseUri}/src`]])
   const expectedItems = {
     paths: ['src/main.ts', 'src/utils.ts'],
     pattern: 'src/*.ts',
@@ -117,7 +113,7 @@ test('executeGlobTool matches all files with pattern *', async () => {
   })
 
   const result = await executeGlob('src/*')
-  expectReadDirInvocations(mockRpc, `${baseUri}/src`)
+  expect(mockRpc.invocations).toEqual([['FileSystem.readDirWithFileTypes', `${baseUri}/src`]])
   const expectedItems = {
     paths: ['src/config.json', 'src/main.ts', 'src/utils.ts'],
     pattern: 'src/*',
@@ -136,7 +132,7 @@ test('executeGlobTool matches with ? single character wildcard', async () => {
   })
 
   const result = await executeGlob('src/?.ts')
-  expectReadDirInvocations(mockRpc, `${baseUri}/src`)
+  expect(mockRpc.invocations).toEqual([['FileSystem.readDirWithFileTypes', `${baseUri}/src`]])
   const expectedItems = {
     paths: ['src/a.ts', 'src/b.ts'],
     pattern: 'src/?.ts',
@@ -155,7 +151,7 @@ test('executeGlobTool filters directories with * pattern', async () => {
   })
 
   const result = await executeGlob('src/*.ts')
-  expectReadDirInvocations(mockRpc, `${baseUri}/src`)
+  expect(mockRpc.invocations).toEqual([['FileSystem.readDirWithFileTypes', `${baseUri}/src`]])
   const expectedItems = {
     paths: ['src/main.ts'],
     pattern: 'src/*.ts',
@@ -180,7 +176,11 @@ test('executeGlobTool recursively matches with ** pattern', async () => {
   })
 
   const result = await executeGlob('src/**/*.ts')
-  expectReadDirInvocations(mockRpc, `${baseUri}/src`, `${baseUri}/src/subdir`, `${baseUri}/src/subdir/nested`)
+  expect(mockRpc.invocations).toEqual([
+    ['FileSystem.readDirWithFileTypes', `${baseUri}/src`],
+    ['FileSystem.readDirWithFileTypes', `${baseUri}/src/subdir`],
+    ['FileSystem.readDirWithFileTypes', `${baseUri}/src/subdir/nested`],
+  ])
   const expectedItems = {
     paths: ['src/main.ts', 'src/subdir/index.ts', 'src/subdir/nested/deep.ts'],
     pattern: 'src/**/*.ts',
@@ -208,7 +208,12 @@ test('executeGlobTool matches with ** at the beginning for deep search', async (
   })
 
   const result = await executeGlob('**/test/*.ts')
-  expectReadDirInvocations(mockRpc, baseUri, `${baseUri}/test`, `${baseUri}/src`, `${baseUri}/src/utils`)
+  expect(mockRpc.invocations).toEqual([
+    ['FileSystem.readDirWithFileTypes', baseUri],
+    ['FileSystem.readDirWithFileTypes', `${baseUri}/test`],
+    ['FileSystem.readDirWithFileTypes', `${baseUri}/src`],
+    ['FileSystem.readDirWithFileTypes', `${baseUri}/src/utils`],
+  ])
   const expectedItems = {
     paths: ['test/Main.test.ts'],
     pattern: '**/test/*.ts',
@@ -233,7 +238,11 @@ test('executeGlobTool handles ** matching everything recursively', async () => {
   })
 
   const result = await executeGlob('**/*.ts')
-  expectReadDirInvocations(mockRpc, baseUri, `${baseUri}/dir`, `${baseUri}/dir/nested`)
+  expect(mockRpc.invocations).toEqual([
+    ['FileSystem.readDirWithFileTypes', baseUri],
+    ['FileSystem.readDirWithFileTypes', `${baseUri}/dir`],
+    ['FileSystem.readDirWithFileTypes', `${baseUri}/dir/nested`],
+  ])
   const expectedItems = {
     paths: ['a.ts', 'dir/b.ts', 'dir/nested/c.ts'],
     pattern: '**/*.ts',
@@ -258,7 +267,10 @@ test('executeGlobTool excludes .git directory by default', async () => {
   })
 
   const result = await executeGlob('**/*.ts')
-  expectReadDirInvocations(mockRpc, baseUri, `${baseUri}/src`)
+  expect(mockRpc.invocations).toEqual([
+    ['FileSystem.readDirWithFileTypes', baseUri],
+    ['FileSystem.readDirWithFileTypes', `${baseUri}/src`],
+  ])
   const expectedItems = {
     paths: ['main.ts'],
     pattern: '**/*.ts',
@@ -280,7 +292,7 @@ test('executeGlobTool excludes node_modules directory by default', async () => {
   })
 
   const result = await executeGlob('**/*.ts')
-  expectReadDirInvocations(mockRpc, baseUri)
+  expect(mockRpc.invocations).toEqual([['FileSystem.readDirWithFileTypes', baseUri]])
   const expectedItems = {
     paths: ['main.ts'],
     pattern: '**/*.ts',
@@ -307,7 +319,10 @@ test('executeGlobTool excludes multiple default ignored directories', async () =
   })
 
   const result = await executeGlob('**/*.ts')
-  expectReadDirInvocations(mockRpc, baseUri, `${baseUri}/src`)
+  expect(mockRpc.invocations).toEqual([
+    ['FileSystem.readDirWithFileTypes', baseUri],
+    ['FileSystem.readDirWithFileTypes', `${baseUri}/src`],
+  ])
   const expectedItems = {
     paths: ['src/main.ts'],
     pattern: '**/*.ts',
@@ -329,7 +344,7 @@ test('executeGlobTool does not recursively walk into symlinks', async () => {
   })
 
   const result = await executeGlob('**/*.ts')
-  expectReadDirInvocations(mockRpc, baseUri)
+  expect(mockRpc.invocations).toEqual([['FileSystem.readDirWithFileTypes', baseUri]])
   const expectedItems = {
     paths: ['main.ts'],
     pattern: '**/*.ts',
@@ -348,7 +363,7 @@ test('executeGlobTool returns empty array when no matches found', async () => {
   })
 
   const result = await executeGlob('*.ts')
-  expectReadDirInvocations(mockRpc, baseUri)
+  expect(mockRpc.invocations).toEqual([['FileSystem.readDirWithFileTypes', baseUri]])
   const expectedItems = {
     paths: [],
     pattern: '*.ts',
@@ -370,7 +385,10 @@ test('executeGlobTool handles nested pattern with no matches', async () => {
   })
 
   const result = await executeGlob('src/**/*.ts')
-  expectReadDirInvocations(mockRpc, `${baseUri}/src`, `${baseUri}/src/utils`)
+  expect(mockRpc.invocations).toEqual([
+    ['FileSystem.readDirWithFileTypes', `${baseUri}/src`],
+    ['FileSystem.readDirWithFileTypes', `${baseUri}/src/utils`],
+  ])
   const expectedItems = {
     paths: [],
     pattern: 'src/**/*.ts',
@@ -392,7 +410,7 @@ test('executeGlobTool handles empty directory', async () => {
   })
 
   const result = await executeGlob('empty/**/*.ts')
-  expectReadDirInvocations(mockRpc, `${baseUri}/empty`)
+  expect(mockRpc.invocations).toEqual([['FileSystem.readDirWithFileTypes', `${baseUri}/empty`]])
   const expectedItems = {
     paths: [],
     pattern: 'empty/**/*.ts',
@@ -411,7 +429,7 @@ test('executeGlobTool handles single file pattern without directory', async () =
   })
 
   const result = await executeGlob('*.md')
-  expectReadDirInvocations(mockRpc, baseUri)
+  expect(mockRpc.invocations).toEqual([['FileSystem.readDirWithFileTypes', baseUri]])
   const expectedItems = {
     paths: ['README.md'],
     pattern: '*.md',
@@ -430,7 +448,7 @@ test('executeGlobTool preserves path order consistency', async () => {
   })
 
   const result = await executeGlob('*.ts')
-  expectReadDirInvocations(mockRpc, baseUri)
+  expect(mockRpc.invocations).toEqual([['FileSystem.readDirWithFileTypes', baseUri]])
   const expectedItems = {
     paths: ['a.ts', 'b.ts', 'c.ts'],
     pattern: '*.ts',
@@ -449,7 +467,7 @@ test('executeGlobTool handles paths with brackets in pattern', async () => {
   })
 
   const result = await executeGlob('[ab].ts')
-  expectReadDirInvocations(mockRpc, baseUri)
+  expect(mockRpc.invocations).toEqual([['FileSystem.readDirWithFileTypes', baseUri]])
   const expectedItems = {
     paths: ['a.ts', 'b.ts'],
     pattern: '[ab].ts',
@@ -472,7 +490,7 @@ test('executeGlobTool handles case sensitivity in extensions', async () => {
   })
 
   const result = await executeGlob('*.ts')
-  expectReadDirInvocations(mockRpc, baseUri)
+  expect(mockRpc.invocations).toEqual([['FileSystem.readDirWithFileTypes', baseUri]])
   const expectedItems = {
     paths: ['main.ts'],
     pattern: '*.ts',
@@ -491,7 +509,7 @@ test('executeGlobTool handles multiple consecutive slashes', async () => {
   })
 
   const result = await executeGlob('src//main.ts')
-  expectReadDirInvocations(mockRpc, `${baseUri}/src`)
+  expect(mockRpc.invocations).toEqual([['FileSystem.readDirWithFileTypes', `${baseUri}/src`]])
   const expectedItems = {
     paths: ['src/main.ts'],
     pattern: 'src//main.ts',
@@ -506,7 +524,7 @@ test('executeGlobTool returns pattern in response', async () => {
 
   const pattern = '*.ts'
   const result = await executeGlob(pattern)
-  expectReadDirInvocations(mockRpc, baseUri)
+  expect(mockRpc.invocations).toEqual([['FileSystem.readDirWithFileTypes', baseUri]])
   const expectedItems = {
     paths: ['test.ts'],
     pattern,
@@ -525,7 +543,7 @@ test('executeGlobTool handles pattern with trailing slash', async () => {
   })
 
   const result = await executeGlob('src/')
-  expectReadDirInvocations(mockRpc, `${baseUri}/src`)
+  expect(mockRpc.invocations).toEqual([['FileSystem.readDirWithFileTypes', `${baseUri}/src`]])
   const expectedItems = {
     paths: ['src/main.ts', 'src/nested'],
     pattern: 'src/',
