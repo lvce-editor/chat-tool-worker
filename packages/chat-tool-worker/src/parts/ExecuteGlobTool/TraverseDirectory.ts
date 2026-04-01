@@ -17,30 +17,35 @@ export const traverseDirectory = async (
   baseUri: string,
   currentPath: string,
   onEntry: (path: string, entry: DirEntry) => Promise<void>,
-  visited: Set<string> = new Set(),
 ): Promise<void> => {
-  const uri = currentPath === '' ? baseUri : `${baseUri}/${currentPath}`
+  const visited = new Set<string>()
 
-  if (visited.has(uri)) {
-    return
-  }
-  visited.add(uri)
+  const visit = async (path: string): Promise<void> => {
+    const uri = path === '' ? baseUri : `${baseUri}/${path}`
 
-  try {
-    const entries = await FileSystemWorker.readDirWithFileTypes(uri)
+    if (visited.has(uri)) {
+      return
+    }
+    visited.add(uri)
 
-    for (const entry of entries) {
-      const entryPath = currentPath === '' ? entry.name : `${currentPath}/${entry.name}`
-      await onEntry(entryPath, entry)
+    try {
+      const entries = await FileSystemWorker.readDirWithFileTypes(uri)
 
-      if (entry.type === DirentType.Directory && !shouldExcludeDir(entry.name)) {
-        await traverseDirectory(baseUri, entryPath, onEntry, visited)
+      for (const entry of entries) {
+        const entryPath = path === '' ? entry.name : `${path}/${entry.name}`
+        await onEntry(entryPath, entry)
+
+        if (entry.type === DirentType.Directory && !shouldExcludeDir(entry.name)) {
+          await visit(entryPath)
+        }
       }
+    } catch (error) {
+      if (path === '') {
+        throw error
+      }
+      // Ignore unreadable directories and continue with other matches.
     }
-  } catch (error) {
-    if (currentPath === '') {
-      throw error
-    }
-    // Ignore unreadable directories and continue with other matches.
   }
+
+  return visit(currentPath)
 }

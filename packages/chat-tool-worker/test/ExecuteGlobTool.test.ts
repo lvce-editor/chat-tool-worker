@@ -39,7 +39,7 @@ const mockEntry = (options: MockEntryOptions): MockEntry => ({
   type: getEntryType(options),
 })
 
-const expectReadDirInvocations = (mockRpc: { readonly invocations: readonly unknown[] }, ...uris: string[]): void => {
+const expectReadDirInvocations = (mockRpc: { readonly invocations: readonly unknown[] }, ...uris: readonly string[]): void => {
   expect(mockRpc.invocations).toEqual(uris.map((uri) => ['FileSystem.readDirWithFileTypes', uri]))
 }
 
