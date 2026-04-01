@@ -1,10 +1,6 @@
 import { expect, test } from '@jest/globals'
 import { DirentType } from '@lvce-editor/constants'
 import { FileSystemWorker } from '@lvce-editor/rpc-registry'
-import { mkdtemp, mkdir, rm, writeFile } from 'node:fs/promises'
-import { tmpdir } from 'node:os'
-import { join } from 'node:path'
-import { pathToFileURL } from 'node:url'
 import { executeGlobTool } from '../src/parts/ExecuteGlobTool/ExecuteGlobTool.ts'
 
 const baseUri = 'file:///test/workspace'
@@ -551,23 +547,18 @@ test('executeGlobTool handles pattern with trailing slash', async () => {
   expect(result).toEqual(expectedItems)
 })
 
-test('executeGlobTool returns an error when file uris are used without a file system worker rpc', async () => {
-  const tempDir = await mkdtemp(join(tmpdir(), 'execute-glob-tool-'))
-  await mkdir(join(tempDir, 'src'))
-  await mkdir(join(tempDir, 'src', 'nested'))
-  await writeFile(join(tempDir, 'README.md'), '# test\n')
-  await writeFile(join(tempDir, 'src', 'main.ts'), 'export const main = true\n')
-  await writeFile(join(tempDir, 'src', 'nested', 'deep.ts'), 'export const deep = true\n')
+test('executeGlobTool returns an error when file system worker globbing fails', async () => {
+  const error = new Error('File system worker unavailable')
+  using mockRpc = FileSystemWorker.registerMockRpc({
+    'FileSystem.readDirWithFileTypes': async () => {
+      throw error
+    },
+  })
 
-  try {
-    const tempUri = pathToFileURL(tempDir).href
-    const result = await executeGlobTool({ baseUri: tempUri, pattern: '**/*' }, {} as never)
-    const expectedItems = {
-      error: expect.stringContaining('Failed to glob:'),
-      pattern: '**/*',
-    }
-    expect(result).toEqual(expectedItems)
-  } finally {
-    await rm(tempDir, { force: true, recursive: true })
-  }
+  const result = await executeGlobTool({ baseUri, pattern: '**/*' }, {} as never)
+  expect(mockRpc.invocations).toEqual([['FileSystem.readDirWithFileTypes', baseUri]])
+  expect(result).toEqual({
+    error: 'Failed to glob: File system worker unavailable',
+    pattern: '**/*',
+  })
 })
