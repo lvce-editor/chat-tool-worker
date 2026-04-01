@@ -1,7 +1,6 @@
-import { RendererWorker } from '@lvce-editor/rpc-registry'
+import { RendererWorker, TerminalProcess } from '@lvce-editor/rpc-registry'
 import type { ExecuteToolOptions, ToolResponse } from '../Types/Types.ts'
 import { getToolErrorPayload } from '../GetToolErrorPayload/GetToolErrorPayload.ts'
-import * as TerminalProcess from '../TerminalProcess/TerminalProcess.ts'
 
 type ExecuteShellCommandSuccessResult = {
   readonly exitCode: number | null

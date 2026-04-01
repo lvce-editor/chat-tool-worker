@@ -1,8 +1,7 @@
 import { PlatformType } from '@lvce-editor/constants'
 import { LazyTransferMessagePortRpcParent, WebSocketRpcParent2 } from '@lvce-editor/rpc'
-import { RendererWorker } from '@lvce-editor/rpc-registry'
+import { RendererWorker, TerminalProcess } from '@lvce-editor/rpc-registry'
 import * as CommandMap from '../CommandMap/CommandMap.ts'
-import * as TerminalProcess from '../TerminalProcess/TerminalProcess.ts'
 
 const send = async (port: MessagePort): Promise<void> => {
   await RendererWorker.sendMessagePortToTerminalProcess(port, 0)

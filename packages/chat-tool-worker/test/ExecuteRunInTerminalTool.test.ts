@@ -1,7 +1,6 @@
 import { expect, test } from '@jest/globals'
-import { RendererWorker } from '@lvce-editor/rpc-registry'
+import { RendererWorker, TerminalProcess } from '@lvce-editor/rpc-registry'
 import { executeRunInTerminalTool } from '../src/parts/ExecuteRunInTerminalTool/ExecuteRunInTerminalTool.ts'
-import * as TerminalProcess from '../src/parts/TerminalProcess/TerminalProcess.ts'
 
 test('executeRunInTerminalTool executes the shell command via terminal process', async () => {
   using rendererMockRpc = RendererWorker.registerMockRpc({

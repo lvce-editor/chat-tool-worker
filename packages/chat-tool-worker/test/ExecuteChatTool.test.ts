@@ -1,7 +1,6 @@
 import { expect, test } from '@jest/globals'
-import { RendererWorker } from '@lvce-editor/rpc-registry'
+import { RendererWorker, TerminalProcess } from '@lvce-editor/rpc-registry'
 import * as ExecuteChatTool from '../src/parts/ExecuteChatTool/ExecuteChatTool.ts'
-import * as TerminalProcess from '../src/parts/TerminalProcess/TerminalProcess.ts'
 
 const options = {
   assetDir: '',
