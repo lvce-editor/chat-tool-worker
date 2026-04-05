@@ -48,6 +48,6 @@
     "@lvce-editor/rpc": "^6.4.0",
     "@lvce-editor/rpc-registry": "^9.16.0",
     "jest": "^30.3.0",
-    "ts-jest": "^29.4.6"
+    "ts-jest": "^29.4.9"
   }
 }
