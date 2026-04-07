@@ -46,7 +46,7 @@
     "@jest/globals": "^30.3.0",
     "@lvce-editor/constants": "^5.8.0",
     "@lvce-editor/rpc": "^6.4.0",
-    "@lvce-editor/rpc-registry": "^9.16.0",
+    "@lvce-editor/rpc-registry": "^9.17.0",
     "jest": "^30.3.0",
     "ts-jest": "^29.4.9"
   }
