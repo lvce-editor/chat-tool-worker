@@ -62,6 +62,7 @@ test('executeChatTool dispatches rename tool', async () => {
   )
   expect(result).toEqual({
     error: 'Invalid argument: oldUri must be an absolute URI.',
+    errorCode: 'E_INVALID_URI',
   })
 })
 
@@ -78,6 +79,7 @@ test('executeChatTool dispatches edit_file tool', async () => {
   )
   expect(result).toEqual({
     error: 'Invalid argument: uri must be an absolute URI.',
+    errorCode: 'E_INVALID_URI',
   })
 })
 
@@ -146,6 +148,7 @@ test('executeChatTool dispatches glob tool', async () => {
   )
   expect(result).toEqual({
     error: 'Invalid argument: baseUri must be an absolute URI.',
+    errorCode: 'E_INVALID_URI',
   })
 })
 
@@ -264,6 +267,7 @@ test('executeChatTool dispatches create_directory tool', async () => {
 
   expect(result).toEqual({
     error: 'Invalid argument: uri must be an absolute URI.',
+    errorCode: 'E_INVALID_URI',
   })
 })
 
@@ -300,6 +304,7 @@ test('executeChatTool dispatches open_preview tool', async () => {
 
   expect(result).toEqual({
     error: 'Invalid argument: uri must be an absolute URI.',
+    errorCode: 'E_INVALID_URI',
   })
 })
 
@@ -314,6 +319,7 @@ test('executeChatTool dispatches openEditor tool', async () => {
 
   expect(result).toEqual({
     error: 'Invalid argument: uri must be an absolute URI.',
+    errorCode: 'E_INVALID_URI',
   })
 })
 
@@ -328,6 +334,7 @@ test('executeChatTool dispatches read_file tool', async () => {
 
   expect(result).toEqual({
     error: 'Invalid argument: uri must be an absolute URI.',
+    errorCode: 'E_INVALID_URI',
   })
 })
 
@@ -350,5 +357,6 @@ test('executeChatTool dispatches write_file tool', async () => {
 
   expect(result).toEqual({
     error: 'Invalid argument: uri must be an absolute URI.',
+    errorCode: 'E_INVALID_URI',
   })
 })

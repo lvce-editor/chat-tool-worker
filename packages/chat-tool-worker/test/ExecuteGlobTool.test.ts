@@ -60,6 +60,7 @@ test('executeGlobTool requires baseUri to be an absolute uri', async () => {
   const result = await executeGlobTool({ pattern: '*.ts' }, {} as never)
   expect(result).toEqual({
     error: 'Invalid argument: baseUri must be an absolute URI.',
+    errorCode: 'E_INVALID_URI',
   })
 })
 

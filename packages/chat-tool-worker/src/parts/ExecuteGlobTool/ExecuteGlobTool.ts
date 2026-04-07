@@ -1,6 +1,7 @@
 import { DirentType } from '@lvce-editor/constants'
 import { FileSystemWorker } from '@lvce-editor/rpc-registry'
 import type { ExecuteToolOptions, ToolResponse } from '../Types/Types.ts'
+import { getInvalidUriErrorPayload } from '../GetToolErrorPayload/GetToolErrorPayload.ts'
 import { isAbsoluteUri } from '../IsAbsoluteUri/IsAbsoluteUri.ts'
 import { matchesGlobPattern } from './MatchesGlobPattern.ts'
 import { traverseDirectory } from './TraverseDirectory.ts'
@@ -55,9 +56,7 @@ export const executeGlobTool = async (args: Readonly<Record<string, unknown>>, _
 
   const baseUri = typeof args.baseUri === 'string' ? args.baseUri : ''
   if (!baseUri || !isAbsoluteUri(baseUri)) {
-    return {
-      error: 'Invalid argument: baseUri must be an absolute URI.',
-    }
+    return getInvalidUriErrorPayload('baseUri')
   }
   if (baseUri === PLACEHOLDER_WORKSPACE_URI || baseUri.startsWith(`${PLACEHOLDER_WORKSPACE_URI}/`)) {
     return {

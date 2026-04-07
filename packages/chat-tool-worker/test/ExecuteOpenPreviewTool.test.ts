@@ -5,6 +5,7 @@ test('executeOpenPreviewTool rejects relative path values', async () => {
   const result = await executeOpenPreviewTool({ uri: '/test/playground/index.js' }, {} as never)
   expect(result).toEqual({
     error: 'Invalid argument: uri must be an absolute URI.',
+    errorCode: 'E_INVALID_URI',
   })
 })
 
