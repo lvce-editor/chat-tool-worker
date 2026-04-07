@@ -1,7 +1,7 @@
 import { DirentType } from '@lvce-editor/constants'
 import { RendererWorker } from '@lvce-editor/rpc-registry'
 import type { ExecuteToolOptions, ToolResponse } from '../Types/Types.ts'
-import { getToolErrorPayload } from '../GetToolErrorPayload/GetToolErrorPayload.ts'
+import { getInvalidUriErrorPayload, getToolErrorPayload } from '../GetToolErrorPayload/GetToolErrorPayload.ts'
 import { isAbsoluteUri } from '../IsAbsoluteUri/IsAbsoluteUri.ts'
 
 type DirEntry = {
@@ -37,7 +37,7 @@ const mapEntry = (entry: DirEntry): ListFilesEntry => ({
 export const executeListFilesTool = async (args: Readonly<Record<string, unknown>>, _options: ExecuteToolOptions): Promise<ToolResponse> => {
   const uri = typeof args.uri === 'string' ? args.uri : ''
   if (!uri || !isAbsoluteUri(uri)) {
-    return { error: 'Invalid argument: uri must be an absolute URI.' }
+    return getInvalidUriErrorPayload('uri')
   }
   if (uri === 'file:///workspace' || uri.startsWith('file:///workspace/')) {
     return {

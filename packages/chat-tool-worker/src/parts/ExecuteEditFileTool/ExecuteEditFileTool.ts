@@ -1,7 +1,7 @@
 import { RendererWorker } from '@lvce-editor/rpc-registry'
 import type { ExecuteToolOptions, ToolResponse } from '../Types/Types.ts'
 import { applyTextEdit } from '../ApplyTextEdit/ApplyTextEdit.ts'
-import { getToolErrorPayload } from '../GetToolErrorPayload/GetToolErrorPayload.ts'
+import { getInvalidUriErrorPayload, getInvalidUrlErrorPayload, getToolErrorPayload } from '../GetToolErrorPayload/GetToolErrorPayload.ts'
 import { isAbsoluteUri } from '../IsAbsoluteUri/IsAbsoluteUri.ts'
 
 export const executeEditFileTool = async (args: Readonly<Record<string, unknown>>, _options: ExecuteToolOptions): Promise<ToolResponse> => {
@@ -10,13 +10,13 @@ export const executeEditFileTool = async (args: Readonly<Record<string, unknown>
   const end = typeof args.end === 'number' ? args.end : -1
   const text = typeof args.text === 'string' ? args.text : ''
   if (!uri || !isAbsoluteUri(uri)) {
-    return { error: 'Invalid argument: uri must be an absolute URI.' }
+    return getInvalidUriErrorPayload('uri')
   }
 
   try {
     new URL(uri)
   } catch {
-    return { error: 'Invalid argument: invalid URL.' }
+    return getInvalidUrlErrorPayload()
   }
 
   if (!Number.isInteger(start) || start < 0) {

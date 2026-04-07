@@ -5,6 +5,7 @@ test('executeEditFileTool rejects relative path values', async () => {
   const result = await executeEditFileTool({ end: 0, start: 0, text: '', uri: '/test/playground/index.js' }, {} as never)
   expect(result).toEqual({
     error: 'Invalid argument: uri must be an absolute URI.',
+    errorCode: 'E_INVALID_URI',
   })
 })
 
@@ -12,6 +13,7 @@ test('executeEditFileTool rejects malformed absolute uris', async () => {
   const result = await executeEditFileTool({ end: 0, start: 0, text: '', uri: 'invalid://[' }, {} as never)
   expect(result).toEqual({
     error: 'Invalid argument: invalid URL.',
+    errorCode: 'E_INVALID_URI',
   })
 })
 
