@@ -1,5 +1,5 @@
 import { PlatformType } from '@lvce-editor/constants'
-import { LazyTransferMessagePortRpcParent, WebSocketRpcParent2 } from '@lvce-editor/rpc'
+import { LazyTransferMessagePortRpcParent, LazyWebSocketRpcParent2 } from '@lvce-editor/rpc'
 import { RendererWorker, TerminalProcess } from '@lvce-editor/rpc-registry'
 import * as CommandMap from '../CommandMap/CommandMap.ts'
 
@@ -16,7 +16,7 @@ const initializeTerminalProcessElectron = async (): Promise<void> => {
 }
 
 const initializeTerminalProcessRemote = async (): Promise<void> => {
-  const rpc = await WebSocketRpcParent2.create({
+  const rpc = await LazyWebSocketRpcParent2.create({
     commandMap: CommandMap.commandMap,
     type: 'terminal-process',
   })
