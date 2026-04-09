@@ -1,5 +1,5 @@
 import { PlatformType } from '@lvce-editor/constants'
-import { LazyTransferMessagePortRpcParent, LazyWebSocketRpcParent2, WebSocketRpcParent2 } from '@lvce-editor/rpc'
+import { LazyTransferMessagePortRpcParent, LazyWebSocketRpcParent2 } from '@lvce-editor/rpc'
 import { RendererWorker, TerminalProcess } from '@lvce-editor/rpc-registry'
 import * as CommandMap from '../CommandMap/CommandMap.ts'
 
