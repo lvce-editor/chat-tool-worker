@@ -42,13 +42,12 @@ export const executeListFilesTool = async (args: Readonly<Record<string, unknown
   if (uri === 'file:///workspace' || uri.startsWith('file:///workspace/')) {
     return {
       error: 'Invalid argument: uri must be a real workspace folder URI. Call getWorkspaceUri first and use the returned workspaceUri value.',
-      uri,
     }
   }
   try {
     const entries = await RendererWorker.invoke('FileSystem.readDirWithFileTypes', uri)
-    return { entries: (entries as readonly DirEntry[]).map(mapEntry), uri }
+    return { entries: (entries as readonly DirEntry[]).map(mapEntry) }
   } catch (error) {
-    return { ...getToolErrorPayload(error), uri }
+    return getToolErrorPayload(error)
   }
 }

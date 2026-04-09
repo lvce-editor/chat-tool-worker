@@ -6,6 +6,7 @@ export type GrepSearchArgs = {
   readonly includePattern?: string
   readonly maxResults?: number
   readonly includeIgnoredFiles?: boolean
+  readonly useDefaultExcludes: boolean
   readonly outputFormat?: GrepSearchOutputFormat
 }
 
