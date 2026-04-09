@@ -1,4 +1,9 @@
-import type { GrepSearchMatch, GrepSearchOutputFormat } from '../ExecuteGrepSearchToolTypes/ExecuteGrepSearchToolTypes.ts'
+import type {
+  FormattedGrepSearchResult,
+  GrepSearchJsonResult,
+  GrepSearchMatch,
+  GrepSearchOutputFormat,
+} from '../ExecuteGrepSearchToolTypes/ExecuteGrepSearchToolTypes.ts'
 
 const escapeXml = (value: string): string => {
   return value.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;')
@@ -30,28 +35,26 @@ const formatXmlMatches = (matches: readonly GrepSearchMatch[]): string => {
   return lines.join('\n')
 }
 
-const formatJsonMatches = (matches: readonly GrepSearchMatch[]): string => {
-  return JSON.stringify(
-    {
-      count: matches.length,
-      matches: matches.map((match) => ({
-        ...(typeof match.lineNumber === 'number' ? { line: match.lineNumber } : {}),
-        path: match.path,
-        text: match.text,
-      })),
-    },
-    undefined,
-    2,
-  )
+const formatJsonMatches = (matches: readonly GrepSearchMatch[]): GrepSearchJsonResult => {
+  return {
+    count: matches.length,
+    matches: matches.map((match) => ({
+      ...(typeof match.lineNumber === 'number' ? { line: match.lineNumber } : {}),
+      path: match.path,
+      text: match.text,
+    })),
+    matchesFound: matches.length > 0,
+  }
 }
 
-export const formatGrepMatches = (matches: readonly GrepSearchMatch[], outputFormat?: GrepSearchOutputFormat): string => {
+export const formatGrepMatches = (matches: readonly GrepSearchMatch[], outputFormat?: GrepSearchOutputFormat): FormattedGrepSearchResult => {
+  if (outputFormat === 'json') {
+    return formatJsonMatches(matches)
+  }
   if (matches.length === 0) {
     return 'No matches found.'
   }
   switch (outputFormat) {
-    case 'json':
-      return formatJsonMatches(matches)
     case 'xml':
       return formatXmlMatches(matches)
     default:

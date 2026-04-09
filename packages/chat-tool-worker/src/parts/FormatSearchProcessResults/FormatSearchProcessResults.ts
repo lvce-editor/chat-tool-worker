@@ -1,9 +1,16 @@
-import type { GrepSearchOutputFormat, SearchProcessResult } from '../ExecuteGrepSearchToolTypes/ExecuteGrepSearchToolTypes.ts'
+import type {
+  FormattedGrepSearchResult,
+  GrepSearchOutputFormat,
+  SearchProcessResult,
+} from '../ExecuteGrepSearchToolTypes/ExecuteGrepSearchToolTypes.ts'
 import { formatGrepMatches } from '../FormatGrepMatches/FormatGrepMatches.ts'
 
-export const formatSearchProcessResults = (results: readonly SearchProcessResult[] | undefined, outputFormat?: GrepSearchOutputFormat): string => {
+export const formatSearchProcessResults = (
+  results: readonly SearchProcessResult[] | undefined,
+  outputFormat?: GrepSearchOutputFormat,
+): FormattedGrepSearchResult => {
   if (!results || results.length === 0) {
-    return 'No matches found.'
+    return formatGrepMatches([], outputFormat)
   }
   let currentFile = ''
   const matches = []
@@ -29,7 +36,7 @@ export const formatSearchProcessResults = (results: readonly SearchProcessResult
     }
   }
   if (matches.length === 0) {
-    return 'No matches found.'
+    return formatGrepMatches([], outputFormat)
   }
   return formatGrepMatches(matches, outputFormat)
 }

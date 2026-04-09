@@ -11,8 +11,9 @@ export const executeFileGrepSearch = async (workspaceUri: string, grepSearchArgs
     ripGrepArgs: getRipGrepArgs(grepSearchArgs),
     searchDir: getSearchDir(workspaceUri, grepSearchArgs.includePattern),
   })) as SearchProcessResponse
+  const formattedResult = formatSearchProcessResults(result.results, grepSearchArgs.outputFormat)
   return {
-    result: formatSearchProcessResults(result.results, grepSearchArgs.outputFormat),
+    ...(typeof formattedResult === 'string' ? { result: formattedResult } : formattedResult),
     ...(result.limitHit ? { warning: 'Search result limit reached.' } : {}),
   }
 }
