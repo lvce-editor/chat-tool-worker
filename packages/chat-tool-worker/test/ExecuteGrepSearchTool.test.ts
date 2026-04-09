@@ -64,6 +64,10 @@ test('executeGrepSearchTool uses search-process for file workspaces', async () =
       '--ignore-case',
       '--no-ignore',
       '--glob',
+      '!**/node_modules/**',
+      '--glob',
+      '!**/.git/**',
+      '--glob',
       'src/**/*.ts',
       '--regexp',
       'function|method|procedure',
@@ -88,6 +92,10 @@ test('executeGrepSearchTool uses search-process for file workspaces', async () =
           '1',
           '--ignore-case',
           '--no-ignore',
+          '--glob',
+          '!**/node_modules/**',
+          '--glob',
+          '!**/.git/**',
           '--glob',
           'src/**/*.ts',
           '--regexp',
@@ -153,6 +161,10 @@ test('executeGrepSearchTool formats file workspace results as xml', async () => 
           '--threads',
           '1',
           '--ignore-case',
+          '--glob',
+          '!**/node_modules/**',
+          '--glob',
+          '!**/.git/**',
           '--fixed-strings',
           '--',
           'searchText',
@@ -254,6 +266,10 @@ test('executeGrepSearchTool returns empty structured json results when no matche
           '--threads',
           '1',
           '--ignore-case',
+          '--glob',
+          '!**/node_modules/**',
+          '--glob',
+          '!**/.git/**',
           '--fixed-strings',
           '--',
           'missing',
@@ -345,7 +361,7 @@ test('executeGrepSearchTool validates grep_search argument shape', async () => {
 
   expect(result).toEqual({
     error:
-      'Invalid argument: grep_search requires query (string), isRegexp (boolean), optional includePattern (string), optional maxResults (number), optional includeIgnoredFiles (boolean), and optional outputFormat ("xml" | "json").',
+      'Invalid argument: grep_search requires query (string), isRegexp (boolean), optional includePattern (string), optional maxResults (number), optional includeIgnoredFiles (boolean), optional useDefaultExcludes (boolean), and optional outputFormat ("xml" | "json").',
   })
 })
 
@@ -361,6 +377,56 @@ test('executeGrepSearchTool rejects unsupported outputFormat values', async () =
 
   expect(result).toEqual({
     error:
-      'Invalid argument: grep_search requires query (string), isRegexp (boolean), optional includePattern (string), optional maxResults (number), optional includeIgnoredFiles (boolean), and optional outputFormat ("xml" | "json").',
+      'Invalid argument: grep_search requires query (string), isRegexp (boolean), optional includePattern (string), optional maxResults (number), optional includeIgnoredFiles (boolean), optional useDefaultExcludes (boolean), and optional outputFormat ("xml" | "json").',
+  })
+})
+
+test('executeGrepSearchTool can disable default excludes', async () => {
+  using mockRpc = RendererWorker.registerMockRpc({
+    'SearchProcess.invoke': async () => {
+      return {
+        limitHit: false,
+        results: [],
+      }
+    },
+    'Workspace.getPath': async () => 'file:///workspace',
+  })
+
+  const result = await executeGrepSearchTool(
+    {
+      isRegexp: false,
+      query: 'node_modules',
+      useDefaultExcludes: false,
+    },
+    options,
+  )
+
+  expect(mockRpc.invocations).toEqual([
+    ['Workspace.getPath'],
+    [
+      'SearchProcess.invoke',
+      'TextSearch.search',
+      {
+        maxSearchResults: undefined,
+        ripGrepArgs: [
+          '--hidden',
+          '--no-require-git',
+          '--smart-case',
+          '--stats',
+          '--json',
+          '--threads',
+          '1',
+          '--ignore-case',
+          '--fixed-strings',
+          '--',
+          'node_modules',
+          '.',
+        ],
+        searchDir: '/workspace',
+      },
+    ],
+  ])
+  expect(result).toEqual({
+    result: 'No matches found.',
   })
 })
