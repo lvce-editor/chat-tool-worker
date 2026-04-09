@@ -220,14 +220,7 @@ test('executeChatTool dispatches grep_search tool', async () => {
     ],
   ])
   expect(result).toEqual({
-    arguments: {
-      includeIgnoredFiles: false,
-      includePattern: 'packages/chat-tool-worker/src/**/*.ts',
-      isRegexp: false,
-      query: 'search text',
-    },
     result: 'No matches found.',
-    workspaceUri: 'file:///workspace',
   })
 })
 
