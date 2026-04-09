@@ -1,4 +1,8 @@
-import type { FormattedGrepSearchResult, GrepSearchOutputFormat, SearchProcessResult } from '../ExecuteGrepSearchToolTypes/ExecuteGrepSearchToolTypes.ts'
+import type {
+  FormattedGrepSearchResult,
+  GrepSearchOutputFormat,
+  SearchProcessResult,
+} from '../ExecuteGrepSearchToolTypes/ExecuteGrepSearchToolTypes.ts'
 import { formatGrepMatches } from '../FormatGrepMatches/FormatGrepMatches.ts'
 
 export const formatSearchProcessResults = (

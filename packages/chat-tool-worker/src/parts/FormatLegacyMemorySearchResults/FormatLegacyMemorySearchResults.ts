@@ -1,4 +1,8 @@
-import type { FormattedGrepSearchResult, GrepSearchOutputFormat, LegacyMemorySearchResult } from '../ExecuteGrepSearchToolTypes/ExecuteGrepSearchToolTypes.ts'
+import type {
+  FormattedGrepSearchResult,
+  GrepSearchOutputFormat,
+  LegacyMemorySearchResult,
+} from '../ExecuteGrepSearchToolTypes/ExecuteGrepSearchToolTypes.ts'
 import { formatGrepMatches } from '../FormatGrepMatches/FormatGrepMatches.ts'
 
 export const formatLegacyMemorySearchResults = (
