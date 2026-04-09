@@ -8,4 +8,5 @@ export const commandMap = {
   'ChatTool.getTools': getBasicChatTools,
   'ChatTool.initialize': initialize,
   'HandleMessagePort.handleMessagePort': handleMessagePort,
+  initialize: (_: string, port: MessagePort): Promise<void> => handleMessagePort(port, true),
 }
