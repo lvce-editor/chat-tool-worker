@@ -2,10 +2,17 @@ import type { GrepSearchArgs } from '../ExecuteGrepSearchToolTypes/ExecuteGrepSe
 import { isAbsoluteFileSystemPath } from '../IsAbsoluteFileSystemPath/IsAbsoluteFileSystemPath.ts'
 import { isFileUri } from '../IsFileUri/IsFileUri.ts'
 
-export const getRipGrepArgs = ({ includeIgnoredFiles, includePattern, isRegexp, query }: GrepSearchArgs): readonly string[] => {
+const defaultExcludeGlobs = ['!**/node_modules/**', '!**/.git/**']
+
+export const getRipGrepArgs = ({ includeIgnoredFiles, includePattern, isRegexp, query, useDefaultExcludes }: GrepSearchArgs): readonly string[] => {
   const ripGrepArgs = ['--hidden', '--no-require-git', '--smart-case', '--stats', '--json', '--threads', '1', '--ignore-case']
   if (includeIgnoredFiles) {
     ripGrepArgs.push('--no-ignore')
+  }
+  if (useDefaultExcludes) {
+    for (const glob of defaultExcludeGlobs) {
+      ripGrepArgs.push('--glob', glob)
+    }
   }
   if (includePattern && !isFileUri(includePattern) && !isAbsoluteFileSystemPath(includePattern)) {
     ripGrepArgs.push('--glob', includePattern)
