@@ -12,9 +12,7 @@ export const executeFileGrepSearch = async (workspaceUri: string, grepSearchArgs
     searchDir: getSearchDir(workspaceUri, grepSearchArgs.includePattern),
   })) as SearchProcessResponse
   return {
-    arguments: grepSearchArgs,
     result: formatSearchProcessResults(result.results, grepSearchArgs.outputFormat),
-    workspaceUri,
     ...(result.limitHit ? { warning: 'Search result limit reached.' } : {}),
   }
 }

@@ -30,9 +30,7 @@ export const executeMemoryGrepSearch = async (
       options.assetDir,
     )) as { readonly limitHit?: boolean; readonly results?: readonly LegacyMemorySearchResult[] }
     return {
-      arguments: grepSearchArgs,
       result: formatLegacyMemorySearchResults(result.results || [], grepSearchArgs.outputFormat),
-      workspaceUri,
       ...(result.limitHit ? { warning: 'Search result limit reached.' } : {}),
     }
   } catch {
@@ -45,11 +43,9 @@ export const executeMemoryGrepSearch = async (
       options.assetDir,
     )) as unknown
     return {
-      arguments: grepSearchArgs,
       result: isLegacyMemorySearchResult(legacyResults)
         ? formatLegacyMemorySearchResults(legacyResults, grepSearchArgs.outputFormat)
         : 'No matches found.',
-      workspaceUri,
     }
   }
 }
