@@ -1,7 +1,10 @@
-import type { GrepSearchOutputFormat, LegacyMemorySearchResult } from '../ExecuteGrepSearchToolTypes/ExecuteGrepSearchToolTypes.ts'
+import type { FormattedGrepSearchResult, GrepSearchOutputFormat, LegacyMemorySearchResult } from '../ExecuteGrepSearchToolTypes/ExecuteGrepSearchToolTypes.ts'
 import { formatGrepMatches } from '../FormatGrepMatches/FormatGrepMatches.ts'
 
-export const formatLegacyMemorySearchResults = (results: readonly LegacyMemorySearchResult[], outputFormat?: GrepSearchOutputFormat): string => {
+export const formatLegacyMemorySearchResults = (
+  results: readonly LegacyMemorySearchResult[],
+  outputFormat?: GrepSearchOutputFormat,
+): FormattedGrepSearchResult => {
   const matches: { path: string; text: string }[] = []
   for (const result of results) {
     const [path, resultMatches] = result
@@ -21,7 +24,7 @@ export const formatLegacyMemorySearchResults = (results: readonly LegacyMemorySe
     }
   }
   if (matches.length === 0) {
-    return 'No matches found.'
+    return formatGrepMatches([], outputFormat)
   }
   return formatGrepMatches(matches, outputFormat)
 }

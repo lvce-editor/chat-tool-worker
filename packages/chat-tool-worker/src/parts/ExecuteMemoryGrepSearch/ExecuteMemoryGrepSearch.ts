@@ -29,8 +29,9 @@ export const executeMemoryGrepSearch = async (
       searchOptions,
       options.assetDir,
     )) as { readonly limitHit?: boolean; readonly results?: readonly LegacyMemorySearchResult[] }
+    const formattedResult = formatLegacyMemorySearchResults(result.results || [], grepSearchArgs.outputFormat)
     return {
-      result: formatLegacyMemorySearchResults(result.results || [], grepSearchArgs.outputFormat),
+      ...(typeof formattedResult === 'string' ? { result: formattedResult } : formattedResult),
       ...(result.limitHit ? { warning: 'Search result limit reached.' } : {}),
     }
   } catch {
@@ -42,10 +43,11 @@ export const executeMemoryGrepSearch = async (
       searchOptions,
       options.assetDir,
     )) as unknown
+    const formattedResult = isLegacyMemorySearchResult(legacyResults)
+      ? formatLegacyMemorySearchResults(legacyResults, grepSearchArgs.outputFormat)
+      : formatLegacyMemorySearchResults([], grepSearchArgs.outputFormat)
     return {
-      result: isLegacyMemorySearchResult(legacyResults)
-        ? formatLegacyMemorySearchResults(legacyResults, grepSearchArgs.outputFormat)
-        : 'No matches found.',
+      ...(typeof formattedResult === 'string' ? { result: formattedResult } : formattedResult),
     }
   }
 }

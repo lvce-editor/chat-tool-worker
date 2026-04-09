@@ -207,19 +207,53 @@ test('executeGrepSearchTool formats memory workspace results as json', async () 
     ],
   ])
   expect(result).toEqual({
-    result: JSON.stringify(
+    count: 1,
+    matches: [
       {
-        count: 1,
-        matches: [
-          {
-            path: 'src/main.ts',
-            text: 'const fromMemory = true',
-          },
-        ],
+        path: 'src/main.ts',
+        text: 'const fromMemory = true',
       },
-      undefined,
-      2,
-    ),
+    ],
+    matchesFound: true,
+  })
+})
+
+test('executeGrepSearchTool returns empty structured json results when no matches are found', async () => {
+  using mockRpc = RendererWorker.registerMockRpc({
+    'SearchProcess.invoke': async () => {
+      return {
+        limitHit: false,
+        results: [],
+      }
+    },
+    'Workspace.getPath': async () => 'file:///workspace',
+  })
+
+  const result = await executeGrepSearchTool(
+    {
+      isRegexp: false,
+      outputFormat: 'json',
+      query: 'missing',
+    },
+    options,
+  )
+
+  expect(mockRpc.invocations).toEqual([
+    ['Workspace.getPath'],
+    [
+      'SearchProcess.invoke',
+      'TextSearch.search',
+      {
+        maxSearchResults: undefined,
+        ripGrepArgs: ['--hidden', '--no-require-git', '--smart-case', '--stats', '--json', '--threads', '1', '--ignore-case', '--fixed-strings', '--', 'missing', '.'],
+        searchDir: '/workspace',
+      },
+    ],
+  ])
+  expect(result).toEqual({
+    count: 0,
+    matches: [],
+    matchesFound: false,
   })
 })
 

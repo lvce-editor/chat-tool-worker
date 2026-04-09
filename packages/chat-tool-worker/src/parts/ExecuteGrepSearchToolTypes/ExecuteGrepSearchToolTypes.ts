@@ -15,6 +15,20 @@ export type GrepSearchMatch = {
   readonly text: string
 }
 
+export type GrepSearchJsonMatch = {
+  readonly path: string
+  readonly line?: number
+  readonly text: string
+}
+
+export type GrepSearchJsonResult = {
+  readonly count: number
+  readonly matches: readonly GrepSearchJsonMatch[]
+  readonly matchesFound: boolean
+}
+
+export type FormattedGrepSearchResult = string | GrepSearchJsonResult
+
 export type SearchProcessResult = {
   readonly end: number
   readonly lineNumber: number
