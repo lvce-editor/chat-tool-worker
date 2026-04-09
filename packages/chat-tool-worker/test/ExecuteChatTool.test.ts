@@ -286,7 +286,6 @@ test('executeChatTool dispatches list_files tool', async () => {
 
   expect(result).toEqual({
     error: 'Invalid argument: uri must be a real workspace folder URI. Call getWorkspaceUri first and use the returned workspaceUri value.',
-    uri: 'file:///workspace',
   })
 })
 

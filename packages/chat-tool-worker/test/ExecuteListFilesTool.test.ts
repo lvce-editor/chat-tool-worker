@@ -20,7 +20,6 @@ test('executeListFilesTool returns readable entry types', async () => {
       { name: 'src', type: 'folder' },
       { name: 'current', type: 'symlink' },
     ],
-    uri: 'file:///test/workspace',
   })
 })
 
@@ -28,6 +27,5 @@ test('executeListFilesTool rejects placeholder workspace uri with actionable err
   const result = await executeListFilesTool({ uri: 'file:///workspace' }, {} as never)
   expect(result).toEqual({
     error: 'Invalid argument: uri must be a real workspace folder URI. Call getWorkspaceUri first and use the returned workspaceUri value.',
-    uri: 'file:///workspace',
   })
 })
