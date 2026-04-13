@@ -18,6 +18,8 @@ test('executeRunInTerminalTool executes the shell command via terminal process',
     {
       options: {
         command: 'ls -la',
+        explanation: 'List files for inspection',
+        goal: 'Inspect workspace contents',
         shell: '/bin/zsh',
       },
     },
@@ -58,6 +60,8 @@ test('executeRunInTerminalTool returns terminal process error results', async ()
     {
       options: {
         command: 'ls -la',
+        explanation: 'List files for inspection',
+        goal: 'Inspect workspace contents',
         shell: '/bin/missing',
       },
     },
@@ -86,6 +90,8 @@ test('executeRunInTerminalTool validates options object shape', async () => {
   const result = await executeRunInTerminalTool(
     {
       options: {
+        command: 'echo hello',
+        explanation: 'Echo a value',
         shell: '/bin/bash',
       },
     },
@@ -93,6 +99,6 @@ test('executeRunInTerminalTool validates options object shape', async () => {
   )
 
   expect(result).toEqual({
-    error: 'Invalid argument: options must include shell (string) and command (string).',
+    error: 'Invalid argument: options must include shell (string), command (string), explanation (string), and goal (string).',
   })
 })
