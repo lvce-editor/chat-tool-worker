@@ -111,9 +111,11 @@ test('run_in_terminal defines options object arguments for shell execution', () 
     readonly properties: Readonly<Record<string, unknown>>
   }
   expect(optionsProperty.type).toBe('object')
-  expect(optionsProperty.required).toEqual(['shell', 'command'])
+  expect(optionsProperty.required).toEqual(['shell', 'command', 'explanation', 'goal'])
   expect(optionsProperty.properties).toHaveProperty('shell')
   expect(optionsProperty.properties).toHaveProperty('command')
+  expect(optionsProperty.properties).toHaveProperty('explanation')
+  expect(optionsProperty.properties).toHaveProperty('goal')
 })
 
 test('glob defines baseUri and pattern arguments for file matching', () => {

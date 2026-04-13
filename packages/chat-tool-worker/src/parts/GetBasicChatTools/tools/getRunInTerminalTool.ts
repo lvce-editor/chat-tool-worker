@@ -12,13 +12,23 @@ export const getRunInTerminalTool = (): ChatTool => {
             additionalProperties: false,
             properties: {
               command: {
+                description: 'The shell command to execute.',
+                type: 'string',
+              },
+              explanation: {
+                description: 'Why this terminal command is being run.',
+                type: 'string',
+              },
+              goal: {
+                description: 'The higher-level objective this terminal command is meant to achieve.',
                 type: 'string',
               },
               shell: {
+                description: 'The shell executable that should run the command.',
                 type: 'string',
               },
             },
-            required: ['shell', 'command'],
+            required: ['shell', 'command', 'explanation', 'goal'],
             type: 'object',
           },
         },

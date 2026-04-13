@@ -100,6 +100,8 @@ test('executeChatTool dispatches run_in_terminal tool', async () => {
     JSON.stringify({
       options: {
         command: 'echo hello',
+        explanation: 'Echo a greeting',
+        goal: 'Verify terminal execution',
         shell: '/bin/bash',
       },
     }),

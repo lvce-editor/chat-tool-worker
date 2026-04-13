@@ -19,6 +19,8 @@ type ExecuteShellCommandResult = ExecuteShellCommandSuccessResult | ExecuteShell
 type RunInTerminalOptions = {
   readonly shell: string
   readonly command: string
+  readonly explanation: string
+  readonly goal: string
 }
 
 const getRunInTerminalOptions = (args: Readonly<Record<string, unknown>>): RunInTerminalOptions | undefined => {
@@ -28,13 +30,15 @@ const getRunInTerminalOptions = (args: Readonly<Record<string, unknown>>): RunIn
   }
 
   const candidate = options as Record<string, unknown>
-  const { command, shell } = candidate
-  if (typeof command !== 'string' || typeof shell !== 'string') {
+  const { command, explanation, goal, shell } = candidate
+  if (typeof command !== 'string' || typeof explanation !== 'string' || typeof goal !== 'string' || typeof shell !== 'string') {
     return undefined
   }
 
   return {
     command,
+    explanation,
+    goal,
     shell,
   }
 }
@@ -43,7 +47,7 @@ export const executeRunInTerminalTool = async (args: Readonly<Record<string, unk
   const runInTerminalOptions = getRunInTerminalOptions(args)
   if (!runInTerminalOptions) {
     return {
-      error: 'Invalid argument: options must include shell (string) and command (string).',
+      error: 'Invalid argument: options must include shell (string), command (string), explanation (string), and goal (string).',
     }
   }
 
