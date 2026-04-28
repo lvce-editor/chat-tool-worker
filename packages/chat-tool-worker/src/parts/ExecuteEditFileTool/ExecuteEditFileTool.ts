@@ -35,7 +35,7 @@ export const executeEditFileTool = async (args: Readonly<Record<string, unknown>
     const content = await RendererWorker.readFile(uri)
     const nextContent = applyTextEdit(content, start, end, text)
     await RendererWorker.writeFile(uri, nextContent)
-    return { ok: true, uri }
+    return { ok: true }
   } catch (error) {
     return { ...getToolErrorPayload(error), uri }
   }
