@@ -107,15 +107,12 @@ const matchesEmbeddedDoubleStarPattern = (
 ): boolean => {
   const patternPart = patternParts[patternIdx]
   const pathPart = pathParts[pathIdx]
-  return matchesSinglePatternPart(pathPart, patternPart.replace('**', '')) && matchesPatternParts(pathParts, patternParts, pathIdx + 1, patternIdx + 1)
+  return (
+    matchesSinglePatternPart(pathPart, patternPart.replace('**', '')) && matchesPatternParts(pathParts, patternParts, pathIdx + 1, patternIdx + 1)
+  )
 }
 
-const matchesDoubleStarPattern = (
-  pathParts: readonly string[],
-  patternParts: readonly string[],
-  pathIdx: number,
-  patternIdx: number,
-): boolean => {
+const matchesDoubleStarPattern = (pathParts: readonly string[], patternParts: readonly string[], pathIdx: number, patternIdx: number): boolean => {
   for (let i = pathIdx; i <= pathParts.length; i++) {
     if (matchesPatternParts(pathParts, patternParts, i, patternIdx + 1)) {
       return true
