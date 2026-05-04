@@ -46,59 +46,107 @@ const joinUri = (baseUri: string, path: string): string => {
   return baseUri.endsWith('/') ? `${baseUri}${path}` : `${baseUri}/${path}`
 }
 
-export const executeGlobTool = async (args: Readonly<Record<string, unknown>>, _options: ExecuteToolOptions): Promise<ToolResponse> => {
+const isPlaceholderWorkspaceUri = (baseUri: string): boolean => {
+  return baseUri === PLACEHOLDER_WORKSPACE_URI || baseUri.startsWith(`${PLACEHOLDER_WORKSPACE_URI}/`)
+}
+
+const getPattern = (args: Readonly<Record<string, unknown>>): string | undefined => {
   const pattern = typeof args.pattern === 'string' ? args.pattern : ''
+  return pattern || undefined
+}
+
+const getBaseUri = (args: Readonly<Record<string, unknown>>): string | undefined => {
+  const baseUri = typeof args.baseUri === 'string' ? args.baseUri : ''
+  if (!baseUri || !isAbsoluteUri(baseUri) || isPlaceholderWorkspaceUri(baseUri)) {
+    return undefined
+  }
+  return baseUri
+}
+
+const getBaseUriError = (args: Readonly<Record<string, unknown>>): ToolResponse | undefined => {
+  const baseUri = typeof args.baseUri === 'string' ? args.baseUri : ''
+  if (!baseUri || !isAbsoluteUri(baseUri)) {
+    return getInvalidUriErrorPayload('baseUri')
+  }
+  if (isPlaceholderWorkspaceUri(baseUri)) {
+    return {
+      baseUri,
+      error: 'Invalid argument: baseUri must be a real workspace folder URI. Call getWorkspaceUri first and use the returned workspaceUri value.',
+    }
+  }
+  return undefined
+}
+
+const getDirectoryMatches = async (baseUri: string, globPart: string): Promise<string[]> => {
+  const dirUri = joinUri(baseUri, globPart)
+  const entries = await FileSystemWorker.readDirWithFileTypes(dirUri)
+  return entries.map((entry) => (globPart ? `${globPart}/${entry.name}` : entry.name))
+}
+
+const getRecursiveMatches = async (baseUri: string, baseDir: string, normalizedPattern: string): Promise<string[]> => {
+  const matches: string[] = []
+  const baseDirUri = joinUri(baseUri, baseDir)
+  await traverseDirectory(baseDirUri, '', async (relativePath, entry) => {
+    if (entry.type !== DirentType.File) {
+      return
+    }
+    const fullPath = baseDir ? `${baseDir}/${relativePath}` : relativePath
+    if (matchesGlobPattern(fullPath, normalizedPattern)) {
+      matches.push(fullPath)
+    }
+  })
+  return matches
+}
+
+const getDirectMatches = async (baseUri: string, baseDir: string, normalizedPattern: string): Promise<string[]> => {
+  const dirUri = joinUri(baseUri, baseDir)
+  const entries = await FileSystemWorker.readDirWithFileTypes(dirUri)
+  const matches: string[] = []
+  for (const entry of entries) {
+    const fullPath = baseDir ? `${baseDir}/${entry.name}` : entry.name
+    if (matchesGlobPattern(fullPath, normalizedPattern)) {
+      matches.push(fullPath)
+    }
+  }
+  return matches
+}
+
+const getMatches = async (baseUri: string, pattern: string): Promise<string[]> => {
+  const normalizedPattern = normalizeInputPattern(pattern)
+  const { baseDir, globPart, matchDirectories } = normalizePattern(pattern)
+  if (matchDirectories) {
+    return getDirectoryMatches(baseUri, globPart)
+  }
+  if (globPart.includes('**')) {
+    return getRecursiveMatches(baseUri, baseDir, normalizedPattern)
+  }
+  return getDirectMatches(baseUri, baseDir, normalizedPattern)
+}
+
+const sortMatches = (matches: readonly string[]): string[] => {
+  return matches.toSorted((left, right) => left.localeCompare(right))
+}
+
+export const executeGlobTool = async (args: Readonly<Record<string, unknown>>, _options: ExecuteToolOptions): Promise<ToolResponse> => {
+  const pattern = getPattern(args)
   if (!pattern) {
     return {
       error: 'Invalid argument: pattern must be a non-empty string.',
     }
   }
 
-  const baseUri = typeof args.baseUri === 'string' ? args.baseUri : ''
-  if (!baseUri || !isAbsoluteUri(baseUri)) {
+  const baseUriError = getBaseUriError(args)
+  if (baseUriError) {
+    return baseUriError
+  }
+
+  const baseUri = getBaseUri(args)
+  if (!baseUri) {
     return getInvalidUriErrorPayload('baseUri')
   }
-  if (baseUri === PLACEHOLDER_WORKSPACE_URI || baseUri.startsWith(`${PLACEHOLDER_WORKSPACE_URI}/`)) {
-    return {
-      baseUri,
-      error: 'Invalid argument: baseUri must be a real workspace folder URI. Call getWorkspaceUri first and use the returned workspaceUri value.',
-    }
-  }
-
-  const normalizedPattern = normalizeInputPattern(pattern)
-  const { baseDir, globPart, matchDirectories } = normalizePattern(pattern)
-  const matches: string[] = []
 
   try {
-    if (matchDirectories) {
-      const dirUri = joinUri(baseUri, globPart)
-      const entries = await FileSystemWorker.readDirWithFileTypes(dirUri)
-      for (const entry of entries) {
-        matches.push(globPart ? `${globPart}/${entry.name}` : entry.name)
-      }
-    } else if (globPart.includes('**')) {
-      const baseDirUri = joinUri(baseUri, baseDir)
-      await traverseDirectory(baseDirUri, '', async (relativePath, entry) => {
-        if (entry.type !== DirentType.File) {
-          return
-        }
-        const fullPath = baseDir ? `${baseDir}/${relativePath}` : relativePath
-        if (matchesGlobPattern(fullPath, normalizedPattern)) {
-          matches.push(fullPath)
-        }
-      })
-    } else {
-      const dirUri = joinUri(baseUri, baseDir)
-      const entries = await FileSystemWorker.readDirWithFileTypes(dirUri)
-      for (const entry of entries) {
-        const fullPath = baseDir ? `${baseDir}/${entry.name}` : entry.name
-        if (matchesGlobPattern(fullPath, normalizedPattern)) {
-          matches.push(fullPath)
-        }
-      }
-    }
-
-    matches.sort()
+    const matches = sortMatches(await getMatches(baseUri, pattern))
 
     return {
       paths: matches,

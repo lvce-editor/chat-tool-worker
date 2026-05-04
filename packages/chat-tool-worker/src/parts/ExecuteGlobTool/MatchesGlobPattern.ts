@@ -17,6 +17,34 @@ const escapeRegExp = (str: string): string => {
   return str.replaceAll(REGEX_SPECIAL_CHARS_REGEX, '\\$&')
 }
 
+type CharacterClassRegex = {
+  readonly regex: string
+  readonly nextIndex: number
+}
+
+const getCharacterClassRegex = (classContents: string, negated: boolean): string => {
+  if (negated) {
+    return `[^${escapeRegExp(classContents)}]`
+  }
+  return `[${classContents.replaceAll('\\', '\\\\')}]`
+}
+
+const readCharacterClass = (segment: string, index: number): CharacterClassRegex | undefined => {
+  let classIndex = index + 1
+  const negated = segment[classIndex] === '!'
+  if (negated) {
+    classIndex++
+  }
+  const closingIndex = segment.indexOf(']', classIndex)
+  if (closingIndex === -1) {
+    return undefined
+  }
+  return {
+    nextIndex: closingIndex + 1,
+    regex: getCharacterClassRegex(segment.slice(classIndex, closingIndex), negated),
+  }
+}
+
 /*
  * Convert a glob pattern to a regex, but only for segments between separators
  */
@@ -27,60 +55,75 @@ const segmentToRegex = (segment: string): RegExp => {
   while (i < segment.length) {
     const char = segment[i]
 
-    switch (char) {
-      case '?': {
-        regexStr += '[^/]'
-        i++
-        break
-      }
-      case '[': {
-        let j = i + 1
-        let negated = false
-        if (j < segment.length && segment[j] === '!') {
-          negated = true
-          j++
-        }
-        let classStr = ''
-        while (j < segment.length && segment[j] !== ']') {
-          classStr += segment[j]
-          j++
-        }
-        if (j < segment.length) {
-          if (negated) {
-            regexStr += `[^${escapeRegExp(classStr)}]`
-          } else {
-            regexStr += `[${classStr.replaceAll('\\', '\\\\')}]`
-          }
-          i = j + 1
-        } else {
-          regexStr += escapeRegExp(char)
-          i++
-        }
-        break
-      }
-      case '*': {
-        regexStr += '[^/]*'
-        i++
-        break
-      }
-      default: {
-        regexStr += escapeRegExp(char)
-        i++
+    if (char === '?') {
+      regexStr += '[^/]'
+      i++
+      continue
+    }
+
+    if (char === '*') {
+      regexStr += '[^/]*'
+      i++
+      continue
+    }
+
+    if (char === '[') {
+      const characterClass = readCharacterClass(segment, i)
+      if (characterClass) {
+        regexStr += characterClass.regex
+        i = characterClass.nextIndex
+        continue
       }
     }
+
+    regexStr += escapeRegExp(char)
+    i++
   }
 
   return new RegExp(`^${regexStr}$`)
 }
 
-export const matchesGlobPattern = (path: string, pattern: string): boolean => {
-  const normalizedPath = path.replaceAll('\\', '/').replaceAll(LEADING_DOT_SLASH_REGEX, '')
-  let normalizedPattern = pattern.replaceAll('\\', '/').replaceAll(LEADING_DOT_SLASH_REGEX, '').replaceAll(MULTIPLE_SLASHES_REGEX, '/')
+const normalizePath = (path: string): string => {
+  return path.replaceAll('\\', '/').replaceAll(LEADING_DOT_SLASH_REGEX, '')
+}
 
-  if (normalizedPattern.endsWith('/')) {
-    normalizedPattern = normalizedPattern.slice(0, -1) + '/*'
+const normalizePattern = (pattern: string): string => {
+  const normalizedPattern = pattern.replaceAll('\\', '/').replaceAll(LEADING_DOT_SLASH_REGEX, '').replaceAll(MULTIPLE_SLASHES_REGEX, '/')
+  if (!normalizedPattern.endsWith('/')) {
+    return normalizedPattern
   }
+  return normalizedPattern.slice(0, -1) + '/*'
+}
 
+const matchesSinglePatternPart = (pathPart: string, patternPart: string): boolean => {
+  return segmentToRegex(patternPart).test(pathPart)
+}
+
+const matchesEmbeddedDoubleStarPattern = (
+  pathParts: readonly string[],
+  patternParts: readonly string[],
+  pathIdx: number,
+  patternIdx: number,
+): boolean => {
+  const patternPart = patternParts[patternIdx]
+  const pathPart = pathParts[pathIdx]
+  return (
+    matchesSinglePatternPart(pathPart, patternPart.replace('**', '')) && matchesPatternParts(pathParts, patternParts, pathIdx + 1, patternIdx + 1)
+  )
+}
+
+const matchesDoubleStarPattern = (pathParts: readonly string[], patternParts: readonly string[], pathIdx: number, patternIdx: number): boolean => {
+  for (let i = pathIdx; i <= pathParts.length; i++) {
+    if (matchesPatternParts(pathParts, patternParts, i, patternIdx + 1)) {
+      return true
+    }
+  }
+  return false
+}
+
+export const matchesGlobPattern = (path: string, pattern: string): boolean => {
+  const normalizedPath = normalizePath(path)
+  const normalizedPattern = normalizePattern(pattern)
   const patternParts = normalizedPattern.split('/')
   const pathParts = normalizedPath.split('/')
 
@@ -97,17 +140,8 @@ const matchesPatternParts = (pathParts: readonly string[], patternParts: readonl
   }
 
   const patternPart = patternParts[patternIdx]
-  if (patternPart === undefined) {
-    return false
-  }
-
   if (patternPart === '**') {
-    for (let i = pathIdx; i <= pathParts.length; i++) {
-      if (matchesPatternParts(pathParts, patternParts, i, patternIdx + 1)) {
-        return true
-      }
-    }
-    return false
+    return matchesDoubleStarPattern(pathParts, patternParts, pathIdx, patternIdx)
   }
 
   if (pathIdx === pathParts.length) {
@@ -115,19 +149,9 @@ const matchesPatternParts = (pathParts: readonly string[], patternParts: readonl
   }
 
   if (patternPart.includes('**')) {
-    const regex = segmentToRegex(patternPart.replace('**', ''))
-    const pathPart = pathParts[pathIdx]
-    if (pathPart !== undefined && regex.test(pathPart)) {
-      return matchesPatternParts(pathParts, patternParts, pathIdx + 1, patternIdx + 1)
-    }
-    return false
+    return matchesEmbeddedDoubleStarPattern(pathParts, patternParts, pathIdx, patternIdx)
   }
 
-  const regex = segmentToRegex(patternPart)
   const pathPart = pathParts[pathIdx]
-  if (pathPart !== undefined && regex.test(pathPart)) {
-    return matchesPatternParts(pathParts, patternParts, pathIdx + 1, patternIdx + 1)
-  }
-
-  return false
+  return matchesSinglePatternPart(pathPart, patternPart) && matchesPatternParts(pathParts, patternParts, pathIdx + 1, patternIdx + 1)
 }
