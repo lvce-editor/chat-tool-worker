@@ -3,6 +3,7 @@ import type { ExecuteToolOptions, ToolResponse } from '../Types/Types.ts'
 import { applyTextEdit } from '../ApplyTextEdit/ApplyTextEdit.ts'
 import { getInvalidUriErrorPayload, getInvalidUrlErrorPayload, getToolErrorPayload } from '../GetToolErrorPayload/GetToolErrorPayload.ts'
 import { isAbsoluteUri } from '../IsAbsoluteUri/IsAbsoluteUri.ts'
+import { isValidUri } from '../IsValidUri/IsValidUri.ts'
 
 export const executeEditFileTool = async (args: Readonly<Record<string, unknown>>, _options: ExecuteToolOptions): Promise<ToolResponse> => {
   const uri = typeof args.uri === 'string' ? args.uri : ''
@@ -13,9 +14,7 @@ export const executeEditFileTool = async (args: Readonly<Record<string, unknown>
     return getInvalidUriErrorPayload('uri')
   }
 
-  try {
-    new URL(uri)
-  } catch {
+  if (!isValidUri(uri)) {
     return getInvalidUrlErrorPayload()
   }
 
