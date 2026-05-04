@@ -123,8 +123,8 @@ const getMatches = async (baseUri: string, pattern: string): Promise<string[]> =
   return getDirectMatches(baseUri, baseDir, normalizedPattern)
 }
 
-const sortMatches = (matches: string[]): void => {
-  matches.sort((left, right) => left.localeCompare(right))
+const sortMatches = (matches: readonly string[]): string[] => {
+  return matches.toSorted((left, right) => left.localeCompare(right))
 }
 
 export const executeGlobTool = async (args: Readonly<Record<string, unknown>>, _options: ExecuteToolOptions): Promise<ToolResponse> => {
@@ -146,8 +146,7 @@ export const executeGlobTool = async (args: Readonly<Record<string, unknown>>, _
   }
 
   try {
-    const matches = await getMatches(baseUri, pattern)
-    sortMatches(matches)
+    const matches = sortMatches(await getMatches(baseUri, pattern))
 
     return {
       paths: matches,

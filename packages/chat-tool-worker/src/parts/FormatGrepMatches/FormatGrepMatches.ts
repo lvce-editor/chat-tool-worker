@@ -59,9 +59,14 @@ const formatStringMatches = (matches: readonly GrepSearchMatch[], outputFormat?:
   }
 }
 
-export const formatGrepMatches = (matches: readonly GrepSearchMatch[], outputFormat?: GrepSearchOutputFormat): FormattedGrepSearchResult => {
+const getMatchesFormatter = (outputFormat?: GrepSearchOutputFormat): ((matches: readonly GrepSearchMatch[]) => FormattedGrepSearchResult) => {
   if (outputFormat === 'json') {
-    return formatJsonMatches(matches)
+    return formatJsonMatches
   }
-  return formatStringMatches(matches, outputFormat)
+  return (matches) => formatStringMatches(matches, outputFormat)
+}
+
+export const formatGrepMatches = (matches: readonly GrepSearchMatch[], outputFormat?: GrepSearchOutputFormat): FormattedGrepSearchResult => {
+  const formatter = getMatchesFormatter(outputFormat)
+  return formatter(matches)
 }
