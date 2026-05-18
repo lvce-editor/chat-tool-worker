@@ -1,4 +1,4 @@
-import { RendererWorker } from '@lvce-editor/rpc-registry'
+import { FileSystemWorker } from '@lvce-editor/rpc-registry'
 import type { ExecuteToolOptions, ToolResponse } from '../Types/Types.ts'
 import { getInvalidUriErrorPayload, getInvalidUrlErrorPayload, getToolErrorPayload } from '../GetToolErrorPayload/GetToolErrorPayload.ts'
 import { isAbsoluteUri } from '../IsAbsoluteUri/IsAbsoluteUri.ts'
@@ -15,8 +15,8 @@ export const executeCreateDirectoryTool = async (args: Readonly<Record<string, u
   }
 
   try {
-    await RendererWorker.invoke('FileSystem.mkdir', uri)
-    return { ok: true, uri }
+    await FileSystemWorker.mkdir(uri)
+    return { ok: true }
   } catch (error) {
     return { ...getToolErrorPayload(error), uri }
   }
