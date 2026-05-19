@@ -15,7 +15,7 @@ const getSearchOptions = (args: Readonly<Record<string, unknown>>): SearchOption
   }
 
   const candidate = options as Record<string, unknown>
-  const { exclude, isRegex, matchWholeWord: matchWholeWord, matchCase, value } = candidate
+  const { exclude, isRegex, matchWholeWord, matchCase, value } = candidate
   if (typeof value !== 'string' || typeof isRegex !== 'boolean' || typeof matchCase !== 'boolean' || typeof matchWholeWord !== 'boolean') {
     return undefined
   }
