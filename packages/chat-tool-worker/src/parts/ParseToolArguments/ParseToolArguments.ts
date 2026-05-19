@@ -1,6 +1,6 @@
 export const parseToolArguments = (rawArguments: unknown): Record<string, unknown> => {
   if (typeof rawArguments !== 'string') {
-    return {}
+    return rawArguments as any
   }
   try {
     const parsed = JSON.parse(rawArguments) as unknown
