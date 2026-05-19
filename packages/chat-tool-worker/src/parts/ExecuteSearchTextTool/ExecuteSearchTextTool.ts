@@ -15,7 +15,7 @@ const getSearchOptions = (args: Readonly<Record<string, unknown>>): SearchOption
   }
 
   const candidate = options as Record<string, unknown>
-  const { exclude, isRegex, machWholeWord: matchWholeWord, matchCase, value } = candidate
+  const { exclude, isRegex, matchWholeWord: matchWholeWord, matchCase, value } = candidate
   if (typeof value !== 'string' || typeof isRegex !== 'boolean' || typeof matchCase !== 'boolean' || typeof matchWholeWord !== 'boolean') {
     return undefined
   }
@@ -37,7 +37,7 @@ export const executeSearchTextTool = async (args: Readonly<Record<string, unknow
   if (!searchOptions) {
     return {
       error:
-        'Invalid argument: options must include value (string), isRegex (boolean), matchCase (boolean), machWholeWord (boolean), and exclude (string[]).',
+        'Invalid argument: options must include value (string), isRegex (boolean), matchCase (boolean), matchWholeWord (boolean), and exclude (string[]).',
     }
   }
 

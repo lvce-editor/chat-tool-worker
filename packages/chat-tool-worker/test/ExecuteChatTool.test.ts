@@ -19,7 +19,7 @@ test('executeChatTool dispatches search_text tool', async () => {
       options: {
         exclude: ['**/dist/**'],
         isRegex: false,
-        machWholeWord: true,
+        matchWholeWord: true,
         matchCase: true,
         value: 'TODO',
       },
@@ -30,7 +30,7 @@ test('executeChatTool dispatches search_text tool', async () => {
     options: {
       exclude: ['**/dist/**'],
       isRegex: false,
-      machWholeWord: true,
+      matchWholeWord: true,
       matchCase: true,
       value: 'TODO',
     },

@@ -20,17 +20,17 @@ export const getSearchTextTool = (): ChatTool => {
               isRegex: {
                 type: 'boolean',
               },
-              machWholeWord: {
+              matchCase: {
                 type: 'boolean',
               },
-              matchCase: {
+              matchWholeWord: {
                 type: 'boolean',
               },
               value: {
                 type: 'string',
               },
             },
-            required: ['value', 'isRegex', 'matchCase', 'machWholeWord', 'exclude'],
+            required: ['value', 'isRegex', 'matchCase', 'matchWholeWord', 'exclude'],
             type: 'object',
           },
         },

@@ -7,7 +7,7 @@ test('executeSearchTextTool returns mock search results', async () => {
       options: {
         exclude: ['**/node_modules/**', '**/*.min.js'],
         isRegex: false,
-        machWholeWord: false,
+        matchWholeWord: false,
         matchCase: false,
         value: 'needle',
       },
@@ -19,7 +19,7 @@ test('executeSearchTextTool returns mock search results', async () => {
     options: {
       exclude: ['**/node_modules/**', '**/*.min.js'],
       isRegex: false,
-      machWholeWord: false,
+      matchWholeWord: false,
       matchCase: false,
       value: 'needle',
     },
@@ -46,7 +46,7 @@ test('executeSearchTextTool validates options object shape', async () => {
       options: {
         exclude: ['**/node_modules/**'],
         isRegex: false,
-        machWholeWord: false,
+        matchWholeWord: false,
         matchCase: false,
       },
     },
@@ -55,6 +55,6 @@ test('executeSearchTextTool validates options object shape', async () => {
 
   expect(result).toEqual({
     error:
-      'Invalid argument: options must include value (string), isRegex (boolean), matchCase (boolean), machWholeWord (boolean), and exclude (string[]).',
+      'Invalid argument: options must include value (string), isRegex (boolean), matchCase (boolean), matchWholeWord (boolean), and exclude (string[]).',
   })
 })
