@@ -20,6 +20,54 @@ const isExcludedPath = (path: string, exclude: readonly string[]): boolean => {
   return exclude.some((pattern) => matchesGlobPattern(path, pattern))
 }
 
+const readDirEntries = async (uri: string, relativePath: string): Promise<readonly DirEntry[] | undefined> => {
+  try {
+    return (await FileSystemWorker.readDirWithFileTypes(uri)) as readonly DirEntry[]
+  } catch (error) {
+    if (relativePath === '') {
+      throw error
+    }
+    return undefined
+  }
+}
+
+const searchFileContents = async (entryUri: string, searchOptions: SearchOptions): Promise<readonly TextSearchResult[]> => {
+  try {
+    const content = await FileSystemWorker.readFile(entryUri)
+    return searchInText(content, entryUri, searchOptions)
+  } catch {
+    // Ignore unreadable files and continue with remaining matches.
+    return []
+  }
+}
+
+const visitDirEntry = async (
+  uri: string,
+  relativePath: string,
+  dirent: DirEntry,
+  searchOptions: SearchOptions,
+  visit: (uri: string, relativePath: string) => Promise<void>,
+): Promise<readonly TextSearchResult[]> => {
+  const entryPath = relativePath ? `${relativePath}/${dirent.name}` : dirent.name
+  if (isExcludedPath(entryPath, searchOptions.exclude)) {
+    return []
+  }
+
+  const entryUri = joinUri(uri, dirent.name)
+  if (dirent.type === DirentType.Directory) {
+    if (!shouldExcludeDir(dirent.name)) {
+      await visit(entryUri, entryPath)
+    }
+    return []
+  }
+
+  if (dirent.type === DirentType.File) {
+    return searchFileContents(entryUri, searchOptions)
+  }
+
+  return []
+}
+
 const sortSearchResults = (results: readonly TextSearchResult[]): TextSearchResult[] => {
   return results.toSorted((left, right) => {
     const uriComparison = left.uri.localeCompare(right.uri)
@@ -46,40 +94,13 @@ export const searchTextManual = async (workspaceUri: string, searchOptions: Sear
     }
     visited.add(uri)
 
-    let dirents: readonly DirEntry[]
-    try {
-      dirents = (await FileSystemWorker.readDirWithFileTypes(uri)) as readonly DirEntry[]
-    } catch (error) {
-      if (relativePath === '') {
-        throw error
-      }
+    const dirents = await readDirEntries(uri, relativePath)
+    if (!dirents) {
       return
     }
 
     for (const dirent of dirents) {
-      const entryPath = relativePath ? `${relativePath}/${dirent.name}` : dirent.name
-      if (isExcludedPath(entryPath, searchOptions.exclude)) {
-        continue
-      }
-
-      const entryUri = joinUri(uri, dirent.name)
-      if (dirent.type === DirentType.Directory) {
-        if (!shouldExcludeDir(dirent.name)) {
-          await visit(entryUri, entryPath)
-        }
-        continue
-      }
-
-      if (dirent.type !== DirentType.File) {
-        continue
-      }
-
-      try {
-        const content = await FileSystemWorker.readFile(entryUri)
-        results.push(...searchInText(content, entryUri, searchOptions))
-      } catch {
-        // Ignore unreadable files and continue with remaining matches.
-      }
+      results.push(...(await visitDirEntry(uri, relativePath, dirent, searchOptions, visit)))
     }
   }
 

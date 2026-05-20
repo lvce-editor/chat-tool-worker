@@ -1,7 +1,7 @@
 import { RendererWorker } from '@lvce-editor/rpc-registry'
 import type { ExecuteToolOptions, ToolResponse } from '../Types/Types.ts'
+import type { SearchOptions } from '../SearchInText/SearchInText.ts'
 import { getToolErrorPayload } from '../GetToolErrorPayload/GetToolErrorPayload.ts'
-import { type SearchOptions } from '../SearchInText/SearchInText.ts'
 import { searchTextManual } from '../SearchTextManual/SearchTextManual.ts'
 
 const getSearchOptions = (args: Readonly<Record<string, unknown>>): SearchOptions | undefined => {
