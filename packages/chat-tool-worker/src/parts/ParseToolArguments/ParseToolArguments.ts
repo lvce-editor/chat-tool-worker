@@ -3,8 +3,6 @@ export const parseToolArguments = (rawArguments: unknown): Record<string, unknow
     return {}
   }
 
-
-
   if (typeof rawArguments !== 'string') {
     return rawArguments as any
   }
