@@ -93,11 +93,11 @@ test('search_text defines options object arguments for text search', () => {
     readonly properties: Readonly<Record<string, unknown>>
   }
   expect(optionsProperty.type).toBe('object')
-  expect(optionsProperty.required).toEqual(['value', 'isRegex', 'matchCase', 'machWholeWord', 'exclude'])
+  expect(optionsProperty.required).toEqual(['value', 'isRegex', 'matchCase', 'matchWholeWord', 'exclude'])
   expect(optionsProperty.properties).toHaveProperty('value')
   expect(optionsProperty.properties).toHaveProperty('isRegex')
   expect(optionsProperty.properties).toHaveProperty('matchCase')
-  expect(optionsProperty.properties).toHaveProperty('machWholeWord')
+  expect(optionsProperty.properties).toHaveProperty('matchWholeWord')
   expect(optionsProperty.properties).toHaveProperty('exclude')
 })
 
