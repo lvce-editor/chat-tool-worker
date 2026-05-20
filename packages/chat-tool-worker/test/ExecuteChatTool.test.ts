@@ -27,13 +27,6 @@ test('executeChatTool dispatches search_text tool', async () => {
     options,
   )
   expect(result).toEqual({
-    options: {
-      exclude: ['**/dist/**'],
-      isRegex: false,
-      matchCase: true,
-      matchWholeWord: true,
-      value: 'TODO',
-    },
     results: [
       {
         column: 12,

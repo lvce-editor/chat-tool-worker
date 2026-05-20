@@ -57,7 +57,6 @@ export const executeSearchTextTool = async (args: Readonly<Record<string, unknow
   ]
 
   return {
-    options: searchOptions,
     results,
   }
 }
