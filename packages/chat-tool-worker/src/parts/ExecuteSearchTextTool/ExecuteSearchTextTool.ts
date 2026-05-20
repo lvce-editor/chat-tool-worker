@@ -1,12 +1,8 @@
+import { RendererWorker } from '@lvce-editor/rpc-registry'
+import type { SearchOptions } from '../SearchInText/SearchInText.ts'
 import type { ExecuteToolOptions, ToolResponse } from '../Types/Types.ts'
-
-type SearchOptions = {
-  readonly value: string
-  readonly isRegex: boolean
-  readonly matchCase: boolean
-  readonly matchWholeWord: boolean
-  readonly exclude: readonly string[]
-}
+import { getToolErrorPayload } from '../GetToolErrorPayload/GetToolErrorPayload.ts'
+import { searchTextManual } from '../SearchTextManual/SearchTextManual.ts'
 
 const getSearchOptions = (args: Readonly<Record<string, unknown>>): SearchOptions | undefined => {
   const { options } = args
@@ -32,6 +28,18 @@ const getSearchOptions = (args: Readonly<Record<string, unknown>>): SearchOption
   }
 }
 
+const validateRegex = (searchOptions: SearchOptions): string | undefined => {
+  if (!searchOptions.isRegex) {
+    return undefined
+  }
+  try {
+    new RegExp(searchOptions.value)
+    return undefined
+  } catch {
+    return 'Invalid argument: options.value must be a valid regular expression.'
+  }
+}
+
 export const executeSearchTextTool = async (args: Readonly<Record<string, unknown>>, _options: ExecuteToolOptions): Promise<ToolResponse> => {
   const searchOptions = getSearchOptions(args)
   if (!searchOptions) {
@@ -41,22 +49,20 @@ export const executeSearchTextTool = async (args: Readonly<Record<string, unknow
     }
   }
 
-  const results = [
-    {
-      column: 12,
-      line: 5,
-      text: `Mock match for "${searchOptions.value}" in src/main.ts`,
-      uri: 'file:///workspace/src/main.ts',
-    },
-    {
-      column: 3,
-      line: 18,
-      text: `Mock match for "${searchOptions.value}" in src/utils/search.ts`,
-      uri: 'file:///workspace/src/utils/search.ts',
-    },
-  ]
+  const regexError = validateRegex(searchOptions)
+  if (regexError) {
+    return {
+      error: regexError,
+    }
+  }
 
-  return {
-    results,
+  try {
+    const workspaceUri = await RendererWorker.getWorkspacePath()
+    const results = await searchTextManual(workspaceUri, searchOptions)
+    return {
+      results,
+    }
+  } catch (error) {
+    return getToolErrorPayload(error)
   }
 }

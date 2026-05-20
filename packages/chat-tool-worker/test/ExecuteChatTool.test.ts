@@ -1,5 +1,6 @@
 import { expect, test } from '@jest/globals'
-import { RendererWorker, TerminalProcess } from '@lvce-editor/rpc-registry'
+import { DirentType } from '@lvce-editor/constants'
+import { FileSystemWorker, RendererWorker, TerminalProcess } from '@lvce-editor/rpc-registry'
 import * as ExecuteChatTool from '../src/parts/ExecuteChatTool/ExecuteChatTool.ts'
 
 const options = {
@@ -13,6 +14,42 @@ test('executeChatTool returns unknown tool error', async () => {
 })
 
 test('executeChatTool dispatches search_text tool', async () => {
+  using rendererMockRpc = RendererWorker.registerMockRpc({
+    'Workspace.getPath': async () => 'file:///workspace',
+  })
+  using fileSystemMockRpc = FileSystemWorker.registerMockRpc({
+    'FileSystem.readDirWithFileTypes': async (uri: string) => {
+      if (uri === 'file:///workspace') {
+        return [
+          { name: 'src', type: DirentType.Directory },
+          { name: 'README.md', type: DirentType.File },
+        ]
+      }
+      if (uri === 'file:///workspace/src') {
+        return [
+          { name: 'main.ts', type: DirentType.File },
+          { name: 'utils', type: DirentType.Directory },
+        ]
+      }
+      if (uri === 'file:///workspace/src/utils') {
+        return [{ name: 'search.ts', type: DirentType.File }]
+      }
+      throw new Error(`unexpected uri: ${uri}`)
+    },
+    'FileSystem.readFile': async (uri: string) => {
+      if (uri === 'file:///workspace/README.md') {
+        return 'No matches here'
+      }
+      if (uri === 'file:///workspace/src/main.ts') {
+        return 'const value = 1\n// TODO main task'
+      }
+      if (uri === 'file:///workspace/src/utils/search.ts') {
+        return 'ok\nTODO search helper'
+      }
+      throw new Error(`unexpected read: ${uri}`)
+    },
+  })
+
   const result = await ExecuteChatTool.executeChatTool(
     'search_text',
     JSON.stringify({
@@ -29,19 +66,28 @@ test('executeChatTool dispatches search_text tool', async () => {
   expect(result).toEqual({
     results: [
       {
-        column: 12,
-        line: 5,
-        text: 'Mock match for "TODO" in src/main.ts',
+        column: 4,
+        line: 2,
+        text: '// TODO main task',
         uri: 'file:///workspace/src/main.ts',
       },
       {
-        column: 3,
-        line: 18,
-        text: 'Mock match for "TODO" in src/utils/search.ts',
+        column: 1,
+        line: 2,
+        text: 'TODO search helper',
         uri: 'file:///workspace/src/utils/search.ts',
       },
     ],
   })
+  expect(rendererMockRpc.invocations).toEqual([['Workspace.getPath']])
+  expect(fileSystemMockRpc.invocations).toEqual([
+    ['FileSystem.readDirWithFileTypes', 'file:///workspace'],
+    ['FileSystem.readDirWithFileTypes', 'file:///workspace/src'],
+    ['FileSystem.readFile', 'file:///workspace/src/main.ts'],
+    ['FileSystem.readDirWithFileTypes', 'file:///workspace/src/utils'],
+    ['FileSystem.readFile', 'file:///workspace/src/utils/search.ts'],
+    ['FileSystem.readFile', 'file:///workspace/README.md'],
+  ])
 })
 
 test('executeChatTool dispatches rename tool', async () => {
