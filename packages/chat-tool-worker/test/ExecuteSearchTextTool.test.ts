@@ -62,10 +62,7 @@ test('executeSearchTextTool searches workspace files recursively', async () => {
     },
   })
 
-  const result = await executeSearchTextTool(
-    getOptions(),
-    {} as never,
-  )
+  const result = await executeSearchTextTool(getOptions(), {} as never)
 
   expect(result).toEqual({
     results: [
@@ -126,7 +123,11 @@ test('executeSearchTextTool respects exclude patterns for files and directories'
   using fileSystemMockRpc = FileSystemWorker.registerMockRpc({
     'FileSystem.readDirWithFileTypes': async (uri: string) => {
       if (uri === workspaceUri) {
-        return [mockEntry({ isFile: false, name: 'ignored' }), mockEntry({ isFile: true, name: 'README.md' }), mockEntry({ isFile: false, name: 'src' })]
+        return [
+          mockEntry({ isFile: false, name: 'ignored' }),
+          mockEntry({ isFile: true, name: 'README.md' }),
+          mockEntry({ isFile: false, name: 'src' }),
+        ]
       }
       if (uri === `${workspaceUri}/src`) {
         return [mockEntry({ isFile: true, name: 'main.ts' })]
@@ -141,10 +142,7 @@ test('executeSearchTextTool respects exclude patterns for files and directories'
     },
   })
 
-  const result = await executeSearchTextTool(
-    getOptions({ exclude: ['ignored/**', '**/*.md'] }),
-    {} as never,
-  )
+  const result = await executeSearchTextTool(getOptions({ exclude: ['ignored/**', '**/*.md'] }), {} as never)
 
   expect(result).toEqual({
     results: [
@@ -215,10 +213,7 @@ test('executeSearchTextTool supports whole-word regex searches', async () => {
     'FileSystem.readFile': async () => 'cat scatter cat',
   })
 
-  const result = await executeSearchTextTool(
-    getOptions({ isRegex: true, matchWholeWord: true, value: 'cat' }),
-    {} as never,
-  )
+  const result = await executeSearchTextTool(getOptions({ isRegex: true, matchWholeWord: true, value: 'cat' }), {} as never)
 
   expect(result).toEqual({
     results: [
@@ -244,10 +239,7 @@ test('executeSearchTextTool supports whole-word regex searches', async () => {
 })
 
 test('executeSearchTextTool returns an error for invalid regex input', async () => {
-  const result = await executeSearchTextTool(
-    getOptions({ isRegex: true, value: '[' }),
-    {} as never,
-  )
+  const result = await executeSearchTextTool(getOptions({ isRegex: true, value: '[' }), {} as never)
 
   expect(result).toEqual({
     error: 'Invalid argument: options.value must be a valid regular expression.',
