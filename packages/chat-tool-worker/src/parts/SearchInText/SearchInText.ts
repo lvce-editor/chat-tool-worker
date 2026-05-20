@@ -1,6 +1,11 @@
-import type { SearchResult } from '@lvce-editor/rpc-registry'
-
 const WORD_CHARACTER_REGEX = /\w/
+
+export type TextSearchResult = {
+  readonly column: number
+  readonly line: number
+  readonly text: string
+  readonly uri: string
+}
 
 export type SearchOptions = {
   readonly value: string
@@ -16,7 +21,7 @@ const isWholeWordMatch = (text: string, startIndex: number, matchLength: number)
   return !WORD_CHARACTER_REGEX.test(beforeChar) && !WORD_CHARACTER_REGEX.test(afterChar)
 }
 
-const createSearchResult = (uri: string, lineNumber: number, column: number, text: string): SearchResult => {
+const createSearchResult = (uri: string, lineNumber: number, column: number, text: string): TextSearchResult => {
   return {
     column,
     line: lineNumber,
@@ -25,8 +30,8 @@ const createSearchResult = (uri: string, lineNumber: number, column: number, tex
   }
 }
 
-const searchPlainText = (text: string, uri: string, options: SearchOptions): SearchResult[] => {
-  const results: SearchResult[] = []
+const searchPlainText = (text: string, uri: string, options: SearchOptions): TextSearchResult[] => {
+  const results: TextSearchResult[] = []
   const lines = text.split('\n')
   const needle = options.matchCase ? options.value : options.value.toLowerCase()
 
@@ -54,8 +59,8 @@ const searchPlainText = (text: string, uri: string, options: SearchOptions): Sea
   return results
 }
 
-const searchRegExp = (text: string, uri: string, options: SearchOptions): SearchResult[] => {
-  const results: SearchResult[] = []
+const searchRegExp = (text: string, uri: string, options: SearchOptions): TextSearchResult[] => {
+  const results: TextSearchResult[] = []
   const lines = text.split('\n')
   const flags = options.matchCase ? 'g' : 'gi'
   const regex = new RegExp(options.value, flags)
@@ -80,7 +85,7 @@ const searchRegExp = (text: string, uri: string, options: SearchOptions): Search
   return results
 }
 
-export const searchInText = (text: string, uri: string, options: SearchOptions): SearchResult[] => {
+export const searchInText = (text: string, uri: string, options: SearchOptions): TextSearchResult[] => {
   if (options.isRegex) {
     return searchRegExp(text, uri, options)
   }

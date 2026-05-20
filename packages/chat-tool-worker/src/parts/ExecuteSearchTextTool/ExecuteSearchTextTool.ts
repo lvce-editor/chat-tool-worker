@@ -4,7 +4,7 @@ import type { ExecuteToolOptions, ToolResponse } from '../Types/Types.ts'
 import { matchesGlobPattern } from '../ExecuteGlobTool/MatchesGlobPattern.ts'
 import { shouldExcludeDir } from '../ExecuteGlobTool/TraverseDirectory.ts'
 import { getToolErrorPayload } from '../GetToolErrorPayload/GetToolErrorPayload.ts'
-import { searchInText, type SearchOptions } from '../SearchInText/SearchInText.ts'
+import { searchInText, type SearchOptions, type TextSearchResult } from '../SearchInText/SearchInText.ts'
 
 type DirEntry = {
   readonly name: string
@@ -58,7 +58,7 @@ const validateRegex = (searchOptions: SearchOptions): string | undefined => {
   }
 }
 
-const sortSearchResults = (results: readonly ReturnType<typeof searchInText>[number][]): ReturnType<typeof searchInText> => {
+const sortSearchResults = (results: readonly TextSearchResult[]): TextSearchResult[] => {
   return results.toSorted((left, right) => {
     const uriComparison = left.uri.localeCompare(right.uri)
     if (uriComparison !== 0) {
@@ -74,8 +74,8 @@ const sortSearchResults = (results: readonly ReturnType<typeof searchInText>[num
   })
 }
 
-const searchTextManual = async (workspaceUri: string, searchOptions: SearchOptions): Promise<readonly ReturnType<typeof searchInText>[number][]> => {
-  const results: ReturnType<typeof searchInText> = []
+const searchTextManual = async (workspaceUri: string, searchOptions: SearchOptions): Promise<readonly TextSearchResult[]> => {
+  const results: TextSearchResult[] = []
   const visited = new Set<string>()
 
   const visit = async (uri: string, relativePath: string): Promise<void> => {
