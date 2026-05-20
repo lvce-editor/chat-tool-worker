@@ -1,3 +1,6 @@
+import type { SearchResult } from '@lvce-editor/rpc-registry';
+import { DirentType } from '@lvce-editor/constants';
+import { FileSystemWorker } from '@lvce-editor/rpc-registry'
 import type { ExecuteToolOptions, ToolResponse } from '../Types/Types.ts'
 
 type SearchOptions = {
@@ -32,6 +35,28 @@ const getSearchOptions = (args: Readonly<Record<string, unknown>>): SearchOption
   }
 }
 
+
+const searchTextManual = async (uri: string, options: any): Promise<readonly SearchResult[]> => {
+  console.log({ uri })
+  const results: SearchResult[] = []
+  try {
+
+    const dirents = await FileSystemWorker.readDirWithFileTypes(uri)
+
+    for (const dirent of dirents) {
+      if (dirent.type === DirentType.File) {
+        const content = await FileSystemWorker.readFile(`${uri}/${dirent.name}`)
+        console.log({ content })
+      }
+    }
+    console.log({ dirents })
+    return []
+  } catch (error) {
+    console.error('Error reading directory:', error)
+    return []
+  }
+}
+
 export const executeSearchTextTool = async (args: Readonly<Record<string, unknown>>, _options: ExecuteToolOptions): Promise<ToolResponse> => {
   const searchOptions = getSearchOptions(args)
   if (!searchOptions) {
@@ -40,6 +65,14 @@ export const executeSearchTextTool = async (args: Readonly<Record<string, unknow
         'Invalid argument: options must include value (string), isRegex (boolean), matchCase (boolean), matchWholeWord (boolean), and exclude (string[]).',
     }
   }
+
+  if ('uri' in args && typeof args.uri === 'string' && args.uri.startsWith('file://')) {
+    // TODO use ripgrep
+  }
+
+  const r = await searchTextManual(args.uri, searchOptions)
+  // TODO use manual search,
+
 
   const results = [
     {
