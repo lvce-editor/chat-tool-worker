@@ -3,16 +3,10 @@ export const parseToolArguments = (rawArguments: unknown): Record<string, unknow
     return {}
   }
 
-  if (Array.isArray(rawArguments)) {
-    return rawArguments as unknown as Record<string, unknown>
-  }
 
-  if (typeof rawArguments === 'object') {
-    return rawArguments as Record<string, unknown>
-  }
 
   if (typeof rawArguments !== 'string') {
-    return {}
+    return rawArguments as any
   }
 
   try {
