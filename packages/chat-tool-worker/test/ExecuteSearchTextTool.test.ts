@@ -16,13 +16,7 @@ test('executeSearchTextTool returns mock search results', async () => {
   )
 
   expect(result).toEqual({
-    options: {
-      exclude: ['**/node_modules/**', '**/*.min.js'],
-      isRegex: false,
-      matchCase: false,
-      matchWholeWord: false,
-      value: 'needle',
-    },
+
     results: [
       {
         column: 12,
