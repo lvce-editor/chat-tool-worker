@@ -16,7 +16,6 @@ test('executeSearchTextTool returns mock search results', async () => {
   )
 
   expect(result).toEqual({
-
     results: [
       {
         column: 12,
