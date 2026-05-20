@@ -3,7 +3,15 @@ import { searchInText } from '../src/parts/SearchInText/SearchInText.ts'
 
 const uri = 'file:///workspace/src/example.ts'
 
-const getOptions = (overrides: Record<string, unknown> = {}) => ({
+const getOptions = (
+  overrides: Readonly<Record<string, unknown>> = {},
+): {
+  readonly exclude: readonly string[]
+  readonly isRegex: boolean
+  readonly matchCase: boolean
+  readonly matchWholeWord: boolean
+  readonly value: string
+} => ({
   exclude: [],
   isRegex: false,
   matchCase: false,

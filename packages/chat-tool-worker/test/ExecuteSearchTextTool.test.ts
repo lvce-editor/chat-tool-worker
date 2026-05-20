@@ -15,7 +15,17 @@ type MockEntry = {
 
 const workspaceUri = 'file:///test/workspace'
 
-const getOptions = (overrides: Record<string, unknown> = {}) => ({
+const getOptions = (
+  overrides: Readonly<Record<string, unknown>> = {},
+): {
+  readonly options: {
+    readonly exclude: readonly string[]
+    readonly isRegex: boolean
+    readonly matchCase: boolean
+    readonly matchWholeWord: boolean
+    readonly value: string
+  }
+} => ({
   options: {
     exclude: [],
     isRegex: false,
