@@ -7,8 +7,8 @@ test('executeSearchTextTool returns mock search results', async () => {
       options: {
         exclude: ['**/node_modules/**', '**/*.min.js'],
         isRegex: false,
-        matchWholeWord: false,
         matchCase: false,
+        matchWholeWord: false,
         value: 'needle',
       },
     },
@@ -19,8 +19,8 @@ test('executeSearchTextTool returns mock search results', async () => {
     options: {
       exclude: ['**/node_modules/**', '**/*.min.js'],
       isRegex: false,
-      matchWholeWord: false,
       matchCase: false,
+      matchWholeWord: false,
       value: 'needle',
     },
     results: [
@@ -46,8 +46,8 @@ test('executeSearchTextTool validates options object shape', async () => {
       options: {
         exclude: ['**/node_modules/**'],
         isRegex: false,
-        matchWholeWord: false,
         matchCase: false,
+        matchWholeWord: false,
       },
     },
     {} as never,
