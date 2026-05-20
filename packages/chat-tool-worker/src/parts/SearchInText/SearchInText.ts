@@ -1,74 +1,88 @@
-import type { SearchResult } from '@lvce-editor/rpc-registry';
-import { DirentType } from '@lvce-editor/constants';
-import { FileSystemWorker } from '@lvce-editor/rpc-registry'
-import type { ExecuteToolOptions, ToolResponse } from '../Types/Types.ts'
+import type { SearchResult } from '@lvce-editor/rpc-registry'
 
+const WORD_CHARACTER_REGEX = /\w/
 
+export type SearchOptions = {
+  readonly value: string
+  readonly isRegex: boolean
+  readonly matchCase: boolean
+  readonly matchWholeWord: boolean
+  readonly exclude: readonly string[]
+}
 
-const searchInText = (text: string, options: SearchOptions): SearchResult[] => {
+const isWholeWordMatch = (text: string, startIndex: number, matchLength: number): boolean => {
+  const beforeChar = startIndex > 0 ? text[startIndex - 1] : ' '
+  const afterChar = startIndex + matchLength < text.length ? text[startIndex + matchLength] : ' '
+  return !WORD_CHARACTER_REGEX.test(beforeChar) && !WORD_CHARACTER_REGEX.test(afterChar)
+}
+
+const createSearchResult = (uri: string, lineNumber: number, column: number, text: string): SearchResult => {
+  return {
+    column,
+    line: lineNumber,
+    text,
+    uri,
+  }
+}
+
+const searchPlainText = (text: string, uri: string, options: SearchOptions): SearchResult[] => {
   const results: SearchResult[] = []
   const lines = text.split('\n')
-  const searchValue = options.matchCase ? options.value : options.value.toLowerCase()
+  const needle = options.matchCase ? options.value : options.value.toLowerCase()
+
+  if (needle === '') {
+    return results
+  }
 
   for (let lineNumber = 0; lineNumber < lines.length; lineNumber++) {
     const lineText = lines[lineNumber]
     const searchLineText = options.matchCase ? lineText : lineText.toLowerCase()
-    let matchIndex = -1
+    let searchStartIndex = 0
 
-    if (options.isRegex) {
-      try {
-        const regex = new RegExp(searchValue, options.matchCase ? '' : 'i')
-        let match: RegExpExecArray | null
-        while ((match = regex.exec(searchLineText)) !== null) {
-          if (options.matchWholeWord) {
-            const beforeChar = match.index > 0 ? searchLineText[match.index - 1] : ' '
-            const afterChar = match.index + match[0].length < searchLineText.length ? searchLineText[match.index + match[0].length] : ' '
-            if (!/\w/.test(beforeChar) && !/\w/.test(afterChar)) {
-              results.push({
-                line: lineNumber + 1,
-                column: match.index + 1,
-                text: lineText,
-                uri: '', // This should be set to the actual file URI
-              })
-            }
-          } else {
-            results.push({
+    while (searchStartIndex <= searchLineText.length) {
+      const matchIndex = searchLineText.indexOf(needle, searchStartIndex)
+      if (matchIndex === -1) {
+        break
+      }
+      if (!options.matchWholeWord || isWholeWordMatch(lineText, matchIndex, needle.length)) {
+        results.push(createSearchResult(uri, lineNumber + 1, matchIndex + 1, lineText))
+      }
+      searchStartIndex = matchIndex + needle.length
+    }
+  }
 
+  return results
+}
 
-              line: lineNumber + 1, column: match.index + 1,
-              text: lineText,
-              uri: '', // This should be set to the actual file URI
-            })
-          }
-        } catch (error) {
-          console.error('Invalid regex pattern:', error)
-        }
-      } else {
-        let searchStartIndex = 0
-        while ((matchIndex = searchLineText.indexOf(searchValue, searchStartIndex)) !== -1) {
-          if (options.matchWholeWord) {
-            const beforeChar = matchIndex > 0 ? searchLineText[matchIndex - 1] : ' '
-            const afterChar = matchIndex + searchValue.length < searchLineText.length ? searchLineText[matchIndex + searchValue.length] : ' '
-            if (!/\w/.test(beforeChar) && !/\w/.test(afterChar)) {
-              results.push({
-                line: lineNumber + 1,
-                column: matchIndex + 1,
-                text: lineText
+const searchRegExp = (text: string, uri: string, options: SearchOptions): SearchResult[] => {
+  const results: SearchResult[] = []
+  const lines = text.split('\n')
+  const flags = options.matchCase ? 'g' : 'gi'
+  const regex = new RegExp(options.value, flags)
 
-              })
-            }
-          } else {
-            results.push({
-              line: lineNumber + 1,
-              column: matchIndex + 1,
-              text: lineText,
-              uri: '', // This should be set to the actual file URI
-            })
-          }
-          searchStartIndex = matchIndex + searchValue.length
-        }
+  for (let lineNumber = 0; lineNumber < lines.length; lineNumber++) {
+    const lineText = lines[lineNumber]
+    regex.lastIndex = 0
+    let match: RegExpExecArray | null
+
+    while ((match = regex.exec(lineText)) !== null) {
+      const matchedText = match[0]
+      if (matchedText !== '' && (!options.matchWholeWord || isWholeWordMatch(lineText, match.index, matchedText.length))) {
+        results.push(createSearchResult(uri, lineNumber + 1, match.index + 1, lineText))
+      }
+
+      if (matchedText === '') {
+        regex.lastIndex++
       }
     }
-
-    return results
   }
+
+  return results
+}
+
+export const searchInText = (text: string, uri: string, options: SearchOptions): SearchResult[] => {
+  if (options.isRegex) {
+    return searchRegExp(text, uri, options)
+  }
+  return searchPlainText(text, uri, options)
+}

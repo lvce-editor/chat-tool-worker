@@ -1,14 +1,14 @@
-import type { SearchResult } from '@lvce-editor/rpc-registry';
-import { DirentType } from '@lvce-editor/constants';
-import { FileSystemWorker } from '@lvce-editor/rpc-registry'
+import { DirentType } from '@lvce-editor/constants'
+import { FileSystemWorker, RendererWorker } from '@lvce-editor/rpc-registry'
 import type { ExecuteToolOptions, ToolResponse } from '../Types/Types.ts'
+import { matchesGlobPattern } from '../ExecuteGlobTool/MatchesGlobPattern.ts'
+import { shouldExcludeDir } from '../ExecuteGlobTool/TraverseDirectory.ts'
+import { getToolErrorPayload } from '../GetToolErrorPayload/GetToolErrorPayload.ts'
+import { searchInText, type SearchOptions } from '../SearchInText/SearchInText.ts'
 
-type SearchOptions = {
-  readonly value: string
-  readonly isRegex: boolean
-  readonly matchCase: boolean
-  readonly matchWholeWord: boolean
-  readonly exclude: readonly string[]
+type DirEntry = {
+  readonly name: string
+  readonly type: number
 }
 
 const getSearchOptions = (args: Readonly<Record<string, unknown>>): SearchOptions | undefined => {
@@ -35,26 +35,94 @@ const getSearchOptions = (args: Readonly<Record<string, unknown>>): SearchOption
   }
 }
 
+const joinUri = (baseUri: string, path: string): string => {
+  if (!path) {
+    return baseUri
+  }
+  return baseUri.endsWith('/') ? `${baseUri}${path}` : `${baseUri}/${path}`
+}
 
-const searchTextManual = async (uri: string, options: any): Promise<readonly SearchResult[]> => {
-  console.log({ uri })
-  const results: SearchResult[] = []
+const isExcludedPath = (path: string, exclude: readonly string[]): boolean => {
+  return exclude.some((pattern) => matchesGlobPattern(path, pattern))
+}
+
+const validateRegex = (searchOptions: SearchOptions): string | undefined => {
+  if (!searchOptions.isRegex) {
+    return undefined
+  }
   try {
+    new RegExp(searchOptions.value)
+    return undefined
+  } catch {
+    return 'Invalid argument: options.value must be a valid regular expression.'
+  }
+}
 
-    const dirents = await FileSystemWorker.readDirWithFileTypes(uri)
+const sortSearchResults = (results: readonly ReturnType<typeof searchInText>[number][]): ReturnType<typeof searchInText> => {
+  return results.toSorted((left, right) => {
+    const uriComparison = left.uri.localeCompare(right.uri)
+    if (uriComparison !== 0) {
+      return uriComparison
+    }
+    if (left.line !== right.line) {
+      return left.line - right.line
+    }
+    if (left.column !== right.column) {
+      return left.column - right.column
+    }
+    return left.text.localeCompare(right.text)
+  })
+}
+
+const searchTextManual = async (workspaceUri: string, searchOptions: SearchOptions): Promise<readonly ReturnType<typeof searchInText>[number][]> => {
+  const results: ReturnType<typeof searchInText> = []
+  const visited = new Set<string>()
+
+  const visit = async (uri: string, relativePath: string): Promise<void> => {
+    if (visited.has(uri)) {
+      return
+    }
+    visited.add(uri)
+
+    let dirents: readonly DirEntry[]
+    try {
+      dirents = (await FileSystemWorker.readDirWithFileTypes(uri)) as readonly DirEntry[]
+    } catch (error) {
+      if (relativePath === '') {
+        throw error
+      }
+      return
+    }
 
     for (const dirent of dirents) {
-      if (dirent.type === DirentType.File) {
-        const content = await FileSystemWorker.readFile(`${uri}/${dirent.name}`)
-        console.log({ content })
+      const entryPath = relativePath ? `${relativePath}/${dirent.name}` : dirent.name
+      if (isExcludedPath(entryPath, searchOptions.exclude)) {
+        continue
+      }
+
+      const entryUri = joinUri(uri, dirent.name)
+      if (dirent.type === DirentType.Directory) {
+        if (!shouldExcludeDir(dirent.name)) {
+          await visit(entryUri, entryPath)
+        }
+        continue
+      }
+
+      if (dirent.type !== DirentType.File) {
+        continue
+      }
+
+      try {
+        const content = await FileSystemWorker.readFile(entryUri)
+        results.push(...searchInText(content, entryUri, searchOptions))
+      } catch {
+        // Ignore unreadable files and continue with remaining matches.
       }
     }
-    console.log({ dirents })
-    return []
-  } catch (error) {
-    console.error('Error reading directory:', error)
-    return []
   }
+
+  await visit(workspaceUri, '')
+  return sortSearchResults(results)
 }
 
 export const executeSearchTextTool = async (args: Readonly<Record<string, unknown>>, _options: ExecuteToolOptions): Promise<ToolResponse> => {
@@ -66,30 +134,20 @@ export const executeSearchTextTool = async (args: Readonly<Record<string, unknow
     }
   }
 
-  if ('uri' in args && typeof args.uri === 'string' && args.uri.startsWith('file://')) {
-    // TODO use ripgrep
+  const regexError = validateRegex(searchOptions)
+  if (regexError) {
+    return {
+      error: regexError,
+    }
   }
 
-  const r = await searchTextManual(args.uri, searchOptions)
-  // TODO use manual search,
-
-
-  const results = [
-    {
-      column: 12,
-      line: 5,
-      text: `Mock match for "${searchOptions.value}" in src/main.ts`,
-      uri: 'file:///workspace/src/main.ts',
-    },
-    {
-      column: 3,
-      line: 18,
-      text: `Mock match for "${searchOptions.value}" in src/utils/search.ts`,
-      uri: 'file:///workspace/src/utils/search.ts',
-    },
-  ]
-
-  return {
-    results,
+  try {
+    const workspaceUri = await RendererWorker.getWorkspacePath()
+    const results = await searchTextManual(workspaceUri, searchOptions)
+    return {
+      results,
+    }
+  } catch (error) {
+    return getToolErrorPayload(error)
   }
 }
