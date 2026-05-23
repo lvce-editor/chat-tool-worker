@@ -4,11 +4,16 @@ import { getLineDiffStats } from '../GetLineDiffStats/GetLineDiffStats.ts'
 import { getInvalidUriErrorPayload, getInvalidUrlErrorPayload, getToolErrorPayload } from '../GetToolErrorPayload/GetToolErrorPayload.ts'
 import { isAbsoluteUri } from '../IsAbsoluteUri/IsAbsoluteUri.ts'
 import { isValidUri } from '../IsValidUri/IsValidUri.ts'
+import { validateWriteFileToolArgs } from '../ValidateWriteFileToolArgs/ValidateWriteFileToolArgs.ts'
 
 export const executeWriteFileTool = async (args: Readonly<Record<string, unknown>>, _options: ExecuteToolOptions): Promise<ToolResponse> => {
-  const uri = typeof args.uri === 'string' ? args.uri : ''
-  const content = typeof args.content === 'string' ? args.content : ''
-  if (!uri || !isAbsoluteUri(uri)) {
+  const validatedArgs = validateWriteFileToolArgs(args)
+  if (!validatedArgs.ok) {
+    return validatedArgs.response
+  }
+
+  const { content, uri } = validatedArgs.args
+  if (!isAbsoluteUri(uri)) {
     return getInvalidUriErrorPayload('uri')
   }
 

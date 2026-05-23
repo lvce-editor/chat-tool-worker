@@ -2,6 +2,41 @@ import { expect, test } from '@jest/globals'
 import { FileSystemWorker } from '@lvce-editor/rpc-registry'
 import { executeWriteFileTool } from '../src/parts/ExecuteWriteFileTool/ExecuteWriteFileTool.ts'
 
+test('executeWriteFileTool rejects non-object args', async () => {
+  const result = await executeWriteFileTool(null as never, {} as never)
+  expect(result).toEqual({
+    error: 'Invalid argument: args must be an object.',
+  })
+})
+
+test('executeWriteFileTool rejects missing uri', async () => {
+  const result = await executeWriteFileTool({ content: '' }, {} as never)
+  expect(result).toEqual({
+    error: 'Missing required argument: uri',
+  })
+})
+
+test('executeWriteFileTool rejects missing content', async () => {
+  const result = await executeWriteFileTool({ uri: 'file:///workspace/file.txt' }, {} as never)
+  expect(result).toEqual({
+    error: 'Missing required argument: content',
+  })
+})
+
+test('executeWriteFileTool rejects non-string uri values', async () => {
+  const result = await executeWriteFileTool({ content: '', uri: 42 as never }, {} as never)
+  expect(result).toEqual({
+    error: 'Invalid argument: uri must be a string.',
+  })
+})
+
+test('executeWriteFileTool rejects non-string content values', async () => {
+  const result = await executeWriteFileTool({ content: 42 as never, uri: 'file:///workspace/file.txt' }, {} as never)
+  expect(result).toEqual({
+    error: 'Invalid argument: content must be a string.',
+  })
+})
+
 test('executeWriteFileTool rejects relative path values', async () => {
   const result = await executeWriteFileTool({ content: '', uri: '/test/playground/index.js' }, {} as never)
   expect(result).toEqual({
