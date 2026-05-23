@@ -24,14 +24,14 @@ test('executeWriteFileTool rejects missing content', async () => {
 })
 
 test('executeWriteFileTool rejects non-string uri values', async () => {
-  const result = await executeWriteFileTool({ content: '', uri: 42 as never }, {} as never)
+  const result = await executeWriteFileTool({ content: '', uri: 42 }, {} as never)
   expect(result).toEqual({
     error: 'Invalid argument: uri must be a string.',
   })
 })
 
 test('executeWriteFileTool rejects non-string content values', async () => {
-  const result = await executeWriteFileTool({ content: 42 as never, uri: 'file:///workspace/file.txt' }, {} as never)
+  const result = await executeWriteFileTool({ content: 42, uri: 'file:///workspace/file.txt' }, {} as never)
   expect(result).toEqual({
     error: 'Invalid argument: content must be a string.',
   })
