@@ -23,3 +23,19 @@ test('getToolErrorPayload omits stack when missing', () => {
   const payload = GetToolErrorPayload.getToolErrorPayload('failure')
   expect(payload).toEqual({ error: 'failure' })
 })
+
+test('getInvalidUriErrorPayload returns absolute URI error payload', () => {
+  const payload = GetToolErrorPayload.getInvalidUriErrorPayload('uri')
+  expect(payload).toEqual({
+    error: 'Invalid argument: uri must be an absolute URI.',
+    errorCode: 'E_INVALID_URI',
+  })
+})
+
+test('getInvalidUrlErrorPayload returns invalid URL payload', () => {
+  const payload = GetToolErrorPayload.getInvalidUrlErrorPayload()
+  expect(payload).toEqual({
+    error: 'Invalid argument: invalid URL.',
+    errorCode: 'E_INVALID_URI',
+  })
+})
