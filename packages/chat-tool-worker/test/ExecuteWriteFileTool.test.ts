@@ -91,7 +91,6 @@ test('executeWriteFileTool writes file and returns ok payload', async () => {
     addedLines: 1,
     ok: true,
     removedLines: 0,
-    uri,
   })
 })
 
@@ -126,7 +125,6 @@ test('executeWriteFileTool returns diff counts when writing a new file', async (
     addedLines: 2,
     ok: true,
     removedLines: 0,
-    uri,
   })
 })
 
