@@ -26,7 +26,7 @@ export const executeWriteFileTool = async (args: Readonly<Record<string, unknown
     const previousContent = exists ? await FileSystemWorker.readFile(uri) : ''
     const { addedLines, removedLines } = getLineDiffStats(previousContent, content)
     await FileSystemWorker.writeFile(uri, content)
-    return { addedLines, ok: true, removedLines, uri }
+    return { addedLines, ok: true, removedLines, }
   } catch (error) {
     return { ...getToolErrorPayload(error), uri }
   }
