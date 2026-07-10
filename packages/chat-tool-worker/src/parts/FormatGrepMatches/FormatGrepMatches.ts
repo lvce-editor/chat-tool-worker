@@ -39,7 +39,7 @@ const formatJsonMatches = (matches: readonly GrepSearchMatch[]): GrepSearchJsonR
   return {
     count: matches.length,
     matches: matches.map((match) => ({
-      ...(typeof match.lineNumber === 'number' ? { line: match.lineNumber } : {}),
+      ...(typeof match.lineNumber === 'number' && { line: match.lineNumber }),
       path: match.path,
       text: match.text,
     })),
