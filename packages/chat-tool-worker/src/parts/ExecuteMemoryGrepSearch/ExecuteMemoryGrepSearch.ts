@@ -32,7 +32,7 @@ export const executeMemoryGrepSearch = async (
     const formattedResult = formatLegacyMemorySearchResults(result.results || [], grepSearchArgs.outputFormat)
     return {
       ...(typeof formattedResult === 'string' ? { result: formattedResult } : formattedResult),
-      ...(result.limitHit ? { warning: 'Search result limit reached.' } : {}),
+      ...(result.limitHit && { warning: 'Search result limit reached.' }),
     }
   } catch {
     const legacyResults = (await RendererWorker.invoke(

@@ -41,10 +41,10 @@ export const getGrepSearchArgs = (args: Readonly<Record<string, unknown>>): Grep
     return undefined
   }
   return {
-    ...(includeIgnoredFiles === undefined ? {} : { includeIgnoredFiles }),
-    ...(includePattern === undefined ? {} : { includePattern }),
-    ...(maxResults === undefined ? {} : { maxResults }),
-    ...(outputFormat === undefined ? {} : { outputFormat }),
+    ...(includeIgnoredFiles !== undefined && { includeIgnoredFiles }),
+    ...(includePattern !== undefined && { includePattern }),
+    ...(maxResults !== undefined && { maxResults }),
+    ...(outputFormat !== undefined && { outputFormat }),
     isRegexp,
     query,
     useDefaultExcludes: useDefaultExcludes === undefined ? true : useDefaultExcludes,

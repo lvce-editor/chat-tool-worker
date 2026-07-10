@@ -22,9 +22,9 @@ const getRgArgs = (args: Readonly<Record<string, unknown>>): RgArgs | undefined 
     return undefined
   }
   return {
-    ...(lineNumbers === undefined ? {} : { '-n': lineNumbers }),
-    ...(output_mode === undefined ? {} : { output_mode }),
-    ...(path === undefined ? {} : { path }),
+    ...(lineNumbers !== undefined && { '-n': lineNumbers }),
+    ...(output_mode !== undefined && { output_mode }),
+    ...(path !== undefined && { path }),
     pattern,
   }
 }
