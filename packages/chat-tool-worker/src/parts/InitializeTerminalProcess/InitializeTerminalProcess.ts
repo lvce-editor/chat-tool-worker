@@ -30,7 +30,13 @@ const initializeTerminalProcessRemote = async (): Promise<void> => {
     TerminalProcess.set(rpc)
     return
   } catch (error) {
-    if (!(error instanceof Error && error.message.includes('WebSocketCapability.create') && commandNotFoundRegex.test(error.message))) {
+    if (
+      !(
+        error instanceof Error &&
+        (error.message.includes('WebSocketCapability.create') || error.message.includes('module WebSocketCapability not found')) &&
+        commandNotFoundRegex.test(error.message)
+      )
+    ) {
       throw error
     }
   }
