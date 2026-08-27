@@ -1,0 +1,1 @@
+export const INVALID_URI_ERROR_CODE = 'E_INVALID_URI'
