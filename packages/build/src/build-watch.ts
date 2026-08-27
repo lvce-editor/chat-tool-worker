@@ -3,8 +3,6 @@ import { mkdir } from 'node:fs/promises'
 import { join } from 'node:path'
 import { root } from './root.ts'
 
-const esbuild = join(root, 'packages', 'build', 'node_modules', '.bin', 'esbuild')
-
 const commonArgs = ['--format=esm', '--bundle', '--platform=node', '--watch']
 
 const tasks = [
@@ -19,8 +17,13 @@ const tasks = [
 const main = async () => {
   for (const task of tasks) {
     await mkdir(join(root, task.outputDir), { recursive: true })
-    const args = [...commonArgs, ...task.external.map((item) => `--external:${item}`), task.input, `--outfile=${task.outputFile}`]
-    execa(esbuild, args, {
+    const args = [
+      ...commonArgs,
+      ...task.external.map((item) => `--external:${item}`),
+      join(root, task.input),
+      `--outfile=${join(root, task.outputFile)}`,
+    ]
+    execa('npm', ['exec', '--workspace', 'build', '--', 'esbuild', ...args], {
       cwd: root,
       stdio: 'inherit',
     })
