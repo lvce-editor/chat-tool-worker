@@ -11,8 +11,8 @@
   "type": "module",
   "main": "src/chatToolWorkerMain.ts",
   "scripts": {
-    "test": "node --unhandled-rejections=warn --experimental-vm-modules ./node_modules/jest/bin/jest.js --detectOpenHandles --forceExit",
-    "test:watch": "node --unhandled-rejections=warn --experimental-vm-modules ./node_modules/jest/bin/jest.js --watch"
+    "test": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --detectOpenHandles --forceExit",
+    "test:watch": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --watch"
   },
   "jest": {
     "injectGlobals": false,
@@ -44,10 +44,10 @@
   },
   "devDependencies": {
     "@jest/globals": "^30.4.1",
-    "@lvce-editor/constants": "^5.14.0",
-    "@lvce-editor/rpc": "^6.4.0",
-    "@lvce-editor/rpc-registry": "^9.24.0",
+    "@lvce-editor/constants": "^5.29.0",
+    "@lvce-editor/rpc": "^6.19.3",
+    "@lvce-editor/rpc-registry": "^9.55.0",
     "jest": "^30.4.2",
-    "ts-jest": "^29.4.11"
+    "ts-jest": "^29.4.12"
   }
 }
