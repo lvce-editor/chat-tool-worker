@@ -38,10 +38,16 @@ const replaceRemoteUrlWithAssetUrl = (
   const occurrence = `// const ${variableName} = \`\${assetDir}/packages/${packageName}/dist/${workerMainName}\`
 const ${variableName} = \`${remoteUrl}\``
   const replacement = `const ${variableName} = \`\${assetDir}/packages/${packageName}/dist/${workerMainName}\``
-  if (!currentContent.includes(occurrence)) {
-    return currentContent
+  if (currentContent.includes(occurrence)) {
+    return currentContent.replace(occurrence, replacement)
   }
-  return currentContent.replace(occurrence, replacement)
+  const remoteUrlLiteral = `\`${remoteUrl}\``
+  const assetUrlLiteral = `\`\${assetDir}/packages/${packageName}/dist/${workerMainName}\``
+  if (currentContent.includes(remoteUrlLiteral)) {
+    return currentContent.replace(remoteUrlLiteral, assetUrlLiteral)
+  }
+  const runtimeWorkerUrl = `\`\${assetDir}/packages/renderer-worker/node_modules/@lvce-editor/${packageName}/dist/${workerMainName}\``
+  return currentContent.replace(runtimeWorkerUrl, assetUrlLiteral)
 }
 
 let newContent = content

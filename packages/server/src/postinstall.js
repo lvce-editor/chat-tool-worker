@@ -34,10 +34,11 @@ const replaceWorkerUrl = (currentContent, variableName, packageName, workerMainN
   const occurrence = `const ${variableName} = \`\${assetDir}/packages/${packageName}/dist/${workerMainName}\``
   const replacement = `// const ${variableName} = \`\${assetDir}/packages/${packageName}/dist/${workerMainName}\`
 const ${variableName} = \`${remoteUrl}\``
-  if (!currentContent.includes(occurrence)) {
-    return currentContent
+  if (currentContent.includes(occurrence)) {
+    return currentContent.replace(occurrence, replacement)
   }
-  return currentContent.replace(occurrence, replacement)
+  const runtimeWorkerUrl = `\`\${assetDir}/packages/renderer-worker/node_modules/@lvce-editor/${packageName}/dist/${workerMainName}\``
+  return currentContent.replace(runtimeWorkerUrl, `\`${remoteUrl}\``)
 }
 
 let newContent = content
